@@ -4,69 +4,98 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import java.util.function.DoubleUnaryOperator;
+
+import com.chopshop166.chopshoplib.Autonomous;
+import com.chopshop166.chopshoplib.RobotUtils;
+import com.chopshop166.chopshoplib.commands.CommandRobot;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
+public class Robot extends CommandRobot {
 
-  private final RobotContainer m_robotContainer;
+    private RobotMap map = getRobotMap(RobotMap.class, new RobotMap());
+    private ButtonXboxController driveController = new ButtonXboxController(0);
+    private ButtonXboxController copilotController = new ButtonXboxController(1);
 
-  public Robot() {
-    m_robotContainer = new RobotContainer();
-  }
+    NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
-  @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
-
-  @Override
-  public void disabledInit() {}
-
-  @Override
-  public void disabledPeriodic() {}
-
-  @Override
-  public void disabledExit() {}
-
-  @Override
-  public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+    public void registerNamedCommands() {
+        // Register named commands. These are all set as the reset gyro command, please
+        // input actual commands once all subsystems are merged with main. Do this
+        // correctly, as the names are already in PathPlanner. We should probably make
+        // sequences in this code if needed (like adding arm rotation to shoot) so that
+        // PathPlanner doesn't get too complicated. You might need to add wait
+        // commands into PathPlanner.
     }
-  }
 
-  @Override
-  public void autonomousPeriodic() {}
+    @Autonomous(name = "No Auto", defaultAuto = true)
+    public Command noAuto = Commands.none();
 
-  @Override
-  public void autonomousExit() {}
+    private final SendableChooser<Command> autoChooser;
 
-  @Override
-  public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    public Robot() {
+        super();
+        registerNamedCommands();
+        autoChooser = AutoBuilder.buildAutoChooser();
     }
-  }
 
-  @Override
-  public void teleopPeriodic() {}
+    @Override
+    public void robotInit() {
+        super.robotInit();
 
-  @Override
-  public void teleopExit() {}
+        // Record metadata
+        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+        switch (BuildConstants.DIRTY) {
+            case 0:
+                Logger.recordMetadata("GitDirty", "All changes committed");
+                break;
+            case 1:
+                Logger.recordMetadata("GitDirty", "Uncomitted changes");
+                break;
+            default:
+                Logger.recordMetadata("GitDirty", "Unknown");
+                break;
+        }
 
-  @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+        map.setupLogging();
+        if (!isReal()) {
+            setUseTiming(false); // Run as fast as possible
+        }
+        // Start logging! No more data receivers, replay sources, or metadata values may
+        // be added.
+        Logger.start();
 
-  @Override
-  public void testPeriodic() {}
+        led.colorAlliance().schedule();
+        DriverStation.silenceJoystickConnectionWarning(true);
 
-  @Override
-  public void testExit() {}
+    }
+
+    @Override
+    public void configureButtonBindings() {
+    }
+
+    @Override
+    public void populateDashboard() {
+
+    }
+
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    @Override
+    public Command getAutoCommand() {
+        return autoChooser.getSelected();
+    }
+
+    @Override
+    public void setDefaultCommands() {
+    }
 }
