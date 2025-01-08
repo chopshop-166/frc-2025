@@ -1,7 +1,16 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
-  "java.server.launchMode": "Standard",
+  "java.server.launchMode": "Hybrid",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "[java]": {
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4
+  },
   "files.exclude": {
+    "**/build/": true,
+    "**/.gradle/": true,
     "**/.git": true,
     "**/.svn": true,
     "**/.hg": true,
@@ -14,19 +23,12 @@
     "**/.factorypath": true,
     "**/*~": true
   },
-  "java.test.config": [
-    {
-      "name": "WPIlibUnitTests",
-      "workingDirectory": "${workspaceFolder}/build/jni/release",
-      "vmargs": [ "-Djava.library.path=${workspaceFolder}/build/jni/release" ],
-      "env": {
-        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release" ,
-        "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
-      }
-    },
+  "java.cleanup.actions": [
+    "addDeprecated",
+    "addOverride",
+    "invertEquals",
+    "stringConcatToTextBlock"
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests",
-  "java.import.gradle.annotationProcessing.enabled": false,
   "java.completion.favoriteStaticMembers": [
     "org.junit.Assert.*",
     "org.junit.Assume.*",
@@ -37,8 +39,26 @@
     "org.mockito.Mockito.*",
     "org.mockito.ArgumentMatchers.*",
     "org.mockito.Answers.*",
-    "edu.wpi.first.units.Units.*"
+    "edu.wpi.first.units.Units.*",
+    "edu.wpi.first.wpilibj2.command.Commands.*",
+    "com.chopshop166.chopshoplib.commands.Commands.*"
   ],
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.test.config": [
+    {
+      "name": "WPIlibUnitTests",
+      "workingDirectory": "${workspaceFolder}/build/jni/release",
+      "vmargs": [
+        "-Djava.library.path=${workspaceFolder}/build/jni/release"
+      ],
+      "env": {
+        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
+        "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
+      }
+    },
+  ],
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "java.import.gradle.annotationProcessing.enabled": false,
   "java.completion.filteredTypes": [
     "java.awt.*",
     "com.sun.*",
@@ -56,5 +76,5 @@
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
-  ]
+  ],
 }
