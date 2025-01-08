@@ -9,9 +9,11 @@ import java.util.function.DoubleUnaryOperator;
 import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.Autonomous;
+import com.chopshop166.chopshoplib.RobotUtils;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
+import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Led;
 
 public final class Robot extends CommandRobot {
@@ -30,7 +33,15 @@ public final class Robot extends CommandRobot {
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
 
+    private Drive drive = new Drive(map.getDriveMap(), () -> {
+        return driveScaler.applyAsDouble(-driveController.getLeftX());
+    }, () -> {
+        return driveScaler.applyAsDouble(-driveController.getLeftY());
+    }, () -> {
+        return driveScaler.applyAsDouble(-driveController.getRightX());
+    });
     private Led led = new Led(map.getLedMap());
+    private CommandSequences commandSequences = new CommandSequences(drive, led);
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
@@ -89,7 +100,17 @@ public final class Robot extends CommandRobot {
     }
 
     @Override
+    public void disabledInit() {
+        super.disabledInit();
+        led.colorAlliance().schedule();
+    }
+
+    @Override
     public void configureButtonBindings() {
+        driveController.back().onTrue(drive.resetCmd());
+        driveController.leftBumper()
+                .whileTrue(drive.robotCentricDrive());
+
     }
 
     @Override
