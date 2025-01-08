@@ -6,19 +6,31 @@ package frc.robot;
 
 import java.util.function.DoubleUnaryOperator;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.chopshop166.chopshoplib.Autonomous;
-import com.chopshop166.chopshoplib.RobotUtils;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
+import com.chopshop166.chopshoplib.controls.ButtonXboxController;
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.maps.RobotMap;
+import frc.robot.subsystems.Led;
 
-public class Robot extends CommandRobot {
+public final class Robot extends CommandRobot {
 
     private RobotMap map = getRobotMap(RobotMap.class, new RobotMap());
     private ButtonXboxController driveController = new ButtonXboxController(0);
     private ButtonXboxController copilotController = new ButtonXboxController(1);
 
+    // Helpers
+    final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
+
+    private Led led = new Led(map.getLedMap());
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
@@ -97,5 +109,14 @@ public class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
+    }
+
+    public DoubleUnaryOperator getScaler(double leftRange, double rightRange) {
+        return speed -> {
+            double leftTrigger = driveController.getLeftTriggerAxis();
+            double rightTrigger = driveController.getRightTriggerAxis();
+            double modifier = (rightRange * rightTrigger) - (leftRange * leftTrigger) + 0.75;
+            return modifier * speed;
+        };
     }
 }

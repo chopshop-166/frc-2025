@@ -5,48 +5,13 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.chopshop166.chopshoplib.maps.LedMap;
-import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
-
-import frc.robot.maps.subsystems.ArmRotateMap;
-import frc.robot.maps.subsystems.BetterIntakeMap;
-import frc.robot.maps.subsystems.ClawMap;
-import frc.robot.maps.subsystems.IntakeMap;
-import frc.robot.maps.subsystems.ShooterMap;
-import frc.robot.maps.subsystems.UndertakerMap;
+import com.chopshop166.chopshoplib.maps.LedMapBase;
+import com.chopshop166.chopshoplib.maps.MockLedMap;
 
 public class RobotMap {
 
-    public SwerveDriveMap getDriveMap() {
-        return new SwerveDriveMap();
-    }
-
-    public ArmRotateMap getArmRotateMap() {
-        return new ArmRotateMap();
-    }
-
-    public IntakeMap getIntakeMap() {
-        return new IntakeMap();
-    }
-
-    public ShooterMap getShooterMap() {
-        return new ShooterMap();
-    }
-
-    public LedMap getLedMap() {
-        return new LedMap();
-    }
-
-    public UndertakerMap getUndertakerMap() {
-        return new UndertakerMap();
-    }
-
-    public ClawMap getClawMap() {
-        return new ClawMap();
-    }
-
-    public BetterIntakeMap getBetterIntakeMap() {
-        return new BetterIntakeMap();
+    public LedMapBase getLedMap() {
+        return new MockLedMap();
     }
 
     public void setupLogging() {
