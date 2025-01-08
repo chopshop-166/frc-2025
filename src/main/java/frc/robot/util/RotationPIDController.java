@@ -1,4 +1,5 @@
 package frc.robot.util;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 
@@ -32,7 +33,7 @@ public class RotationPIDController {
     }
 
     public double getError() {
-        return pid.getPositionError();
+        return pid.getError();
     }
 
     public double getP() {
