@@ -10,10 +10,15 @@ import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
 import frc.robot.maps.subsystems.patterns.OuttakeMap;
@@ -122,10 +127,16 @@ public class Alpha extends RobotMap {
         // new ReplanningConfig() // Default path replanning config. See the API for the
         // options here
         // );
+        RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
+                0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
+                new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
+                new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
+                new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
+                new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY));
 
         return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
                 maxDriveSpeedMetersPerSecond,
-                maxRotationRadianPerSecond, pigeonGyro2, null);
+                maxRotationRadianPerSecond, pigeonGyro2, config);
 
     }
 
