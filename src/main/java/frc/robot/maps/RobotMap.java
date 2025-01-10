@@ -9,6 +9,9 @@ import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 
+import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
+import frc.robot.maps.subsystems.patterns.OuttakeMap;
+
 public class RobotMap {
 
     public SwerveDriveMap getDriveMap() {
@@ -17,6 +20,14 @@ public class RobotMap {
 
     public LedMapBase getLedMap() {
         return new MockLedMap();
+    }
+
+    public OuttakeMap getOuttakeMap() {
+        return new OuttakeMap();
+    }
+
+    public AlgaeDestageMap getAlgaeDestageMap() {
+        return new AlgaeDestageMap();
     }
 
     public void setupLogging() {
