@@ -1,19 +1,21 @@
 package frc.robot.maps.subsystems.patterns;
 
-import javax.xml.crypto.Data;
-
-import com.chopshop166.chopshoplib.logging.DataWrapper;
-import frc.robot.maps.subsystems.AlgaeDestageMap.Data;
+import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 public class AlgaeDestageMap {
 
-    @Override
-    public void updateData(Data Data) {
+    public SmartMotorController motor;
+    public double spinSpeed;
 
+    public AlgaeDestageMap() {
+        this(new SmartMotorController(), 0);
     }
 
-    public static class data extends DataWrapper {
-
+    public AlgaeDestageMap(SmartMotorController motor, double spinSpeed) {
+        this.motor = motor;
+        this.spinSpeed = spinSpeed;
     }
+
+    // Will add data/logging stuff when we need it
 
 }
