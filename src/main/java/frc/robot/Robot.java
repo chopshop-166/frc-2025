@@ -19,8 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
+import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Led;
+import frc.robot.subsystems.Outtake;
 
 public final class Robot extends CommandRobot {
 
@@ -39,16 +41,17 @@ public final class Robot extends CommandRobot {
         return driveScaler.applyAsDouble(-driveController.getRightX());
     });
     private Led led = new Led(map.getLedMap());
+    // Waiting for code from Daniel and Nina to make these work - Tim 1/10 3:53
+    // private AlgaeDestage algaeDestage = new
+    // AlgaeDestage(map.getAlgaeDestageMap());
+    // private Outtake outtake = new Outtake(map.getOuttakeMap());
+
     private CommandSequences commandSequences = new CommandSequences(drive, led);
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
-        // Register named commands. These are all set as the reset gyro command, please
-        // input actual commands once all subsystems are merged with main. Do this
-        // correctly, as the names are already in PathPlanner. We should probably make
-        // sequences in this code if needed (like adding arm rotation to shoot) so that
-        // PathPlanner doesn't get too complicated. You might need to add wait
-        // commands into PathPlanner.
+        // Nothing here yet. Add stuff once we get commands from Daniel and Nina - 1/10
+        // Tim at 3:45.
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)
@@ -62,40 +65,44 @@ public final class Robot extends CommandRobot {
         autoChooser = AutoBuilder.buildAutoChooser();
     }
 
-    @Override
-    public void robotInit() {
-        super.robotInit();
+    // Logging stuff that we don't need yet. Do we need it at all for Alpha? - Tim
+    // 1/10 3:45
 
-        // Record metadata
-        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        switch (BuildConstants.DIRTY) {
-            case 0:
-                Logger.recordMetadata("GitDirty", "All changes committed");
-                break;
-            case 1:
-                Logger.recordMetadata("GitDirty", "Uncomitted changes");
-                break;
-            default:
-                Logger.recordMetadata("GitDirty", "Unknown");
-                break;
-        }
+    // @Override
+    // public void robotInit() {
+    // super.robotInit();
 
-        map.setupLogging();
-        if (!isReal()) {
-            setUseTiming(false); // Run as fast as possible
-        }
-        // Start logging! No more data receivers, replay sources, or metadata values may
-        // be added.
-        Logger.start();
+    // // Record metadata
+    // Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    // Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    // Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    // Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    // Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    // switch (BuildConstants.DIRTY) {
+    // case 0:
+    // Logger.recordMetadata("GitDirty", "All changes committed");
+    // break;
+    // case 1:
+    // Logger.recordMetadata("GitDirty", "Uncomitted changes");
+    // break;
+    // default:
+    // Logger.recordMetadata("GitDirty", "Unknown");
+    // break;
+    // }
 
-        led.colorAlliance().schedule();
-        DriverStation.silenceJoystickConnectionWarning(true);
+    // map.setupLogging();
+    // if (!isReal()) {
+    // setUseTiming(false); // Run as fast as possible
+    // }
+    // // Start logging! No more data receivers, replay sources, or metadata values
+    // may
+    // // be added.
+    // Logger.start();
 
-    }
+    // led.colorAlliance().schedule();
+    // DriverStation.silenceJoystickConnectionWarning(true);
+
+    // }
 
     @Override
     public void disabledInit() {

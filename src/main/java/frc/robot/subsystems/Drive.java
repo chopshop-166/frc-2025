@@ -12,7 +12,9 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.Modifier;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PPLTVController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -103,6 +105,34 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 map.config,
                 () -> !isBlue,
                 this);
+
+        // Auto Stuff!!
+
+        AutoBuilder.configure(
+                () -> estimator.getEstimatedPosition(), // Robot pose supplier
+                this::setPose, // Method to reset odometry (will be called if your auto has a
+                // starting pose)
+                this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> move(speeds), // Method that will drive the robot given ROBOT RELATIVE
+                // ChassisSpeeds. Also optionally outputs individual module
+                // feedforwards
+                new PPLTVController(0.02), // PPLTVController is the built in path following controller for differential
+                // drive trains
+                getMap().config, // The robot configuration
+                () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red
+                    // alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this // Reference to this subsystem to set requirements
+        );
 
         rotationPID.enableContinuousInput(-180, 180);
 
