@@ -2,7 +2,7 @@ package frc.robot.maps.subsystems.patterns;
 
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
-public class AlgaeDestageMap {
+public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
 
     public SmartMotorController motor;
     public double spinSpeed;
@@ -18,4 +18,10 @@ public class AlgaeDestageMap {
 
     // Will add data/logging stuff when we need it
 
+    @Override 
+    public void updateData(Data data) {
+    }
+
+    public static class Data extends DataWrapper {
+    }
 }
