@@ -15,6 +15,8 @@ import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
+import frc.robot.maps.subsystems.patterns.OuttakeMap;
 
 @RobotMapFor("00:80:2F:17:F7:AF")
 
@@ -123,8 +125,7 @@ public class Alpha extends RobotMap {
 
         return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
                 maxDriveSpeedMetersPerSecond,
-                maxRotationRadianPerSecond, pigeonGyro2,
-                config);
+                maxRotationRadianPerSecond, pigeonGyro2, null);
 
     }
 
@@ -134,7 +135,7 @@ public class Alpha extends RobotMap {
     }
 
     @Override
-    public OuttkeMap getOuttakeMap() {
+    public OuttakeMap getOuttakeMap() {
         return new OuttakeMap();
     }
 }
