@@ -9,6 +9,12 @@
     "StationR to Reef",
     "Start1 to Reef",
     "Start3 to Reef"
+    "Back Algae Disturb",
+    "Bottom leave",
+    "Mid leave A",
+    "Mid Leave B",
+    "Top leave",
+    "very Bottom leave"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
