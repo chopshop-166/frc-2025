@@ -98,10 +98,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 this::setPose,
                 this::getSpeeds,
                 (speeds, feedforwards) -> move(speeds),
-                new PPHolonomicDriveController(
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-                ),
+                map.holonomicDrive,
                 map.config,
                 () -> !isBlue,
                 this);
