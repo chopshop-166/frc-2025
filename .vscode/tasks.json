@@ -1,23 +1,54 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "gradle",
-			"id": "c:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025deployfrc-166-2025",
-			"script": "deploy",
-			"description": "Deploy all artifacts on all targets",
-			"group": "deployutils",
-			"project": "frc-166-2025",
-			"buildFile": "C:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025\\build.gradle",
-			"rootProject": "frc-166-2025",
-			"projectFolder": "c:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025",
-			"workspaceFolder": "c:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025",
-			"args": "",
-			"javaDebug": false,
-			"problemMatcher": [
-				"$gradle"
-			],
-			"label": "gradle: deploy"
-		}
-	]
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "type": "shell",
+    "windows": {
+        "command": ".\\gradlew"
+    },
+    "linux": {
+        "command": "./gradlew"
+    },
+    "osx": {
+        "command": "./gradlew"
+    },
+    "group": "none",
+    "problemMatcher": [],
+    "tasks": [
+        {
+            "label": "build",
+            "args": [
+                "build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "clean",
+            "args": [
+                "clean"
+            ]
+        },
+        {
+            "label": "deploy",
+            "args": [
+                "deploy",
+                "--offline"
+            ]
+        },
+        {
+            "label": "riolog",
+            "args": [
+                "riolog"
+            ]
+        },
+        {
+            "label": "shuffleboard",
+            "args": [
+                "shuffleboard"
+            ]
+        }
+    ]
 }
