@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - Place coral "
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - Destage algae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - A go to top source"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - score coral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - B go to top source"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - score coral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - B go to top source"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 - score coral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
