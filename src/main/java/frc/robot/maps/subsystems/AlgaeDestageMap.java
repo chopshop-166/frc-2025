@@ -21,6 +21,7 @@ public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
 
     @Override
     public void updateData(Data data) {
+        data.motor.updateData(motor);
     }
 
     public static class Data extends DataWrapper {

@@ -19,7 +19,6 @@ public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
 
     public Command destageAlgae() {
         return runSafe(() -> {
-            // getData().motor.setpoint = destageSpeed;
             getData().motor.setpoint = DESTAGE_SPEED;
         });
     }
