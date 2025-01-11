@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Leave Mid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M. Go to top source"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go to left 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "From left 1 to source"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go to left 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "From left 1 to source"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Go to right 1"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
