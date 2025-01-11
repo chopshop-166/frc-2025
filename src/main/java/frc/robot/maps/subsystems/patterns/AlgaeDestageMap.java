@@ -1,5 +1,7 @@
 package frc.robot.maps.subsystems.patterns;
 
+import com.chopshop166.chopshoplib.logging.DataWrapper;
+import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
@@ -18,7 +20,7 @@ public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
 
     // Will add data/logging stuff when we need it
 
-    @Override 
+    @Override
     public void updateData(Data data) {
     }
 
