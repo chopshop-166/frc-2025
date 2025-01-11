@@ -8,15 +8,13 @@ import com.chopshop166.chopshoplib.motors.SmartMotorController;
 public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
 
     public SmartMotorController motor;
-    public double spinSpeed;
 
     public AlgaeDestageMap() {
-        this(new SmartMotorController(), 0);
+        this(new SmartMotorController());
     }
 
-    public AlgaeDestageMap(SmartMotorController motor, double spinSpeed) {
+    public AlgaeDestageMap(SmartMotorController motor) {
         this.motor = motor;
-        this.spinSpeed = spinSpeed;
     }
 
     // Will add data/logging stuff when we need it

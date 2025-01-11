@@ -16,7 +16,6 @@ public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
     private final double INTAKE_SPEED = 0.3;
     private final double RELEASE_DELAY = 1;
     private final double DELAY = 0.5;
-    private final double OFF = 0;
 
     public Outtake(OuttakeMap outtakeMap) {
         super(new Data(), outtakeMap);
@@ -43,8 +42,8 @@ public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
 
     @Override
     public void safeState() {
-        getData().leftWheel.setpoint = OFF;
-        getData().rightWheel.setpoint = OFF;
+        getData().leftWheel.setpoint = 0;
+        getData().rightWheel.setpoint = 0;
         //
     }
 
