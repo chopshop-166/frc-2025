@@ -1,0 +1,23 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "gradle",
+			"id": "c:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025deployfrc-166-2025",
+			"script": "deploy",
+			"description": "Deploy all artifacts on all targets",
+			"group": "deployutils",
+			"project": "frc-166-2025",
+			"buildFile": "C:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025\\build.gradle",
+			"rootProject": "frc-166-2025",
+			"projectFolder": "c:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025",
+			"workspaceFolder": "c:\\Users\\tyche\\Documents\\Chop Shop 166\\frc-166-2025",
+			"args": "",
+			"javaDebug": false,
+			"problemMatcher": [
+				"$gradle"
+			],
+			"label": "gradle: deploy"
+		}
+	]
+}
