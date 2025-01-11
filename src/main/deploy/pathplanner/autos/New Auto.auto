@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "go to source + get game piece"
+            "pathName": "Reef to Station"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "go to reef"
+            "pathName": "Start to Reef"
           }
         }
       ]

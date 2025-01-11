@@ -12,6 +12,7 @@ import com.chopshop166.chopshoplib.Autonomous;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,16 +43,18 @@ public final class Robot extends CommandRobot {
     });
     private Led led = new Led(map.getLedMap());
     // Waiting for code from Daniel and Nina to make these work - Tim 1/10 3:53
-    // private AlgaeDestage algaeDestage = new
-    // AlgaeDestage(map.getAlgaeDestageMap());
-    // private Outtake outtake = new Outtake(map.getOuttakeMap());
+    private AlgaeDestage algaeDestage = new AlgaeDestage(map.getAlgaeDestageMap());
+    private Outtake outtake = new Outtake(map.getOuttakeMap());
 
-    private CommandSequences commandSequences = new CommandSequences(drive, led);
+    private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, outtake);
+
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
         // Nothing here yet. Add stuff once we get commands from Daniel and Nina - 1/10
         // Tim at 3:45.
+        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
+        NamedCommands.registerCommand("Score Coral", commandSequences.scoreCoral());
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)
