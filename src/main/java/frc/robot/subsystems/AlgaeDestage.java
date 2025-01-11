@@ -11,10 +11,7 @@ import frc.robot.maps.subsystems.AlgaeDestageMap.Data;
 
 public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
 
-    public SmartMotorController motor;
-
     public static double DESTAGE_SPEED = 1.0;
-    public static double OFF = 0;
 
     public AlgaeDestage(AlgaeDestageMap algaeDestageMap) {
         super(new Data(), algaeDestageMap);
@@ -29,6 +26,6 @@ public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
 
     @Override
     public void safeState() {
-        getData().motor.setpoint = OFF;
+        getData().motor.setpoint = 0;
     }
 }

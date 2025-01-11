@@ -94,8 +94,7 @@ public class Alpha extends RobotMap {
         // Rear Right Module
         final CANcoder encoderRR = new CANcoder(1);
         CANcoderConfiguration encoderRRConfig = new CANcoderConfiguration();
-        // encoderRRConfig.MagnetSensor.AbsoluteSensorRange =
-        // AbsoluteSensorRangeValue.Unsigned_0To1;
+        encoderRRConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         encoderRRConfig.MagnetSensor.MagnetOffset = RROFFSET;
         encoderRR.getConfigurator().apply(encoderRRConfig);
         final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
@@ -105,18 +104,6 @@ public class Alpha extends RobotMap {
 
         final double maxRotationRadianPerSecond = Math.PI;
 
-        // final HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig(
-        // // HolonomicPathFollowerConfig, this should likely live in your
-        // // Constants class
-        // new PIDConstants(2, 0.0, 0.05), // Translation PID constants (OFF_AXIS)
-        // new PIDConstants(1, 0.0, 0.0), // Rotation PID constants (OFF_AXIS)
-        // 2.0, // Max module speed, in m/s
-        // 0.3429,
-        // // Drive base radius (OFF_AXIS) in meters. Distance from robot center to
-        // // furthest module.
-        // new ReplanningConfig() // Default path replanning config. See the API for the
-        // options here
-        // );
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
