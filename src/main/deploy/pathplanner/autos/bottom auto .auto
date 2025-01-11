@@ -7,49 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mid Bottom leave "
+            "pathName": "Bottom leave 4R.L2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "5 - Destage algae"
+            "pathName": "4R.L2 to Bottom source "
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Right Source A"
+            "pathName": "B.source to 4L.L2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Right Post"
+            "pathName": "4L.L2 to B.source"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Right Source B"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left Post"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left Source"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left Post"
+            "pathName": "B.source to 6R.L2"
           }
         }
       ]
