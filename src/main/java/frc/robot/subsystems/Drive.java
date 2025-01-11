@@ -116,8 +116,11 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 (speeds, feedforwards) -> move(speeds), // Method that will drive the robot given ROBOT RELATIVE
                 // ChassisSpeeds. Also optionally outputs individual module
                 // feedforwards
-                new PPLTVController(0.02), // PPLTVController is the built in path following controller for differential
-                // drive trains
+                new PPHolonomicDriveController( // PPLTVController is the built in path following controller for
+                                                // holonomic
+                        // drive trains
+                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0)), // Rotation PID constants)
                 getMap().config, // The robot configuration
                 () -> !isBlue,
                 this // Reference to this subsystem to set requirements
