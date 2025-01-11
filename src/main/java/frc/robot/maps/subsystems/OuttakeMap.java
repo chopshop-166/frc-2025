@@ -14,12 +14,13 @@ public class OuttakeMap implements LoggableMap<OuttakeMap.Data> {
     public BooleanSupplier sensor;
 
     public OuttakeMap() {
-        this(new SmartMotorController(), new SmartMotorController());
+        this(new SmartMotorController(), new SmartMotorController(), () -> false);
     }
 
-    public OuttakeMap(SmartMotorController leftWheel, SmartMotorController rightWheel) {
+    public OuttakeMap(SmartMotorController leftWheel, SmartMotorController rightWheel, BooleanSupplier sensor) {
         this.leftMotor = leftWheel;
         this.rightMotor = rightWheel;
+        this.sensor = sensor;
     }
 
     // Will add data/logging stuff when we need it
