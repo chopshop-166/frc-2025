@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.OuttakeMap;
@@ -21,9 +20,16 @@ public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
         super(new Data(), outtakeMap);
     }
 
-    public Command spinOut() {
+    public Command spinOutL1() {
         return run(() -> {
             getData().leftWheel.setpoint = RELEASE_SPEEDLEFT;
+            getData().rightWheel.setpoint = RELEASE_SPEEDRIGHT;
+        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
+    }
+
+    public Command spinOut() {
+        return run(() -> {
+            getData().leftWheel.setpoint = RELEASE_SPEEDRIGHT;
             getData().rightWheel.setpoint = RELEASE_SPEEDRIGHT;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
     }

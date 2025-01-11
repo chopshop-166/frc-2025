@@ -111,9 +111,14 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void configureButtonBindings() {
-        driveController.back().onTrue(drive.resetCmd());
+        driveController.back().onTrue(commandSequences.resetAll());
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
+
+        driveController.a().onTrue(outtake.spinIn());
+        driveController.b().whileTrue(outtake.spinOut());
+        driveController.x().whileTrue(outtake.spinOutL1());
+        driveController.y().whileTrue(algaeDestage.destageAlgae());
 
     }
 

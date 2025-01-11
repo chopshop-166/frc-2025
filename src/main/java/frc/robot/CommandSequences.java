@@ -38,4 +38,8 @@ public class CommandSequences {
             controller.getHID().setRumble(RumbleType.kBothRumble, rumbleAmount);
         });
     }
+
+    public Command resetAll() {
+        return drive.resetCmd().andThen(outtake.resetCmd(), algaeDestage.resetCmd());
+    }
 }
