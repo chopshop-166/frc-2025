@@ -1,4 +1,4 @@
-package frc.robot.maps.subsystems.patterns;
+package frc.robot.maps.subsystems;
 
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;

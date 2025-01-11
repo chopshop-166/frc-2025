@@ -6,9 +6,8 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 import edu.wpi.first.wpilibj2.command.Command;
-
-import frc.robot.maps.subsystems.patterns.OuttakeMap;
-import frc.robot.maps.subsystems.patterns.OuttakeMap.Data;
+import frc.robot.maps.subsystems.OuttakeMap;
+import frc.robot.maps.subsystems.OuttakeMap.Data;
 
 public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
 

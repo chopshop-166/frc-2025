@@ -6,8 +6,8 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
-import frc.robot.maps.subsystems.patterns.AlgaeDestageMap.Data;
+import frc.robot.maps.subsystems.AlgaeDestageMap;
+import frc.robot.maps.subsystems.AlgaeDestageMap.Data;
 
 public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
 
@@ -27,6 +27,7 @@ public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
         });
     }
 
+    @Override
     public void safeState() {
         getData().motor.setpoint = OFF;
     }

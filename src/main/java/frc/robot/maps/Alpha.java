@@ -26,8 +26,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
-import frc.robot.maps.subsystems.patterns.OuttakeMap;
+import frc.robot.maps.subsystems.AlgaeDestageMap;
+import frc.robot.maps.subsystems.OuttakeMap;
 
 @RobotMapFor("00:80:2F:17:F7:AF")
 

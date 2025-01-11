@@ -9,8 +9,8 @@ import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 
-import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
-import frc.robot.maps.subsystems.patterns.OuttakeMap;
+import frc.robot.maps.subsystems.AlgaeDestageMap;
+import frc.robot.maps.subsystems.OuttakeMap;
 
 public class RobotMap {
 

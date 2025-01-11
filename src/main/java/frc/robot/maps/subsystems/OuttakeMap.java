@@ -1,4 +1,4 @@
-package frc.robot.maps.subsystems.patterns;
+package frc.robot.maps.subsystems;
 
 import java.util.function.BooleanSupplier;
 
