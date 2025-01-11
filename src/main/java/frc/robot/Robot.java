@@ -12,6 +12,7 @@ import com.chopshop166.chopshoplib.Autonomous;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,8 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
+import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Led;
+import frc.robot.subsystems.Outtake;
 
 public final class Robot extends CommandRobot {
 
@@ -49,6 +52,7 @@ public final class Robot extends CommandRobot {
         // sequences in this code if needed (like adding arm rotation to shoot) so that
         // PathPlanner doesn't get too complicated. You might need to add wait
         // commands into PathPlanner.
+        // NamedCommands.registerCommand("Destage Algae", AlgaeDestage.destageAlgae());
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)
