@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
@@ -117,12 +118,17 @@ public class Alpha extends RobotMap {
 
     @Override
     public AlgaeDestageMap getAlgaeDestageMap() {
-        return new AlgaeDestageMap();
+        CSSparkMax motor = new CSSparkMax(9);
+        return new AlgaeDestageMap(motor);
     }
 
     @Override
     public OuttakeMap getOuttakeMap() {
-        return new OuttakeMap();
+        CSSparkMax leftWheels = new CSSparkMax(10);
+        CSSparkMax rightWheels = new CSSparkMax(11);
+        rightWheels.setInverted(true);
+        CSDigitalInput sensor = new CSDigitalInput(9); // same channel as last year dont know if its right
+        return new OuttakeMap(leftWheels, rightWheels, sensor::get);
     }
 
     @Override
