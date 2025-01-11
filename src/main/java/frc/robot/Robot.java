@@ -42,7 +42,6 @@ public final class Robot extends CommandRobot {
         return driveScaler.applyAsDouble(-driveController.getRightX());
     });
     private Led led = new Led(map.getLedMap());
-    // Waiting for code from Daniel and Nina to make these work - Tim 1/10 3:53
     private AlgaeDestage algaeDestage = new AlgaeDestage(map.getAlgaeDestageMap());
     private Outtake outtake = new Outtake(map.getOuttakeMap());
 
@@ -51,8 +50,7 @@ public final class Robot extends CommandRobot {
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
-        // Nothing here yet. Add stuff once we get commands from Daniel and Nina - 1/10
-        // Tim at 3:45.
+
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
         NamedCommands.registerCommand("Score Coral", commandSequences.scoreCoral());
     }
@@ -68,44 +66,42 @@ public final class Robot extends CommandRobot {
         autoChooser = AutoBuilder.buildAutoChooser();
     }
 
-    // Logging stuff that we don't need yet. Do we need it at all for Alpha? - Tim
-    // 1/10 3:45
+    @Override
+    public void robotInit() {
+        super.robotInit();
 
-    // @Override
-    // public void robotInit() {
-    // super.robotInit();
+        // Record metadata
+        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+        switch (BuildConstants.DIRTY) {
+            case 0:
+                Logger.recordMetadata("GitDirty", "All changes committed");
+                break;
+            case 1:
+                Logger.recordMetadata("GitDirty", "Uncomitted changes");
+                break;
+            default:
+                Logger.recordMetadata("GitDirty", "Unknown");
+                break;
+        }
 
-    // // Record metadata
-    // Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    // Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    // Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    // Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    // Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-    // switch (BuildConstants.DIRTY) {
-    // case 0:
-    // Logger.recordMetadata("GitDirty", "All changes committed");
-    // break;
-    // case 1:
-    // Logger.recordMetadata("GitDirty", "Uncomitted changes");
-    // break;
-    // default:
-    // Logger.recordMetadata("GitDirty", "Unknown");
-    // break;
-    // }
+        map.setupLogging();
 
-    // map.setupLogging();
-    // if (!isReal()) {
-    // setUseTiming(false); // Run as fast as possible
-    // }
-    // // Start logging! No more data receivers, replay sources, or metadata values
-    // may
-    // // be added.
-    // Logger.start();
+        if (!isReal()) {
+            setUseTiming(false); // Run as fast as possible
+        }
+        // Start logging! No more data receivers, replay sources, or metadata values
+        // may
+        // be added.
+        Logger.start();
 
-    // led.colorAlliance().schedule();
-    // DriverStation.silenceJoystickConnectionWarning(true);
+        led.colorAlliance().schedule();
+        DriverStation.silenceJoystickConnectionWarning(true);
 
-    // }
+    }
 
     @Override
     public void disabledInit() {

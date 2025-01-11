@@ -119,18 +119,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 new PPLTVController(0.02), // PPLTVController is the built in path following controller for differential
                 // drive trains
                 getMap().config, // The robot configuration
-                () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red
-                    // alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
-                },
+                () -> !isBlue,
                 this // Reference to this subsystem to set requirements
         );
 

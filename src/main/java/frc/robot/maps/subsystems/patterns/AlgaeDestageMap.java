@@ -2,6 +2,7 @@ package frc.robot.maps.subsystems.patterns;
 
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
+import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
@@ -25,5 +26,6 @@ public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
     }
 
     public static class Data extends DataWrapper {
+        public MotorControllerData motor = new MotorControllerData();
     }
 }

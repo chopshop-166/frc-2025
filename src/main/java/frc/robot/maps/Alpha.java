@@ -1,5 +1,9 @@
 package frc.robot.maps;
 
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
@@ -20,23 +24,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.patterns.AlgaeDestageMap;
 import frc.robot.maps.subsystems.patterns.OuttakeMap;
 
 @RobotMapFor("00:80:2F:17:F7:AF")
 
 public class Alpha extends RobotMap {
-
-    // private static void setStatusPeriods(CSSparkMax motor) {
-    // motor.getMotorController().setPeriodicFramePeriod(PeriodicFrame.kStatus3,
-    // 1000);
-    // motor.getMotorController().setPeriodicFramePeriod(PeriodicFrame.kStatus4,
-    // 1000);
-    // motor.getMotorController().setPeriodicFramePeriod(PeriodicFrame.kStatus5,
-    // 1000);
-    // motor.getMotorController().setPeriodicFramePeriod(PeriodicFrame.kStatus6,
-    // 1000);
-    // }
 
     @Override
     public SwerveDriveMap getDriveMap() {
@@ -48,7 +43,7 @@ public class Alpha extends RobotMap {
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
 
-        final double MODULE_OFFSET_XY = Units.inchesToMeters(10.875); // Frostbites was 9.89
+        final double MODULE_OFFSET_XY = Units.inchesToMeters(10.875);
         final PigeonGyro2 pigeonGyro2 = new PigeonGyro2(1);
 
         final CSSparkMax frontLeftSteer = new CSSparkMax(4);
@@ -56,15 +51,10 @@ public class Alpha extends RobotMap {
         final CSSparkMax rearLeftSteer = new CSSparkMax(2);
         final CSSparkMax rearRightSteer = new CSSparkMax(6);
 
-        // setStatusPeriods(frontLeftSteer);
-        // setStatusPeriods(frontRightSteer);
-        // setStatusPeriods(rearLeftSteer);
-        // setStatusPeriods(rearRightSteer);
-
-        frontLeftSteer.getMotorController().setInverted(true);
-        frontRightSteer.getMotorController().setInverted(true);
-        rearLeftSteer.getMotorController().setInverted(true);
-        rearRightSteer.getMotorController().setInverted(true);
+        frontLeftSteer.setInverted(true);
+        frontRightSteer.setInverted(true);
+        rearLeftSteer.setInverted(true);
+        rearRightSteer.setInverted(true);
 
         // Configuration for MK4i with L2 speeds
         Configuration MK4i_L2 = new Configuration(SDSSwerveModule.MK4_V2.gearRatio,
@@ -148,5 +138,13 @@ public class Alpha extends RobotMap {
     @Override
     public OuttakeMap getOuttakeMap() {
         return new OuttakeMap();
+    }
+
+    @Override
+    public void setupLogging() {
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());
+        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     }
 }

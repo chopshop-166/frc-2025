@@ -13,19 +13,21 @@ public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
 
     public SmartMotorController motor;
 
-    public static double destageSpeed = 1.0;
+    public static double DESTAGE_SPEED = 1.0;
+    public static double OFF = 0;
 
     public AlgaeDestage(AlgaeDestageMap algaeDestageMap) {
         super(new Data(), algaeDestageMap);
     }
 
     public Command destageAlgae() {
-        return run(() -> {
-            motor.set(destageSpeed);
+        return runSafe(() -> {
+            // getData().motor.setpoint = destageSpeed;
+            getData().motor.setpoint = DESTAGE_SPEED;
         });
     }
 
-    @Override
     public void safeState() {
+        getData().motor.setpoint = OFF;
     }
 }
