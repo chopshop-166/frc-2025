@@ -64,8 +64,7 @@ public class Alpha extends RobotMap {
         // Front Left Module
         final CANcoder encoderFL = new CANcoder(2);
         CANcoderConfiguration encoderFLConfig = new CANcoderConfiguration();
-        // encoderFLConfig.MagnetSensor.AbsoluteSensorRange =
-        // AbsoluteSensorRangeValue.Unsigned_0To1;
+        encoderFLConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         encoderFLConfig.MagnetSensor.MagnetOffset = FLOFFSET;
         encoderFL.getConfigurator().apply(encoderFLConfig);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
@@ -74,8 +73,7 @@ public class Alpha extends RobotMap {
         // Front Right Module
         final CANcoder encoderFR = new CANcoder(4);
         CANcoderConfiguration encoderFRConfig = new CANcoderConfiguration();
-        // encoderFRConfig.MagnetSensor.AbsoluteSensorRange =
-        // AbsoluteSensorRangeValue.Unsigned_0To1;
+        encoderFRConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         encoderFRConfig.MagnetSensor.MagnetOffset = FROFFSET;
         encoderFR.getConfigurator().apply(encoderFRConfig);
         final SDSSwerveModule frontRight = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
@@ -84,8 +82,7 @@ public class Alpha extends RobotMap {
         // Rear Left Module
         final CANcoder encoderRL = new CANcoder(3);
         CANcoderConfiguration encoderRLConfig = new CANcoderConfiguration();
-        // encoderRLConfig.MagnetSensor.AbsoluteSensorRange =
-        // AbsoluteSensorRangeValue.Unsigned_0To1;
+        encoderRLConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         encoderRLConfig.MagnetSensor.MagnetOffset = RLOFFSET;
         encoderRL.getConfigurator().apply(encoderRLConfig);
         final SDSSwerveModule rearLeft = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
