@@ -12,7 +12,9 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.Modifier;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PPLTVController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -103,6 +105,24 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 map.config,
                 () -> !isBlue,
                 this);
+
+        // Auto Stuff!!
+
+        AutoBuilder.configure(
+                () -> estimator.getEstimatedPosition(), // Robot pose supplier
+                this::setPose, // Method to reset odometry (will be called if your auto has a
+                // starting pose)
+                this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> move(speeds), // Method that will drive the robot given ROBOT RELATIVE
+                // ChassisSpeeds. Also optionally outputs individual module
+                // feedforwards
+                new PPHolonomicDriveController(
+                        new PIDConstants(2, 0.0, 0.05), // Translation PID constants
+                        new PIDConstants(1, 0.0, 0.0)), // Rotation PID constants)
+                getMap().config, // The robot configuration
+                () -> !isBlue,
+                this // Reference to this subsystem to set requirements
+        );
 
         rotationPID.enableContinuousInput(-180, 180);
 
