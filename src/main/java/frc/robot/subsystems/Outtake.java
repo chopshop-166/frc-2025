@@ -12,9 +12,11 @@ import frc.robot.maps.subsystems.patterns.OuttakeMap.Data;
 
 public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
 
-    private final double RELEASE_SPEEDBOTH = 1;
-    private final double RELEASE_SPEEDSPLIT = 0.5;
+    private final double RELEASE_SPEEDRIGHT = 1;
+    private final double RELEASE_SPEEDLEFT = 0.5;
+    private final double INTAKE_SPEED = 0.3;
     private final double RELEASE_DELAY = 1;
+    private final double DELAY = 0.5;
 
     public Outtake(OuttakeMap outtakeMap) {
         super(new Data(), outtakeMap);
@@ -22,9 +24,16 @@ public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
 
     public Command spinOut() {
         return runSafe(() -> {
-            getData().leftWheel.setpoint = RELEASE_SPEEDSPLIT + RELEASE_SPEEDBOTH;
-            getData().rightWheel.setpoint = RELEASE_SPEEDBOTH;
+            getData().leftWheel.setpoint = RELEASE_SPEEDLEFT;
+            getData().rightWheel.setpoint = RELEASE_SPEEDRIGHT;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
+    }
+
+    public Command spinIn() {
+        return runSafe(() -> {
+            getData().leftWheel.setpoint = INTAKE_SPEED;
+            getData().rightWheel.setpoint = INTAKE_SPEED;
+        }).until(() -> getData().gamePieceDetected).andThen(waitSeconds(DELAY), safeStateCmd());
     }
 
     @Override
