@@ -95,7 +95,7 @@ public class Shrimp extends RobotMap {
         final double maxRotationRadianPerSecond = Math.PI * 2;
 
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
-                0.1016, 6000, 1.0, DCMotor.getNEO(3), 50, 1),
+                0.1016, 6000, 1.0, DCMotor.getNEO(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
