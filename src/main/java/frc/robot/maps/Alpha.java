@@ -20,8 +20,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -42,9 +40,9 @@ public class Alpha extends RobotMap {
         final double FROFFSET = -0.38;
         final double RLOFFSET = 0.448;
         final double RROFFSET = -0.891;
+
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
-
         final double MODULE_OFFSET_XY = Units.inchesToMeters(10.875);
         final PigeonGyro2 pigeonGyro2 = new PigeonGyro2(1);
 
@@ -109,7 +107,8 @@ public class Alpha extends RobotMap {
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY));
-        PPHolonomicDriveController holonomicDrive = new PPHolonomicDriveController(new PIDConstants(2.0, 0.0, 0.05), new PIDConstants(1.0, 0.0, 0.0));
+        PPHolonomicDriveController holonomicDrive = new PPHolonomicDriveController(new PIDConstants(2.0, 0.0, 0.05),
+                new PIDConstants(1.0, 0.0, 0.0));
         return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro2, config, holonomicDrive);
