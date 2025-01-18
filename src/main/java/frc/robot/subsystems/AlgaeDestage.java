@@ -24,6 +24,11 @@ public class AlgaeDestage extends LoggedSubsystem<Data, AlgaeDestageMap> {
     }
 
     @Override
+    public void reset() {
+        safeState();
+    }
+
+    @Override
     public void safeState() {
         getData().motor.setpoint = 0;
     }

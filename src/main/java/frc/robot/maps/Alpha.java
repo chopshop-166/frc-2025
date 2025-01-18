@@ -125,7 +125,8 @@ public class Alpha extends RobotMap {
     public OuttakeMap getOuttakeMap() {
         CSSparkMax leftWheels = new CSSparkMax(10);
         CSSparkMax rightWheels = new CSSparkMax(11);
-        rightWheels.setInverted(true);
+        // rightWheels.setInverted(true);
+        rightWheels.setInverted(false);
         CSDigitalInput sensor = new CSDigitalInput(9); // same channel as last year dont know if its right
         return new OuttakeMap(leftWheels, rightWheels, sensor::get);
     }
