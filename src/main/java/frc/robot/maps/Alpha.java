@@ -21,6 +21,11 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -117,17 +122,21 @@ public class Alpha extends RobotMap {
 
     @Override
     public AlgaeDestageMap getAlgaeDestageMap() {
-        CSSparkMax motor = new CSSparkMax(9);
-        return new AlgaeDestageMap(motor);
+        // CSSparkMax motor = new CSSparkMax(9);
+        // SparkMaxConfig config = new SparkMaxConfig();
+        // config.smartCurrentLimit(30);
+        // motor.getMotorController().configure(config,
+        // ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        return new AlgaeDestageMap();
     }
 
     @Override
     public OuttakeMap getOuttakeMap() {
         CSSparkMax leftWheels = new CSSparkMax(10);
         CSSparkMax rightWheels = new CSSparkMax(11);
-        // rightWheels.setInverted(true);
         rightWheels.setInverted(false);
-        CSDigitalInput sensor = new CSDigitalInput(9); // same channel as last year dont know if its right
+        CSDigitalInput sensor = new CSDigitalInput(9); // same channel as last year
+        // dont know if its right
         return new OuttakeMap(leftWheels, rightWheels, sensor::get);
     }
 

@@ -12,7 +12,7 @@ public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
 
     private final double RELEASE_SPEEDRIGHT = 0.3;
     private final double RELEASE_SPEEDLEFT = 0.1;
-    private final double INTAKE_SPEED = 0.2;
+    private final double INTAKE_SPEED = 0.3;
     private final double RELEASE_DELAY = 1;
     private final double DELAY = 0.0;
 
