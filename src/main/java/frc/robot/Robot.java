@@ -44,7 +44,7 @@ public final class Robot extends CommandRobot {
         return driveScaler.applyAsDouble(-driveController.getLeftY());
     }, () -> {
         return driveScaler.applyAsDouble(-driveController.getRightX());
-    });
+    }, map.getVisionMap());
     private Led led = new Led(map.getLedMap());
     private AlgaeDestage algaeDestage = new AlgaeDestage(map.getAlgaeDestageMap());
     private Outtake outtake = new Outtake(map.getOuttakeMap());

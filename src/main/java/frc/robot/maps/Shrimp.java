@@ -6,8 +6,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
+import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro;
 import com.chopshop166.chopshoplib.states.PIDValues;
@@ -17,7 +19,10 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogEncoder;
@@ -100,6 +105,24 @@ public class Shrimp extends RobotMap {
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro,
                 config, holonomicDrive);
+    }
+
+    @Override
+    public VisionMap getVisionMap() {
+        // Cam mounted 9.029 sideways of center, 9.029 in. forward of center, 9.75 in.
+        // up from center.
+        Transform3d robotToCamFL = new Transform3d(
+                new Translation3d(Units.inchesToMeters(-9.029), Units.inchesToMeters(9.029),
+                        Units.inchesToMeters(9.75)),
+                new Rotation3d(0, Units.degreesToRadians(-45), Units.degreesToRadians(65.752)));
+
+        // Cam mounted facing __, __ forward of center, __ up from center.
+        Transform3d robotToCamFR = new Transform3d(
+                new Translation3d(Units.inchesToMeters(9.029), Units.inchesToMeters(9.029),
+                        Units.inchesToMeters(9.75)),
+                new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(65.752)));
+        return new VisionMap(new CameraSource("ShrimpCamFL", robotToCamFL),
+                new CameraSource("ShrimpCamFR", robotToCamFR));
     }
 
     @Override

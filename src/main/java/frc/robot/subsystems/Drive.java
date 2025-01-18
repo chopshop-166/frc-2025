@@ -8,30 +8,24 @@ import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
+import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.Modifier;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public final SwerveDriveKinematics kinematics;
+    private final VisionMap visionMap;
 
     boolean isBlue = false;
     double maxDriveSpeedMetersPerSecond;
@@ -58,25 +53,14 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     SwerveDrivePoseEstimator estimator;
 
-    // Cam mounted facing forward, half a meter forward of center, half a meter up
-    // from center.
-    public static final Transform3d kRobotToCam = new Transform3d(
-            new Translation3d(Units.inchesToMeters(-6.9965), Units.inchesToMeters(-3.029),
-                    Units.inchesToMeters(12.445)),
-            new Rotation3d(0, Units.degreesToRadians(-16.875), Units.degreesToRadians(-6.5 + 180)));
-
     // The layout of the AprilTags on the field
-    public static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    public static final AprilTagFieldLayout kTagLayout = CameraSource.DEFAULT_FIELD;
 
-    // The standard deviations of our vision estimated poses, which affect
-    // correction rate
-    // (Fake values. Experiment and determine estimation noise on an actual robot.)
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-
-    public Drive(SwerveDriveMap map, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rotation) {
+    public Drive(SwerveDriveMap map, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rotation,
+            VisionMap visionMap) {
 
         super(new SwerveDriveData(), map);
+        this.visionMap = visionMap;
 
         getMap().gyro.reset();
         kinematics = new SwerveDriveKinematics(map.frontLeft.getLocation(), map.frontRight.getLocation(),
@@ -258,7 +242,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         isBlue = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
         estimator.update(getMap().gyro.getRotation2d(), getData().getModulePositions());
 
-        periodicMove(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotation.getAsDouble(), isRobotCentric, aimAtSpeaker);
+        visionMap.updateData(estimator);
+
+        periodicMove(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotation.getAsDouble(), isRobotCentric,
+                aimAtSpeaker);
 
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());
