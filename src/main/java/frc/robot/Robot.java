@@ -117,8 +117,8 @@ public final class Robot extends CommandRobot {
 
         driveController.a().onTrue(outtake.spinIn());
         driveController.b().whileTrue(outtake.spinOut());
-        driveController.x().whileTrue(outtake.spinOutL1());
-        driveController.y().whileTrue(algaeDestage.destageAlgae());
+        driveController.x().whileTrue(outtake.reverse());
+        driveController.y().whileTrue(outtake.spinOutL1());
 
     }
 
