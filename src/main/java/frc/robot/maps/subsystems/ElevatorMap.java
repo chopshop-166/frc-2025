@@ -26,8 +26,6 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
         this.conversionRate = conversionRate;
     }
 
-    // Will add data/logging stuff when we need it
-
     @Override
     public void updateData(Data data) {
         data.leftMotor.updateData(leftMotor);

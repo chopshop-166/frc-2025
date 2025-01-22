@@ -14,7 +14,7 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
 
     @Override
     public void safeState() {
-        
+        // no safestate to set
     }
 
 }

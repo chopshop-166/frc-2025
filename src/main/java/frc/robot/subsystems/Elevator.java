@@ -15,8 +15,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     @Override
     public void safeState() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'safeState'");
+        // No safe state to set
     }
 
 }

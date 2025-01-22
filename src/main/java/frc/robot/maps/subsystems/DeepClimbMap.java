@@ -21,8 +21,6 @@ public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
         this.encoder = encoder;
     }
 
-    // Will add data/logging stuff when we need it
-
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
