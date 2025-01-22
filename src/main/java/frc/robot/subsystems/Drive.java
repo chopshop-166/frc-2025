@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -49,7 +50,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     DoubleSupplier ySpeed;
     DoubleSupplier rotation;
     boolean isRobotCentric = false;
-    boolean aimAtSpeaker = false;
 
     SwerveDrivePoseEstimator estimator;
 
@@ -103,7 +103,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     }
 
     private void periodicMove(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric, boolean aimAtSpeaker) {
+            final double rotation, boolean isRobotCentric) {
 
         var deadband = Modifier.scalingDeadband(0.05);
         double rotationInput = deadband.applyAsDouble(rotation);
@@ -116,9 +116,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 * maxDriveSpeedMetersPerSecond * speedCoef;
         double rotationSpeed = rotationInput
                 * maxRotationRadiansPerSecond * rotationCoef;
-        // if (aimAtSpeaker) {
-        // rotationSpeed = calculateRotateSpeedToTarget(this::getSpeakerTarget);
-        // }
 
         move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
     }
@@ -162,47 +159,25 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         });
     }
 
-    public Command aimAtSpeaker() {
-        return startEnd(() -> {
-            aimAtSpeaker = true;
-        }, () -> {
-            aimAtSpeaker = false;
-        });
-    }
-
     public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
         return run(() -> {
             move(xSpeed, ySpeed, 0, false);
         }).withTimeout(seconds).andThen(safeStateCmd());
     }
 
+    // Vision commands!!
     public Command rotateToAngle(double targetAngle) {
         return run(() -> {
             rotateToAngleImpl(targetAngle);
         });
     }
 
-    public Translation2d getSpeakerTarget() {
-        Optional<Pose3d> pose;
-        if (isBlue) {
-            Logger.recordOutput("Alliance Speaker", "Blue");
-            pose = kTagLayout.getTagPose(7);
-        } else {
-            Logger.recordOutput("Alliance Speaker", "Red/Other");
-            pose = kTagLayout.getTagPose(4);
-        }
-        if (pose.isEmpty()) {
-            return new Translation2d();
-        }
-        return pose.get().getTranslation().toTranslation2d();
-    }
-
     public Translation2d getRobotToTarget(Translation2d target) {
         return target.minus(estimator.getEstimatedPosition().getTranslation());
     }
 
-    public Command rotateToSpeaker() {
-        return rotateTo(this::getSpeakerTarget);
+    public Command rotateTo(Translation2d target) {
+        return rotateTo(() -> target);
     }
 
     public Command rotateTo(Supplier<Translation2d> target) {
@@ -213,14 +188,30 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         });
     }
 
+    public Translation2d getReefCenter() {
+        Translation3d pose;
+        if (isBlue) {
+            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
+            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
+            Logger.recordOutput("Reef Center", "Blue");
+            pose = (poseLeft.plus(poseRight).div(2));
+        } else {
+            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
+            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
+            Logger.recordOutput("Reef Center", "Red");
+            pose = (poseLeft.plus(poseRight).div(2));
+        }
+        return pose.toTranslation2d();
+    }
+
+    public Command rotateToReefCenter() {
+        return rotateTo(this.getReefCenter());
+    }
+
     public double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
         var robotToTarget = getRobotToTarget(target.get());
         Logger.recordOutput("Target Pose", robotToTarget);
         return rotateToAngleImpl(robotToTarget.getAngle().getDegrees());
-    }
-
-    public Command rotateTo(Translation2d target) {
-        return rotateTo(() -> target);
     }
 
     @Override
@@ -244,8 +235,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         visionMap.updateData(estimator);
 
-        periodicMove(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotation.getAsDouble(), isRobotCentric,
-                aimAtSpeaker);
+        periodicMove(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotation.getAsDouble(), isRobotCentric);
 
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());

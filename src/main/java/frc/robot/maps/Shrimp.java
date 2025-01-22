@@ -90,7 +90,7 @@ public class Shrimp extends RobotMap {
 
         final double maxDriveSpeedMetersPerSecond = Units.feetToMeters(12);
 
-        final double maxRotationRadianPerSecond = Math.PI * 2;
+        final double maxRotationRadianPerSecond = Math.PI;
 
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNEO(1), 50, 1),
@@ -120,7 +120,8 @@ public class Shrimp extends RobotMap {
         Transform3d robotToCamFR = new Transform3d(
                 new Translation3d(Units.inchesToMeters(9.029), Units.inchesToMeters(9.029),
                         Units.inchesToMeters(9.75)),
-                new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(65.752)));
+                new Rotation3d(0, Units.degreesToRadians(-45), Units.degreesToRadians(-65.752)));
+
         return new VisionMap(new CameraSource("ShrimpCamFL", robotToCamFL),
                 new CameraSource("ShrimpCamFR", robotToCamFR));
     }
