@@ -14,8 +14,7 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
 
     @Override
     public void safeState() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'safeState'");
+        
     }
 
 }

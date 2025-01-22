@@ -7,7 +7,7 @@ import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 public class AlgaeDestageMap implements LoggableMap<AlgaeDestageMap.Data> {
 
-    public SmartMotorController motor;
+    public final SmartMotorController motor;
 
     public AlgaeDestageMap() {
         this(new SmartMotorController());

@@ -9,7 +9,7 @@ import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
 public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
 
-    public SmartMotorController motor;
+    public final SmartMotorController motor;
     public final IEncoder encoder;
 
     public DeepClimbMap() {

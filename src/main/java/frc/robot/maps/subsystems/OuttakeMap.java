@@ -11,7 +11,7 @@ public class OuttakeMap implements LoggableMap<OuttakeMap.Data> {
 
     public final SmartMotorController leftMotor;
     public final SmartMotorController rightMotor;
-    public BooleanSupplier sensor;
+    public final BooleanSupplier sensor;
 
     public OuttakeMap() {
         this(new SmartMotorController(), new SmartMotorController(), () -> false);
