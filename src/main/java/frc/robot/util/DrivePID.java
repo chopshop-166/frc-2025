@@ -9,7 +9,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DrivePID {
-    
+
     private final ProfiledPIDController xPid;
     private final ProfiledPIDController yPid;
     private final RotationPIDController anglePid;
@@ -55,7 +55,7 @@ public class DrivePID {
     public Transform2d calculate(Pose2d currentPose, Pose2d targetPose) {
         double x = xPid.calculate(currentPose.getX(), targetPose.getX());
         if (Math.abs(x) > 0.01) {
-        x += Math.signum(x) * 0.15;
+            x += Math.signum(x) * 0.15;
         }
         double y = yPid.calculate(currentPose.getY(), targetPose.getY());
         if (Math.abs(y) > 0.01) {
