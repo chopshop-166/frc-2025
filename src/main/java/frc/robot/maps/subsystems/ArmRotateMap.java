@@ -1,0 +1,29 @@
+package frc.robot.maps.subsystems;
+
+import com.chopshop166.chopshoplib.logging.DataWrapper;
+import com.chopshop166.chopshoplib.logging.LoggableMap;
+import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
+import com.chopshop166.chopshoplib.motors.SmartMotorController;
+import com.chopshop166.chopshoplib.sensors.IEncoder;
+
+public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
+
+    public SmartMotorController motor;
+    public final IEncoder encoder;
+
+    public ArmRotateMap(SmartMotorController motor, IEncoder encoder) {
+        this.motor = motor;
+        this.encoder = encoder;
+    }
+
+    @Override
+    public void updateData(Data data) {
+        data.motor.updateData(motor);
+        data.rotationAbsAngleDegrees = encoder.getAbsolutePosition();
+    }
+
+    public static class Data extends DataWrapper {
+        public MotorControllerData motor = new MotorControllerData();
+        public double rotationAbsAngleDegrees;
+    }
+}
