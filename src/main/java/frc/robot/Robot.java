@@ -115,10 +115,10 @@ public final class Robot extends CommandRobot {
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
 
-        driveController.a().onTrue(outtake.spinIn());
-        driveController.b().whileTrue(outtake.spinOut());
-        driveController.x().whileTrue(outtake.reverse());
-        driveController.y().whileTrue(outtake.spinOutL1());
+        driveController.a().onTrue(outtake.intake());
+        driveController.b().whileTrue(outtake.score());
+        driveController.x().whileTrue(outtake.scoreL1());
+        driveController.y().whileTrue(algaeDestage.destageAlgae());
 
     }
 

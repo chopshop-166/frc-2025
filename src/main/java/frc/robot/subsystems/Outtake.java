@@ -21,21 +21,21 @@ public class Outtake extends LoggedSubsystem<Data, OuttakeMap> {
         super(new Data(), outtakeMap);
     }
 
-    public Command spinOutL1() {
+    public Command scoreL1() {
         return run(() -> {
             getData().leftWheel.setpoint = RELEASE_SPEEDLEFT;
             getData().rightWheel.setpoint = RELEASE_SPEEDRIGHT;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
     }
 
-    public Command spinOut() {
+    public Command score() {
         return run(() -> {
             getData().leftWheel.setpoint = RELEASE_SPEEDRIGHT;
             getData().rightWheel.setpoint = RELEASE_SPEEDRIGHT;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
     }
 
-    public Command spinIn() {
+    public Command intake() {
         return run(() -> {
             getData().leftWheel.setpoint = INTAKE_SPEED;
             getData().rightWheel.setpoint = INTAKE_SPEED;

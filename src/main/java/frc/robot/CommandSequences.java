@@ -26,11 +26,11 @@ public class CommandSequences {
     }
 
     public Command intake() {
-        return outtake.spinIn();
+        return outtake.intake();
     }
 
     public Command scoreCoral() {
-        return outtake.spinOut();
+        return outtake.score();
     }
 
     public Command setRumble(ButtonXboxController controller, int rumbleAmount) {
