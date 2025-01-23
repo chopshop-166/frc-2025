@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -34,20 +35,23 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
 
-    boolean isBlue = false;
-    double maxDriveSpeedMetersPerSecond;
-    double maxRotationRadiansPerSecond;
-    double speedCoef = 1;
-    double rotationCoef = 1;
-    double rotationKp = 0.05;
-    double rotationKs = 0.19;
-    ProfiledPIDController rotationPID = new ProfiledPIDController(0.065, 0.0, 0.0, new Constraints(240, 270));
-    double visionMaxError = 1;
+    private final double maxDriveSpeedMetersPerSecond;
+    private final double maxRotationRadiansPerSecond;
+    private final double SPEED_COEFFICIENT = 1;
+    private final double ROTATION_COEFFICIENT = 1;
+    private final double ROTATION_KP = 0.05;
+    private final double ROTATION_KS = 0.19;
+    final Modifier DEADBAND = Modifier.scalingDeadband(0.05);
 
+    ProfiledPIDController rotationPID = new ProfiledPIDController(0.065, 0.0, 0.0, new Constraints(240, 270));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
+
+    boolean isBlueAlliance = false;
     boolean isRobotCentric = false;
+    Optional<Translation2d> aimTarget = Optional.empty();
+    boolean isAimingAtReef = false;
 
     SwerveDrivePoseEstimator estimator;
 
@@ -78,7 +82,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 (speeds, feedforwards) -> move(speeds),
                 map.holonomicDrive,
                 map.config,
-                () -> !isBlue,
+                () -> !isBlueAlliance,
                 this);
 
         rotationPID.enableContinuousInput(-180, 180);
@@ -104,12 +108,19 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return kinematics.toChassisSpeeds(getData().getModuleStates());
     }
 
-    // Yes! Remap?
     public Command robotCentricDrive() {
         return startEnd(() -> {
             isRobotCentric = true;
         }, () -> {
             isRobotCentric = false;
+        });
+    }
+
+    public Command aimAtReefCenter() {
+        return startEnd(() -> {
+            aimTarget = Optional.of(getReefCenter());
+        }, () -> {
+            aimTarget = Optional.empty();
         });
     }
 
@@ -119,52 +130,11 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         }).withTimeout(seconds).andThen(safeStateCmd());
     }
 
-    // Vision commands!!
-    public Translation2d getRobotToTarget(Translation2d target) {
-        return target.minus(estimator.getEstimatedPosition().getTranslation());
-    }
-
-    public Command rotateTo(Translation2d target) {
-        return rotateTo(() -> target);
-    }
-
-    public Command rotateTo(Supplier<Translation2d> target) {
-        return run(() -> {
-            double rotationSpeed = calculateRotateSpeedToTarget(target);
-            move(0, 0, rotationSpeed, false);
-        });
-    }
-
-    public Translation2d getReefCenter() {
-        Translation3d pose;
-        if (isBlue) {
-            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Blue");
-            pose = (poseLeft.plus(poseRight).div(2));
-        } else {
-            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Red");
-            pose = (poseLeft.plus(poseRight).div(2));
-        }
-        return pose.toTranslation2d();
-    }
-
-    public Command rotateToReefCenter() {
-        return rotateTo(this.getReefCenter());
-    }
-
-    public double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
-        var robotToTarget = getRobotToTarget(target.get());
-        Logger.recordOutput("Target Pose", robotToTarget);
-        return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
-    }
-
     @Override
     public void reset() {
-        Rotation2d heading = isBlue ? new Rotation2d() : new Rotation2d(Math.PI);
-        setPose(new Pose2d(estimator.getEstimatedPosition().getX(), estimator.getEstimatedPosition().getY(), heading));
+        Rotation2d heading = isBlueAlliance ? new Rotation2d() : new Rotation2d(Math.PI);
+        Pose2d pose = estimator.getEstimatedPosition();
+        setPose(new Pose2d(pose.getX(), pose.getY(), heading));
     }
 
     @Override
@@ -177,13 +147,12 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         // This method will be called once per scheduler run
         // Use this for any background processing
         super.periodic();
-        isBlue = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
+        isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
         estimator.update(getMap().gyro.getRotation2d(), getData().getModulePositions());
 
         visionMap.updateData(estimator);
 
-        periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble(),
-                isRobotCentric);
+        periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());
@@ -193,7 +162,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     private double calculateRotationSpeed(double targetAngleDegrees) {
         double estimatorAngle = estimator.getEstimatedPosition().getRotation().getDegrees();
         double rotationSpeed = rotationPID.calculate(estimatorAngle, targetAngleDegrees);
-        rotationSpeed += Math.copySign(rotationKs, rotationSpeed);
+        rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
         // need to ensure we move at a fast enough speed for gyro to keep up
         if (Math.abs(rotationSpeed) < 0.02 || Math.abs(rotationPID.getPositionError()) < 0.75) {
             rotationSpeed = 0;
@@ -206,28 +175,25 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return rotationSpeed;
     }
 
-    private void periodicMove(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric) {
-        var deadband = Modifier.scalingDeadband(0.05);
-        double rotationInput = deadband.applyAsDouble(rotation);
-        double xInput = deadband.applyAsDouble(xSpeed);
-        double yInput = deadband.applyAsDouble(ySpeed);
+    private void periodicMove(final double xSpeed, final double ySpeed, final double rotation) {
+        double rotationInput = DEADBAND.applyAsDouble(rotation);
+        double xInput = DEADBAND.applyAsDouble(xSpeed);
+        double yInput = DEADBAND.applyAsDouble(ySpeed);
 
-        final double translateXSpeed = xInput
-                * maxDriveSpeedMetersPerSecond * speedCoef;
-        final double translateYSpeed = yInput
-                * maxDriveSpeedMetersPerSecond * speedCoef;
-        double rotationSpeed = rotationInput
-                * maxRotationRadiansPerSecond * rotationCoef;
+        double translateXSpeed = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double translateYSpeed = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
+        if (aimTarget.isPresent()) {
+            rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
+        }
 
         move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
     }
 
     private void move(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric) {
-        // rotationOffset is temporary and startingRotation is set at the start
+            final double rotation, boolean robotCentricDrive) {
         ChassisSpeeds speeds;
-        if (isRobotCentric) {
+        if (robotCentricDrive) {
             speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
         } else {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
@@ -244,5 +210,31 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         // All the states
         getData().setDesiredStates(moduleStates);
+    }
+
+    private Translation2d getRobotToTarget(Translation2d target) {
+        return target.minus(estimator.getEstimatedPosition().getTranslation());
+    }
+
+    private double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
+        var robotToTarget = getRobotToTarget(target.get());
+        Logger.recordOutput("Target Pose", robotToTarget);
+        return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
+    }
+
+    private Translation2d getReefCenter() {
+        Translation3d translation;
+        if (isBlueAlliance) {
+            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
+            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
+            Logger.recordOutput("Reef Center", "Blue");
+            translation = poseLeft.plus(poseRight).div(2);
+        } else {
+            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
+            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
+            Logger.recordOutput("Reef Center", "Red");
+            translation = poseLeft.plus(poseRight).div(2);
+        }
+        return translation.toTranslation2d();
     }
 }

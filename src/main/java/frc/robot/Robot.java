@@ -127,7 +127,7 @@ public final class Robot extends CommandRobot {
         driveController.x().whileTrue(outtake.scoreL1());
         driveController.y().whileTrue(algaeDestage.destageAlgae());
 
-        driveController.rightBumper().whileTrue(drive.rotateToReefCenter());
+        driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
 
     }
 
