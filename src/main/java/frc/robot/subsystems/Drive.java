@@ -243,7 +243,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     }
 
     private double rotateToAngleImpl(double targetAngleDegrees) {
-        targetAngleDegrees += 180;
         double estimatorAngle = estimator.getEstimatedPosition().getRotation().getDegrees();
         double rotationSpeed = rotationPID.calculate(estimatorAngle, targetAngleDegrees);
         rotationSpeed += Math.copySign(rotationKs, rotationSpeed);
