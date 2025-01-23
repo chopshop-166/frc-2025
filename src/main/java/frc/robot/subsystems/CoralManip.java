@@ -14,8 +14,7 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
     @Override
     public void safeState() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'safeState'");
+        // no safe state to set
     }
 
 }
