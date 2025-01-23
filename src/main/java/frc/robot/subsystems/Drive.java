@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -19,7 +18,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -46,9 +44,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.065, 0.0, 0.0, new Constraints(240, 270));
     double visionMaxError = 1;
 
-    DoubleSupplier xSpeed;
-    DoubleSupplier ySpeed;
-    DoubleSupplier rotation;
+    DoubleSupplier xSpeedSupplier;
+    DoubleSupplier ySpeedSupplier;
+    DoubleSupplier rotationSupplier;
     boolean isRobotCentric = false;
 
     SwerveDrivePoseEstimator estimator;
@@ -85,9 +83,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         rotationPID.enableContinuousInput(-180, 180);
 
-        this.xSpeed = xSpeed;
-        this.ySpeed = ySpeed;
-        this.rotation = rotation;
+        this.xSpeedSupplier = xSpeed;
+        this.ySpeedSupplier = ySpeed;
+        this.rotationSupplier = rotation;
 
     }
 
@@ -100,50 +98,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return runOnce(() -> {
             setPose(pose.get());
         });
-    }
-
-    private void periodicMove(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric) {
-
-        var deadband = Modifier.scalingDeadband(0.05);
-        double rotationInput = deadband.applyAsDouble(rotation);
-        double xInput = deadband.applyAsDouble(xSpeed);
-        double yInput = deadband.applyAsDouble(ySpeed);
-
-        final double translateXSpeed = xInput
-                * maxDriveSpeedMetersPerSecond * speedCoef;
-        final double translateYSpeed = yInput
-                * maxDriveSpeedMetersPerSecond * speedCoef;
-        double rotationSpeed = rotationInput
-                * maxRotationRadiansPerSecond * rotationCoef;
-
-        move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
-    }
-
-    private void move(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric) {
-
-        // rotationOffset is temporary and startingRotation is set at the start
-        ChassisSpeeds speeds;
-        if (isRobotCentric) {
-            speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
-        } else {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
-                    rotation, estimator.getEstimatedPosition().getRotation());
-        }
-
-        move(speeds);
-
-    }
-
-    private void move(final ChassisSpeeds speeds) {
-
-        // Now use this in our kinematics
-        final SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, maxDriveSpeedMetersPerSecond);
-
-        // All the states
-        getData().setDesiredStates(moduleStates);
     }
 
     public ChassisSpeeds getSpeeds() {
@@ -166,12 +120,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     }
 
     // Vision commands!!
-    public Command rotateToAngle(double targetAngle) {
-        return run(() -> {
-            rotateToAngleImpl(targetAngle);
-        });
-    }
-
     public Translation2d getRobotToTarget(Translation2d target) {
         return target.minus(estimator.getEstimatedPosition().getTranslation());
     }
@@ -184,7 +132,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return run(() -> {
             double rotationSpeed = calculateRotateSpeedToTarget(target);
             move(0, 0, rotationSpeed, false);
-
         });
     }
 
@@ -211,7 +158,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     public double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
         var robotToTarget = getRobotToTarget(target.get());
         Logger.recordOutput("Target Pose", robotToTarget);
-        return rotateToAngleImpl(robotToTarget.getAngle().getDegrees());
+        return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
     }
 
     @Override
@@ -235,14 +182,15 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         visionMap.updateData(estimator);
 
-        periodicMove(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotation.getAsDouble(), isRobotCentric);
+        periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble(),
+                isRobotCentric);
 
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());
         Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
     }
 
-    private double rotateToAngleImpl(double targetAngleDegrees) {
+    private double calculateRotationSpeed(double targetAngleDegrees) {
         double estimatorAngle = estimator.getEstimatedPosition().getRotation().getDegrees();
         double rotationSpeed = rotationPID.calculate(estimatorAngle, targetAngleDegrees);
         rotationSpeed += Math.copySign(rotationKs, rotationSpeed);
@@ -256,5 +204,45 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Target Velocity", rotationPID.getSetpoint().velocity);
         Logger.recordOutput("Position Error", rotationPID.getPositionError());
         return rotationSpeed;
+    }
+
+    private void periodicMove(final double xSpeed, final double ySpeed,
+            final double rotation, boolean isRobotCentric) {
+        var deadband = Modifier.scalingDeadband(0.05);
+        double rotationInput = deadband.applyAsDouble(rotation);
+        double xInput = deadband.applyAsDouble(xSpeed);
+        double yInput = deadband.applyAsDouble(ySpeed);
+
+        final double translateXSpeed = xInput
+                * maxDriveSpeedMetersPerSecond * speedCoef;
+        final double translateYSpeed = yInput
+                * maxDriveSpeedMetersPerSecond * speedCoef;
+        double rotationSpeed = rotationInput
+                * maxRotationRadiansPerSecond * rotationCoef;
+
+        move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
+    }
+
+    private void move(final double xSpeed, final double ySpeed,
+            final double rotation, boolean isRobotCentric) {
+        // rotationOffset is temporary and startingRotation is set at the start
+        ChassisSpeeds speeds;
+        if (isRobotCentric) {
+            speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
+        } else {
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
+                    rotation, estimator.getEstimatedPosition().getRotation());
+        }
+
+        move(speeds);
+    }
+
+    private void move(final ChassisSpeeds speeds) {
+        // Now use this in our kinematics
+        final SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, maxDriveSpeedMetersPerSecond);
+
+        // All the states
+        getData().setDesiredStates(moduleStates);
     }
 }
