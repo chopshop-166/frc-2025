@@ -103,24 +103,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 () -> !isBlue,
                 this);
 
-        // Auto Stuff!!
-
-        AutoBuilder.configure(
-                () -> estimator.getEstimatedPosition(), // Robot pose supplier
-                this::setPose, // Method to reset odometry (will be called if your auto has a
-                // starting pose)
-                this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> move(speeds), // Method that will drive the robot given ROBOT RELATIVE
-                // ChassisSpeeds. Also optionally outputs individual module
-                // feedforwards
-                new PPHolonomicDriveController(
-                        new PIDConstants(2, 0.0, 0.05), // Translation PID constants
-                        new PIDConstants(1, 0.0, 0.0)), // Rotation PID constants)
-                getMap().config, // The robot configuration
-                () -> !isBlue,
-                this // Reference to this subsystem to set requirements
-        );
-
         rotationPID.enableContinuousInput(-180, 180);
 
         this.xSpeed = xSpeed;
@@ -154,9 +136,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 * maxDriveSpeedMetersPerSecond * speedCoef;
         double rotationSpeed = rotationInput
                 * maxRotationRadiansPerSecond * rotationCoef;
-        if (aimAtSpeaker) {
-            rotationSpeed = calculateRotateSpeedToTarget(this::getSpeakerTarget);
-        }
+        // if (aimAtSpeaker) {
+        // rotationSpeed = calculateRotateSpeedToTarget(this::getSpeakerTarget);
+        // }
 
         move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
     }
