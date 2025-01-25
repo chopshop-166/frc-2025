@@ -20,6 +20,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     final double RAISE_SPEED = .85;
     final double MANUAL_LOWER_SPEED_COEF = 0.5;
     final double SLOW_DOWN_COEF = 0.5;
+    final double LOWER_SPEED = -0.15;
     double holdHeight = 0;
 
     ElevatorPresets level = ElevatorPresets.OFF;
@@ -42,9 +43,18 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
                 level = ElevatorPresets.OFF;
                 getData().setSetpoint(limits(speed * speedCoef));
             } else if (level == ElevatorPresets.OFF) {
-                getData().setSetpoint(0.0 );
+                getData().setSetpoint(0.0);
             }
 
+        });
+    }
+
+    public Command moveToZero() {
+        return startSafe(() -> {
+            getData().setSetpoint(LOWER_SPEED);
+            level = ElevatorPresets.OFF;
+        }).until(() -> {
+            return getElevatorHeight() < getMap().elevatorPreset.getValue(ElevatorPresets.STOW);
         });
     }
 
@@ -78,6 +88,11 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     private double getElevatorHeight() {
         return getData().heightAbsInches;
+    }
+
+    @Override
+    public void reset() {
+        getMap().encoder.reset();
     }
 
     @Override

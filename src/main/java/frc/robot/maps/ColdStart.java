@@ -8,6 +8,7 @@ import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.sensors.CSEncoder;
@@ -116,8 +117,8 @@ public class ColdStart extends RobotMap {
 
     @Override
     public ElevatorMap getElevatorMap() {
-        CSSparkMax leftMotor = new CSSparkMax(11);
-        CSSparkMax rightMotor = new CSSparkMax(12);
+        CSSparkFlex leftMotor = new CSSparkFlex(11);
+        CSSparkFlex rightMotor = new CSSparkFlex(12);
         CSEncoder encoder = new CSEncoder(2, 3);
 
         ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
