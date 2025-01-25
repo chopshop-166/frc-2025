@@ -9,6 +9,7 @@ import java.util.function.DoubleUnaryOperator;
 import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.Autonomous;
+import com.chopshop166.chopshoplib.RobotUtils;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -145,6 +146,7 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
+        elevator.setDefaultCommand(elevator.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY())));
     }
 
     public DoubleUnaryOperator getScaler(double leftRange, double rightRange) {

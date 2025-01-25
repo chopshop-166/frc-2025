@@ -8,6 +8,7 @@ import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.sensors.CSEncoder;
@@ -20,9 +21,16 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
@@ -113,12 +121,21 @@ public class ColdStart extends RobotMap {
 
     @Override
     public ElevatorMap getElevatorMap() {
-        CSSparkMax leftMotor = new CSSparkMax(11);
-        CSSparkMax rightMotor = new CSSparkMax(12);
+        CSSparkFlex leftMotor = new CSSparkFlex(11);
+        CSSparkFlex rightMotor = new CSSparkFlex(12);
+        SparkFlexConfig config = new SparkFlexConfig();
+        config.follow(leftMotor.getMotorController());
+        rightMotor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters,
+                PersistMode.kPersistParameters);
+
         CSEncoder encoder = new CSEncoder(2, 3);
 
-        return new ElevatorMap(leftMotor, rightMotor, encoder, 0, new ElevatorMap.ElevatorPresetValues(0, 0, 0, 0, 0),
-                new ValueRange(0, 0), new ValueRange(0, 0));
+        ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
+        pid.setTolerance(0.25);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0, 0);
+
+        return new ElevatorMap(leftMotor, encoder, new ElevatorMap.ElevatorPresetValues(19.5, 5, 18, 38, 0),
+                new ValueRange(0, 56), new ValueRange(3, 53), pid, feedForward);
     }
 
     @Override
