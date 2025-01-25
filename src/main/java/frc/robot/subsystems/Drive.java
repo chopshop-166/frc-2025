@@ -124,6 +124,17 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         });
     }
 
+    // public Command alignToReefBranch
+    // Probably want arguments of leftBranch or rightBranch?
+    // Pull reef coords from FieldConstants somehow
+    // Find nearest reef apriltag (do we need a different method of estimation
+    // rather than global? Might want to just focus on one tag rather than multiple
+    // behind the robot)
+    // Use coords and move command to move to either left or right branch
+    // (translation to get robotToReef and then move)
+    // Need rotation in here somewhere. Logic from rotateTo command, since ideally
+    // we move and rotate at the same time
+
     public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
         return run(() -> {
             move(xSpeed, ySpeed, 0, false);
