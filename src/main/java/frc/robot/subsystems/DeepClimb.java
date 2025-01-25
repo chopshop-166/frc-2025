@@ -15,13 +15,13 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
     public Command spoolIn() {
         return runSafe(() -> {
             getData().motor.setpoint = 1;
-        });
+        }).until(() -> getData().atTopLimit).andThen(safeStateCmd());
     }
 
     public Command spoolOut() {
         return runSafe(() -> {
             getData().motor.setpoint = -1;
-        });
+        }).until(() -> getData().atBottomLimit).andThen(safeStateCmd());
     }
 
     @Override

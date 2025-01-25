@@ -1,34 +1,36 @@
 package frc.robot.maps.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
-import com.chopshop166.chopshoplib.sensors.IEncoder;
-import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
 public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
 
     public final SmartMotorController motor;
-    public final IEncoder encoder;
+    public final BooleanSupplier sensor;
 
     public DeepClimbMap() {
-        this(new SmartMotorController(), new MockEncoder());
+        this(new SmartMotorController(), () -> true);
     }
 
-    public DeepClimbMap(SmartMotorController motor, IEncoder encoder) {
+    public DeepClimbMap(SmartMotorController motor, BooleanSupplier sensor) {
         this.motor = motor;
-        this.encoder = encoder;
+        this.sensor = sensor;
     }
 
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.rotationAbsAngleDegrees = encoder.getAbsolutePosition();
+        data.atBottomLimit = sensor.getAsBoolean();
+        data.atTopLimit = sensor.getAsBoolean();
     }
 
     public static class Data extends DataWrapper {
         public MotorControllerData motor = new MotorControllerData();
-        public double rotationAbsAngleDegrees;
+        public boolean atBottomLimit;
+        public boolean atTopLimit;
     }
 }
