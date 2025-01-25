@@ -124,7 +124,7 @@ public class ColdStart extends RobotMap {
         pid.setTolerance(2);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0, 0);
 
-        return new ElevatorMap(leftMotor, rightMotor, encoder, 0, new ElevatorMap.ElevatorPresetValues(0, 0, 0, 0, 0),
+        return new ElevatorMap(leftMotor, rightMotor, encoder, new ElevatorMap.ElevatorPresetValues(0, 0, 0, 0, 0),
                 new ValueRange(0, 0), new ValueRange(0, 0), pid, feedForward);
     }
 

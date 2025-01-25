@@ -58,7 +58,6 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public final SmartMotorController leftMotor;
     public final SmartMotorController rightMotor;
     public final IEncoder encoder;
-    public final double conversionRate;
     public final ElevatorPresetValues elevatorPreset;
     public final ValueRange hardLimits;
     public final ValueRange softLimits;
@@ -66,18 +65,17 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public final ElevatorFeedforward feedForward;
 
     public ElevatorMap() {
-        this(new SmartMotorController(), new SmartMotorController(), new MockEncoder(), 1, new ElevatorPresetValues(),
+        this(new SmartMotorController(), new SmartMotorController(), new MockEncoder(), new ElevatorPresetValues(),
                 new ValueRange(0, 0), new ValueRange(0, 0), new ProfiledPIDController(0, 0, 0, new Constraints(0, 0)),
                 new ElevatorFeedforward(0, 0, 0));
     }
 
     public ElevatorMap(SmartMotorController leftMotor, SmartMotorController rightMotor, IEncoder encoder,
-            double conversionRate, ElevatorPresetValues elevatorPreset, ValueRange hardLimits, ValueRange softLimits,
+            ElevatorPresetValues elevatorPreset, ValueRange hardLimits, ValueRange softLimits,
             ProfiledPIDController pid, ElevatorFeedforward feedForward) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.encoder = encoder;
-        this.conversionRate = conversionRate;
         this.elevatorPreset = elevatorPreset;
         this.hardLimits = hardLimits;
         this.softLimits = softLimits;
@@ -89,8 +87,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public void updateData(Data data) {
         data.leftMotor.updateData(leftMotor);
         data.rightMotor.updateData(rightMotor);
-        data.heightAbsInches = encoder.getAbsolutePosition() * conversionRate; // need to do math to figure out the
-                                                                               // right value
+        data.heightAbsInches = encoder.getAbsolutePosition(); // need to do math to figure out the
+                                                              // right value
         data.liftingHeightVelocity = encoder.getRate();
     }
 
@@ -99,6 +97,7 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
         public MotorControllerData rightMotor = new MotorControllerData();
         public double heightAbsInches;
         public double liftingHeightVelocity;
+
         public void setSetpoint(double setpoint) {
             leftMotor.setpoint = setpoint;
             rightMotor.setpoint = setpoint;
