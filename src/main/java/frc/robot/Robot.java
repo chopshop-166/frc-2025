@@ -21,7 +21,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
 import frc.robot.subsystems.AlgaeDestage;
+import frc.robot.subsystems.CoralManip;
+import frc.robot.subsystems.DeepClimb;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Led;
 import frc.robot.subsystems.Outtake;
 
@@ -44,6 +47,9 @@ public final class Robot extends CommandRobot {
     private Led led = new Led(map.getLedMap());
     private AlgaeDestage algaeDestage = new AlgaeDestage(map.getAlgaeDestageMap());
     private Outtake outtake = new Outtake(map.getOuttakeMap());
+    private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
+    private Elevator elevator = new Elevator(map.getElevatorMap());
+    private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, outtake);
 
@@ -115,10 +121,10 @@ public final class Robot extends CommandRobot {
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
 
-        driveController.a().onTrue(outtake.spinIn());
-        driveController.b().whileTrue(outtake.spinOut());
-        driveController.x().whileTrue(outtake.reverse());
-        driveController.y().whileTrue(outtake.spinOutL1());
+        driveController.a().onTrue(outtake.intake());
+        driveController.b().whileTrue(outtake.score());
+        driveController.x().whileTrue(outtake.scoreL1());
+        driveController.y().whileTrue(algaeDestage.destageAlgae());
 
     }
 
