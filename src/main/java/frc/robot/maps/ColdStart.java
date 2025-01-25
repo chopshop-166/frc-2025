@@ -21,6 +21,10 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -119,14 +123,19 @@ public class ColdStart extends RobotMap {
     public ElevatorMap getElevatorMap() {
         CSSparkFlex leftMotor = new CSSparkFlex(11);
         CSSparkFlex rightMotor = new CSSparkFlex(12);
+        SparkFlexConfig config = new SparkFlexConfig();
+        config.follow(leftMotor.getMotorController());
+        rightMotor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters,
+                PersistMode.kPersistParameters);
+
         CSEncoder encoder = new CSEncoder(2, 3);
 
         ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
-        pid.setTolerance(2);
+        pid.setTolerance(0.25);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0, 0);
 
-        return new ElevatorMap(leftMotor, rightMotor, encoder, new ElevatorMap.ElevatorPresetValues(0, 0, 0, 0, 0),
-                new ValueRange(0, 0), new ValueRange(0, 0), pid, feedForward);
+        return new ElevatorMap(leftMotor, rightMotor, encoder, new ElevatorMap.ElevatorPresetValues(19.5, 5, 18, 38, 0),
+                new ValueRange(0, 56), new ValueRange(3, 53), pid, feedForward);
     }
 
     @Override

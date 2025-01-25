@@ -97,10 +97,5 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
         public MotorControllerData rightMotor = new MotorControllerData();
         public double heightAbsInches;
         public double liftingHeightVelocity;
-
-        public void setSetpoint(double setpoint) {
-            leftMotor.setpoint = setpoint;
-            rightMotor.setpoint = setpoint;
-        }
     }
 }

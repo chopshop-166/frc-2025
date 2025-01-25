@@ -8,7 +8,10 @@ import com.chopshop166.chopshoplib.PersistenceCheck;
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.motors.Modifier;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.ElevatorMap.Data;
@@ -31,19 +34,18 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     }
 
     public Command move(DoubleSupplier liftSpeed) {
-        Modifier deadband = Modifier.deadband(.1);
 
         return run(() -> {
-            double speed = deadband.applyAsDouble(liftSpeed.getAsDouble());
+            double speed = liftSpeed.getAsDouble();
             double speedCoef = RAISE_SPEED;
             if (speed < 0) {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }
             if (Math.abs(speed) > 0) {
                 level = ElevatorPresets.OFF;
-                getData().setSetpoint(limits(speed * speedCoef));
+                getData().leftMotor.setpoint = (limits(speed * speedCoef));
             } else if (level == ElevatorPresets.OFF) {
-                getData().setSetpoint(0.0);
+                getData().leftMotor.setpoint =(0.0);
             }
 
         });
@@ -51,7 +53,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     public Command moveToZero() {
         return startSafe(() -> {
-            getData().setSetpoint(LOWER_SPEED);
+            getData().leftMotor.setpoint = (LOWER_SPEED);
             level = ElevatorPresets.OFF;
         }).until(() -> {
             return getElevatorHeight() < getMap().elevatorPreset.getValue(ElevatorPresets.STOW);
@@ -97,7 +99,26 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     @Override
     public void safeState() {
-        getData().setSetpoint(0);
+        getData().leftMotor.setpoint =(0);
+    }
+
+    @Override
+    public void periodic() {
+        super.periodic();
+
+        if (level != ElevatorPresets.OFF) {
+            double targetHeight = level == ElevatorPresets.HOLD ? holdHeight : getMap().elevatorPreset.getValue(level);
+            double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
+            setpoint += getMap().feedForward.calculate(
+                    Units.Degrees.of(pid.getSetpoint().position).in(Units.Radians),
+                    Units.DegreesPerSecond.of(pid.getSetpoint().velocity).in(Units.RadiansPerSecond));
+            getData().leftMotor.setpoint = (setpoint);
+        }
+
+        Logger.recordOutput("Elevator preset", level);
+        Logger.recordOutput("DesiredElevatorVelocity", pid.getSetpoint().velocity);
+        Logger.recordOutput("DesiredElevatorPosition", pid.getSetpoint().position);
+
     }
 
 }
