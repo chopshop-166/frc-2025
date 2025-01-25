@@ -83,15 +83,14 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
     @Override
     public void updateData(Data data) {
-        data.leftMotor.updateData(motor);
+        data.motor.updateData(motor);
         data.heightAbsInches = encoder.getAbsolutePosition(); // need to do math to figure out the
                                                               // right value
         data.liftingHeightVelocity = encoder.getRate();
     }
 
     public static class Data extends DataWrapper {
-        public MotorControllerData leftMotor = new MotorControllerData();
-        public MotorControllerData rightMotor = new MotorControllerData();
+        public MotorControllerData motor = new MotorControllerData();
         public double heightAbsInches;
         public double liftingHeightVelocity;
     }

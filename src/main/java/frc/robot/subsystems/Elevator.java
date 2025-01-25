@@ -43,9 +43,9 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             }
             if (Math.abs(speed) > 0) {
                 level = ElevatorPresets.OFF;
-                getData().leftMotor.setpoint = (limits(speed * speedCoef));
+                getData().motor.setpoint = limits(speed * speedCoef);
             } else if (level == ElevatorPresets.OFF) {
-                getData().leftMotor.setpoint =(0.0);
+                getData().motor.setpoint =0.0;
             }
 
         });
@@ -53,7 +53,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     public Command moveToZero() {
         return startSafe(() -> {
-            getData().leftMotor.setpoint = (LOWER_SPEED);
+            getData().motor.setpoint = LOWER_SPEED;
             level = ElevatorPresets.OFF;
         }).until(() -> {
             return getElevatorHeight() < getMap().elevatorPreset.getValue(ElevatorPresets.STOW);
@@ -99,7 +99,8 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     @Override
     public void safeState() {
-        getData().leftMotor.setpoint =(0);
+        getData().motor.setpoint = 0;
+        level = ElevatorPresets.OFF;
     }
 
     @Override
@@ -110,9 +111,9 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             double targetHeight = level == ElevatorPresets.HOLD ? holdHeight : getMap().elevatorPreset.getValue(level);
             double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
             setpoint += getMap().feedForward.calculate(
-                    Units.Degrees.of(pid.getSetpoint().position).in(Units.Radians),
-                    Units.DegreesPerSecond.of(pid.getSetpoint().velocity).in(Units.RadiansPerSecond));
-            getData().leftMotor.setpoint = (setpoint);
+                    pid.getSetpoint().position,
+                    pid.getSetpoint().velocity);
+            getData().motor.setpoint = setpoint;
         }
 
         Logger.recordOutput("Elevator preset", level);
