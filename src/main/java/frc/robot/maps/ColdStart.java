@@ -132,8 +132,9 @@ public class ColdStart extends RobotMap {
     @Override
     public DeepClimbMap getDeepClimbMap() {
         CSSparkMax motor = new CSSparkMax(13);
-        CSEncoder encoder = new CSEncoder(4, 5);
-        return new DeepClimbMap(motor, encoder);
+        CSDigitalInput sensor = new CSDigitalInput(8);
+        return new DeepClimbMap(motor, sensor::get);
+
     }
 
 }

@@ -25,12 +25,10 @@ public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
     public void updateData(Data data) {
         data.motor.updateData(motor);
         data.atBottomLimit = sensor.getAsBoolean();
-        data.atTopLimit = sensor.getAsBoolean();
     }
 
     public static class Data extends DataWrapper {
         public MotorControllerData motor = new MotorControllerData();
         public boolean atBottomLimit;
-        public boolean atTopLimit;
     }
 }
