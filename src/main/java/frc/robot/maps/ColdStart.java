@@ -21,8 +21,11 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
@@ -117,8 +120,12 @@ public class ColdStart extends RobotMap {
         CSSparkMax rightMotor = new CSSparkMax(12);
         CSEncoder encoder = new CSEncoder(2, 3);
 
+        ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
+        pid.setTolerance(2);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0, 0);
+
         return new ElevatorMap(leftMotor, rightMotor, encoder, 0, new ElevatorMap.ElevatorPresetValues(0, 0, 0, 0, 0),
-                new ValueRange(0, 0), new ValueRange(0, 0));
+                new ValueRange(0, 0), new ValueRange(0, 0), pid, feedForward);
     }
 
     @Override
