@@ -11,6 +11,9 @@ import com.chopshop166.chopshoplib.motors.Modifier;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.ElevatorMap;
@@ -25,6 +28,9 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
     double holdHeight = 0;
+
+    NetworkTableInstance instance = NetworkTableInstance.getDefault();
+    DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
 
     ElevatorPresets level = ElevatorPresets.OFF;
 
@@ -45,7 +51,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
                 level = ElevatorPresets.OFF;
                 getData().motor.setpoint = limits(speed * speedCoef);
             } else if (level == ElevatorPresets.OFF) {
-                getData().motor.setpoint =0.0;
+                getData().motor.setpoint = 0.0;
             }
 
         });
