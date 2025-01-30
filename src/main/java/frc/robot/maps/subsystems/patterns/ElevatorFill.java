@@ -43,16 +43,16 @@ public class ElevatorFill extends AnimatedPattern {
     public void animate(final SegmentBuffer buffer) {
 
         buffer.setAll(Color.kBlack);
-        this.ledPosition = (int) Math.floor(heightSub.getAsDouble() / buffer.getLength());
+        this.ledPosition = (int) Math.floor(heightSub.getAsDouble() * buffer.getLength());
 
-        for (int i = this.ledPosition; i > 0; i--) {
-            buffer.set(this.ledPosition, this.color);
+        for (int i = 0; i <= this.ledPosition; i++) {
+            buffer.set(i, this.color);
         }
 
     }
 
     @Override
     public String toString() {
-        return String.format("FillPattern", this.color.toString());
+        return String.format("FillPattern(%s)", this.color.toString());
     }
 }

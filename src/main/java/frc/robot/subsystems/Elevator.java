@@ -33,9 +33,6 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
 
-    NetworkTableInstance instance = NetworkTableInstance.getDefault();
-    DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
-
     ElevatorPresets level = ElevatorPresets.OFF;
 
     public Elevator(ElevatorMap elevatorMap) {
