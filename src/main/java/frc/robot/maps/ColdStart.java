@@ -65,10 +65,14 @@ public class ColdStart extends RobotMap {
 
         SparkMaxConfig steerConfig = new SparkMaxConfig();
         steerConfig.smartCurrentLimit(30);
-        frontLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        frontRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        rearLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        rearRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        frontLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
+                PersistMode.kPersistParameters);
+        frontRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
+                PersistMode.kPersistParameters);
+        rearLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
+                PersistMode.kPersistParameters);
+        rearRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
+                PersistMode.kPersistParameters);
 
         // Configuration for MK4i with L2 speeds
         Configuration MK4i_L2 = new Configuration(SDSSwerveModule.MK4_V2.gearRatio,
@@ -143,6 +147,7 @@ public class ColdStart extends RobotMap {
 
         configLeft.voltageCompensation(11.5);
         configLeft.smartCurrentLimit(30);
+        configLeft.encoder.velocityConversionFactor(((1 / 22.2) * Math.PI * 1.75) / 60);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
         configLeft.encoder.positionConversionFactor((1 / 22.2) * Math.PI * 1.75);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
