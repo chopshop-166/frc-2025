@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.VisionMap;
 
 import frc.robot.maps.subsystems.AlgaeDestageMap;
 import frc.robot.maps.subsystems.CoralManipMap;
@@ -19,6 +20,10 @@ public class RobotMap {
 
     public SwerveDriveMap getDriveMap() {
         return new SwerveDriveMap();
+    }
+
+    public VisionMap getVisionMap() {
+        return new VisionMap();
     }
 
     public LedMapBase getLedMap() {

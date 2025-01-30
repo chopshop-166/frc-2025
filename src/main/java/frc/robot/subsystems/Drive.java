@@ -8,75 +8,62 @@ import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
+import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.Modifier;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.FieldConstants.Reef;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public final SwerveDriveKinematics kinematics;
+    private final VisionMap visionMap;
 
-    boolean isBlue = false;
-    double maxDriveSpeedMetersPerSecond;
-    double maxRotationRadiansPerSecond;
-    double speedCoef = 1;
-    double rotationCoef = 1;
-    double rotationKp = 0.05;
-    double rotationKs = 0.19;
-    ProfiledPIDController rotationPID = new ProfiledPIDController(0.065, 0.0, 0.0, new Constraints(240, 270));
-    double visionMaxError = 1;
+    private final double maxDriveSpeedMetersPerSecond;
+    private final double maxRotationRadiansPerSecond;
+    private final double SPEED_COEFFICIENT = 1;
+    private final double ROTATION_COEFFICIENT = 1;
+    private final double ROTATION_KP = 0.05;
+    private final double ROTATION_KS = 0.19;
+    final Modifier DEADBAND = Modifier.scalingDeadband(0.05);
 
-    DoubleSupplier xSpeed;
-    DoubleSupplier ySpeed;
-    DoubleSupplier rotation;
+    ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
+    DoubleSupplier xSpeedSupplier;
+    DoubleSupplier ySpeedSupplier;
+    DoubleSupplier rotationSupplier;
+
+    boolean isBlueAlliance = false;
     boolean isRobotCentric = false;
-    boolean aimAtSpeaker = false;
+    Optional<Translation2d> aimTarget = Optional.empty();
+    boolean isAimingAtReef = false;
 
     SwerveDrivePoseEstimator estimator;
 
-    // Cam mounted facing forward, half a meter forward of center, half a meter up
-    // from center.
-    public static final Transform3d kRobotToCam = new Transform3d(
-            new Translation3d(Units.inchesToMeters(-6.9965), Units.inchesToMeters(-3.029),
-                    Units.inchesToMeters(12.445)),
-            new Rotation3d(0, Units.degreesToRadians(-16.875), Units.degreesToRadians(-6.5 + 180)));
-
     // The layout of the AprilTags on the field
-    public static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    public static final AprilTagFieldLayout kTagLayout = CameraSource.DEFAULT_FIELD;
 
-    // The standard deviations of our vision estimated poses, which affect
-    // correction rate
-    // (Fake values. Experiment and determine estimation noise on an actual robot.)
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-
-    public Drive(SwerveDriveMap map, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rotation) {
+    public Drive(SwerveDriveMap map, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rotation,
+            VisionMap visionMap) {
 
         super(new SwerveDriveData(), map);
+        this.visionMap = visionMap;
 
         getMap().gyro.reset();
         kinematics = new SwerveDriveKinematics(map.frontLeft.getLocation(), map.frontRight.getLocation(),
@@ -96,14 +83,14 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 (speeds, feedforwards) -> move(speeds),
                 map.holonomicDrive,
                 map.config,
-                () -> !isBlue,
+                () -> !isBlueAlliance,
                 this);
 
         rotationPID.enableContinuousInput(-180, 180);
 
-        this.xSpeed = xSpeed;
-        this.ySpeed = ySpeed;
-        this.rotation = rotation;
+        this.xSpeedSupplier = xSpeed;
+        this.ySpeedSupplier = ySpeed;
+        this.rotationSupplier = rotation;
 
     }
 
@@ -118,58 +105,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         });
     }
 
-    private void periodicMove(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric, boolean aimAtSpeaker) {
-
-        var deadband = Modifier.scalingDeadband(0.05);
-        double rotationInput = deadband.applyAsDouble(rotation);
-        double xInput = deadband.applyAsDouble(xSpeed);
-        double yInput = deadband.applyAsDouble(ySpeed);
-
-        final double translateXSpeed = xInput
-                * maxDriveSpeedMetersPerSecond * speedCoef;
-        final double translateYSpeed = yInput
-                * maxDriveSpeedMetersPerSecond * speedCoef;
-        double rotationSpeed = rotationInput
-                * maxRotationRadiansPerSecond * rotationCoef;
-        // if (aimAtSpeaker) {
-        // rotationSpeed = calculateRotateSpeedToTarget(this::getSpeakerTarget);
-        // }
-
-        move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
-    }
-
-    private void move(final double xSpeed, final double ySpeed,
-            final double rotation, boolean isRobotCentric) {
-
-        // rotationOffset is temporary and startingRotation is set at the start
-        ChassisSpeeds speeds;
-        if (isRobotCentric) {
-            speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
-        } else {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
-                    rotation, estimator.getEstimatedPosition().getRotation());
-        }
-
-        move(speeds);
-
-    }
-
-    private void move(final ChassisSpeeds speeds) {
-
-        // Now use this in our kinematics
-        final SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, maxDriveSpeedMetersPerSecond);
-
-        // All the states
-        getData().setDesiredStates(moduleStates);
-    }
-
     public ChassisSpeeds getSpeeds() {
         return kinematics.toChassisSpeeds(getData().getModuleStates());
     }
 
-    // Yes! Remap?
     public Command robotCentricDrive() {
         return startEnd(() -> {
             isRobotCentric = true;
@@ -178,13 +117,33 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         });
     }
 
-    public Command aimAtSpeaker() {
+    public Command aimAtReefCenter() {
         return startEnd(() -> {
-            aimAtSpeaker = true;
+            aimTarget = Optional.of(getReefCenter());
         }, () -> {
-            aimAtSpeaker = false;
+            aimTarget = Optional.empty();
         });
     }
+
+    // public Command alignToReefBranch
+    // Probably want arguments of leftBranch or rightBranch?
+    // Pull reef coords from FieldConstants somehow
+    // Find nearest reef apriltag (do we need a different method of estimation
+    // rather than global? Might want to just focus on one tag rather than multiple
+    // behind the robot. Reef tags are blue 17-22, red 6-11)
+    // Use coords and move command to move to either left or right branch
+    // (translation to get robotToReef and then move)
+    // Need rotation in here somewhere. Logic from rotateTo command, since ideally
+    // we move and rotate at the same time
+
+    public enum Branch {
+        leftBranch,
+        rightBranch
+    };
+
+    // public Command alignToReefBranch(Branch leftBranch, Branch rightBranch) {
+
+    // };
 
     public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
         return run(() -> {
@@ -192,57 +151,11 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         }).withTimeout(seconds).andThen(safeStateCmd());
     }
 
-    public Command rotateToAngle(double targetAngle) {
-        return run(() -> {
-            rotateToAngleImpl(targetAngle);
-        });
-    }
-
-    public Translation2d getSpeakerTarget() {
-        Optional<Pose3d> pose;
-        if (isBlue) {
-            Logger.recordOutput("Alliance Speaker", "Blue");
-            pose = kTagLayout.getTagPose(7);
-        } else {
-            Logger.recordOutput("Alliance Speaker", "Red/Other");
-            pose = kTagLayout.getTagPose(4);
-        }
-        if (pose.isEmpty()) {
-            return new Translation2d();
-        }
-        return pose.get().getTranslation().toTranslation2d();
-    }
-
-    public Translation2d getRobotToTarget(Translation2d target) {
-        return target.minus(estimator.getEstimatedPosition().getTranslation());
-    }
-
-    public Command rotateToSpeaker() {
-        return rotateTo(this::getSpeakerTarget);
-    }
-
-    public Command rotateTo(Supplier<Translation2d> target) {
-        return run(() -> {
-            double rotationSpeed = calculateRotateSpeedToTarget(target);
-            move(0, 0, rotationSpeed, false);
-
-        });
-    }
-
-    public double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
-        var robotToTarget = getRobotToTarget(target.get());
-        Logger.recordOutput("Target Pose", robotToTarget);
-        return rotateToAngleImpl(robotToTarget.getAngle().getDegrees());
-    }
-
-    public Command rotateTo(Translation2d target) {
-        return rotateTo(() -> target);
-    }
-
     @Override
     public void reset() {
-        Rotation2d heading = isBlue ? new Rotation2d() : new Rotation2d(Math.PI);
-        setPose(new Pose2d(estimator.getEstimatedPosition().getX(), estimator.getEstimatedPosition().getY(), heading));
+        Rotation2d heading = isBlueAlliance ? new Rotation2d() : new Rotation2d(Math.PI);
+        Pose2d pose = estimator.getEstimatedPosition();
+        setPose(new Pose2d(pose.getX(), pose.getY(), heading));
     }
 
     @Override
@@ -255,21 +168,22 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         // This method will be called once per scheduler run
         // Use this for any background processing
         super.periodic();
-        isBlue = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
+        isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
         estimator.update(getMap().gyro.getRotation2d(), getData().getModulePositions());
 
-        periodicMove(xSpeed.getAsDouble(), ySpeed.getAsDouble(), rotation.getAsDouble(), isRobotCentric, aimAtSpeaker);
+        visionMap.updateData(estimator);
+
+        periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());
         Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
     }
 
-    private double rotateToAngleImpl(double targetAngleDegrees) {
-        targetAngleDegrees += 180;
+    private double calculateRotationSpeed(double targetAngleDegrees) {
         double estimatorAngle = estimator.getEstimatedPosition().getRotation().getDegrees();
         double rotationSpeed = rotationPID.calculate(estimatorAngle, targetAngleDegrees);
-        rotationSpeed += Math.copySign(rotationKs, rotationSpeed);
+        rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
         // need to ensure we move at a fast enough speed for gyro to keep up
         if (Math.abs(rotationSpeed) < 0.02 || Math.abs(rotationPID.getPositionError()) < 0.75) {
             rotationSpeed = 0;
@@ -280,5 +194,68 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Target Velocity", rotationPID.getSetpoint().velocity);
         Logger.recordOutput("Position Error", rotationPID.getPositionError());
         return rotationSpeed;
+    }
+
+    private void periodicMove(final double xSpeed, final double ySpeed, final double rotation) {
+        double rotationInput = DEADBAND.applyAsDouble(rotation);
+        double xInput = DEADBAND.applyAsDouble(xSpeed);
+        double yInput = DEADBAND.applyAsDouble(ySpeed);
+
+        double translateXSpeed = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double translateYSpeed = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
+        if (aimTarget.isPresent()) {
+            rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
+        }
+
+        move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
+    }
+
+    private void move(final double xSpeed, final double ySpeed,
+            final double rotation, boolean robotCentricDrive) {
+        ChassisSpeeds speeds;
+        if (robotCentricDrive) {
+            speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
+        } else {
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
+                    rotation, estimator.getEstimatedPosition().getRotation());
+        }
+
+        move(speeds);
+    }
+
+    private void move(final ChassisSpeeds speeds) {
+        // Now use this in our kinematics
+        final SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, maxDriveSpeedMetersPerSecond);
+
+        // All the states
+        getData().setDesiredStates(moduleStates);
+    }
+
+    private Translation2d getRobotToTarget(Translation2d target) {
+        return target.minus(estimator.getEstimatedPosition().getTranslation());
+    }
+
+    private double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
+        var robotToTarget = getRobotToTarget(target.get());
+        Logger.recordOutput("Target Pose", robotToTarget);
+        return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
+    }
+
+    private Translation2d getReefCenter() {
+        Translation3d translation;
+        if (isBlueAlliance) {
+            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
+            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
+            Logger.recordOutput("Reef Center", "Blue");
+            translation = poseLeft.plus(poseRight).div(2);
+        } else {
+            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
+            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
+            Logger.recordOutput("Reef Center", "Red");
+            translation = poseLeft.plus(poseRight).div(2);
+        }
+        return translation.toTranslation2d();
     }
 }

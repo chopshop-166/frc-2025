@@ -6,8 +6,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
+import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro;
 import com.chopshop166.chopshoplib.states.PIDValues;
@@ -17,7 +19,10 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogEncoder;
@@ -85,7 +90,7 @@ public class Shrimp extends RobotMap {
 
         final double maxDriveSpeedMetersPerSecond = Units.feetToMeters(12);
 
-        final double maxRotationRadianPerSecond = Math.PI * 2;
+        final double maxRotationRadianPerSecond = Math.PI;
 
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNEO(1), 50, 1),
@@ -100,6 +105,29 @@ public class Shrimp extends RobotMap {
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro,
                 config, holonomicDrive);
+    }
+
+    @Override
+    public VisionMap getVisionMap() {
+        // Front left and front right camera locations
+        // Cam mounted 9.029 in. sideways of center(left), 9.029 in. forward of center,
+        // 9.75 in. up from center. Mounted 0 degrees around x axis (roll), angled up
+        // 65.752 degrees, and rotated side-to-side 45 degrees facing left
+        Transform3d robotToCamFL = new Transform3d(
+                new Translation3d(Units.inchesToMeters(-9.029), Units.inchesToMeters(9.029),
+                        Units.inchesToMeters(9.75)),
+                new Rotation3d(0, Units.degreesToRadians(-65.752), Units.degreesToRadians(45)));
+
+        // Cam mounted 9.029 in. sideways of center(right), 9.029 in. forward of center,
+        // 9.75 in. up from center. Mounted 0 degrees around x axis (roll), angled up
+        // 64.752 degrees, and rotated side-to-side 45 degrees facing right
+        Transform3d robotToCamFR = new Transform3d(
+                new Translation3d(Units.inchesToMeters(9.029), Units.inchesToMeters(9.029),
+                        Units.inchesToMeters(9.75)),
+                new Rotation3d(0, Units.degreesToRadians(-64.752), Units.degreesToRadians(-45)));
+
+        return new VisionMap(new CameraSource("ShrimpCamFL", robotToCamFL),
+                new CameraSource("ShrimpCamFR", robotToCamFR));
     }
 
     @Override
