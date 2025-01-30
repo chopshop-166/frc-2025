@@ -109,14 +109,18 @@ public class Shrimp extends RobotMap {
 
     @Override
     public VisionMap getVisionMap() {
-        // Cam mounted 9.029 sideways of center, 9.029 in. forward of center, 9.75 in.
-        // up from center.
+        // Front left and front right camera locations
+        // Cam mounted 9.029 in. sideways of center(left), 9.029 in. forward of center,
+        // 9.75 in. up from center. Mounted 0 degrees around x axis (roll), angled up
+        // 65.752 degrees, and rotated side-to-side 45 degrees facing left
         Transform3d robotToCamFL = new Transform3d(
                 new Translation3d(Units.inchesToMeters(-9.029), Units.inchesToMeters(9.029),
                         Units.inchesToMeters(9.75)),
                 new Rotation3d(0, Units.degreesToRadians(-65.752), Units.degreesToRadians(45)));
 
-        // Cam mounted facing __, __ forward of center, __ up from center.
+        // Cam mounted 9.029 in. sideways of center(right), 9.029 in. forward of center,
+        // 9.75 in. up from center. Mounted 0 degrees around x axis (roll), angled up
+        // 64.752 degrees, and rotated side-to-side 45 degrees facing right
         Transform3d robotToCamFR = new Transform3d(
                 new Translation3d(Units.inchesToMeters(9.029), Units.inchesToMeters(9.029),
                         Units.inchesToMeters(9.75)),

@@ -29,6 +29,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.FieldConstants.Reef;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
@@ -129,11 +130,20 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     // Pull reef coords from FieldConstants somehow
     // Find nearest reef apriltag (do we need a different method of estimation
     // rather than global? Might want to just focus on one tag rather than multiple
-    // behind the robot)
+    // behind the robot. Reef tags are blue 17-22, red 6-11)
     // Use coords and move command to move to either left or right branch
     // (translation to get robotToReef and then move)
     // Need rotation in here somewhere. Logic from rotateTo command, since ideally
     // we move and rotate at the same time
+
+    public enum Branch {
+        leftBranch,
+        rightBranch
+    };
+
+    public Command alignToReefBranch(Branch leftBranch, Branch rightBranch) {
+
+    };
 
     public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
         return run(() -> {
