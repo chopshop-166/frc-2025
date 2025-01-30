@@ -141,9 +141,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         rightBranch
     };
 
-    public Command alignToReefBranch(Branch leftBranch, Branch rightBranch) {
+    // public Command alignToReefBranch(Branch leftBranch, Branch rightBranch) {
 
-    };
+    // };
 
     public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
         return run(() -> {
