@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -29,7 +31,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.FieldConstants.Reef;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
@@ -53,6 +54,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     boolean isRobotCentric = false;
     Optional<Translation2d> aimTarget = Optional.empty();
     boolean isAimingAtReef = false;
+    List<Pose2d> BLUE_APRIL_TAG_REEF_POSITIONS = new ArrayList<>();
+    List<Pose2d> RED_APRIL_TAG_REEF_POSITIONS = new ArrayList<>();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -91,6 +94,19 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.xSpeedSupplier = xSpeed;
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
+
+        // Magic numbers! Beware!
+        // These loops are hard-coded based on the manual.
+        for (int i = 6; i < 12; i++) {
+            kTagLayout.getTagPose(i).ifPresent(pose -> {
+                RED_APRIL_TAG_REEF_POSITIONS.add(pose.toPose2d());
+            });
+        }
+        for (int i = 17; i < 22; i++) {
+            kTagLayout.getTagPose(i).ifPresent(pose -> {
+                BLUE_APRIL_TAG_REEF_POSITIONS.add(pose.toPose2d());
+            });
+        }
 
     }
 
