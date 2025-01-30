@@ -22,9 +22,11 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -60,6 +62,13 @@ public class ColdStart extends RobotMap {
         frontRightSteer.setInverted(true);
         rearLeftSteer.setInverted(true);
         rearRightSteer.setInverted(true);
+
+        SparkMaxConfig steerConfig = new SparkMaxConfig();
+        steerConfig.smartCurrentLimit(30);
+        frontLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        frontRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        rearLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        rearRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         // Configuration for MK4i with L2 speeds
         Configuration MK4i_L2 = new Configuration(SDSSwerveModule.MK4_V2.gearRatio,
@@ -123,15 +132,18 @@ public class ColdStart extends RobotMap {
     public ElevatorMap getElevatorMap() {
         CSSparkFlex leftMotor = new CSSparkFlex(11);
         CSSparkFlex rightMotor = new CSSparkFlex(12);
-        SparkFlexConfig config = new SparkFlexConfig();
-        config.follow(leftMotor.getMotorController());
-        config.voltageCompensation(11.5);
-        // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+        SparkFlexConfig configRight = new SparkFlexConfig();
+        SparkFlexConfig configLeft = new SparkFlexConfig();
+
+        configRight.follow(leftMotor.getMotorController());
+        configRight.voltageCompensation(11.5);
+        configRight.smartCurrentLimit(30);
+        rightMotor.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        SparkFlexConfig configLeft = new SparkFlexConfig();
         configLeft.voltageCompensation(11.5);
+        configLeft.smartCurrentLimit(30);
+        // Gear reduction is 22.2 sprocket diameter is 1.75 inches
         configLeft.encoder.positionConversionFactor((1 / 22.2) * Math.PI * 1.75);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
@@ -152,6 +164,12 @@ public class ColdStart extends RobotMap {
     public CoralManipMap getCoralManipMap() {
         CSSparkMax leftWheels = new CSSparkMax(9);
         CSSparkMax rightWheels = new CSSparkMax(10);
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.smartCurrentLimit(30);
+        leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+                PersistMode.kNoPersistParameters);
+        rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(9);
         return new CoralManipMap(leftWheels, rightWheels, sensor::get);
     }
@@ -159,6 +177,9 @@ public class ColdStart extends RobotMap {
     @Override
     public DeepClimbMap getDeepClimbMap() {
         CSSparkMax motor = new CSSparkMax(13);
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.smartCurrentLimit(30);
+        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(8);
         return new DeepClimbMap(motor, sensor::get);
 
