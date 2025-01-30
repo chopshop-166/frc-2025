@@ -28,6 +28,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
     double holdHeight = 0;
+    double elevatorMaxHeight = 56.5;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
@@ -112,7 +113,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     @Override
     public void periodic() {
         super.periodic();
-
+        heightPub.set(getData().heightAbsInches / elevatorMaxHeight);
         if (level != ElevatorPresets.OFF) {
             double targetHeight = level == ElevatorPresets.HOLD ? holdHeight : getMap().elevatorPreset.getValue(level);
             double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));

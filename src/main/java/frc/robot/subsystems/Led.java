@@ -15,6 +15,9 @@ import frc.robot.maps.subsystems.patterns.ElevatorFill;
 
 public class Led extends LEDSubsystem {
 
+    Color elevatorColor = new Color(112, 255, 248);
+    Color visionColor = new Color(255, 32, 82);
+
     public Led(LedMapBase map) {
         super(map);
         // This one is length / 2 because the buffer has a mirrored other half
@@ -37,23 +40,23 @@ public class Led extends LEDSubsystem {
     }
 
     public Command elevatorToPreset() {
-        return setPattern("Elevator", new SpinPattern(new Color(112, 255, 248)), "Moving");
+        return setPattern("Elevator", new SpinPattern(elevatorColor), "Moving");
     }
 
     public Command elevatorAtPreset() {
-        return setPattern("Elevator", new FlashPattern(new Color(112, 255, 248), 0.125), "At preset");
+        return setPattern("Elevator", new FlashPattern(elevatorColor, 0.125), "At preset");
     }
 
     public Command fillElevator() {
-        return setPattern("Elevator", new ElevatorFill(), "Fill");
+        return setPattern("Elevator", new ElevatorFill(elevatorColor), "Fill");
     }
 
     public Command visionAligning() {
-        return setPattern("Vision", new SpinPattern(new Color(255, 32, 82)), "Aligning");
+        return setPattern("Vision", new SpinPattern(visionColor), "Aligning");
     }
 
     public Command visionAligned() {
-        return setPattern("Vision", new FlashPattern(new Color(255, 32, 82), 0.125), "Aligned");
+        return setPattern("Vision", new FlashPattern(visionColor, 0.125), "Aligned");
     }
 
     public Command starPower() {
@@ -64,7 +67,7 @@ public class Led extends LEDSubsystem {
         return setPattern("Fun", new FirePattern(0), "Fire");
     }
 
-    public Command awesome() {
+    public Command awesomeColour() {
         return setGlobalPattern(new Color(255, 32, 82));
     }
 }
