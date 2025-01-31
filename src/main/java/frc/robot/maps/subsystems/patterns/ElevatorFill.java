@@ -6,9 +6,6 @@ import com.chopshop166.chopshoplib.leds.SegmentBuffer;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.maps.subsystems.ElevatorMap;
-import frc.robot.maps.subsystems.AlgaeDestageMap.Data;
-import frc.robot.subsystems.Elevator;
 
 public class ElevatorFill extends AnimatedPattern {
     private final Color color;

@@ -6,15 +6,11 @@ import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.PersistenceCheck;
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
-import com.chopshop166.chopshoplib.motors.Modifier;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.ElevatorMap.Data;
@@ -28,7 +24,6 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
     double holdHeight = 0;
-    double elevatorMaxHeight = 56.5;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
@@ -113,7 +108,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     @Override
     public void periodic() {
         super.periodic();
-        heightPub.set(getData().heightAbsInches / elevatorMaxHeight);
+        heightPub.set(getData().heightAbsInches / getMap().hardLimits.max());
         if (level != ElevatorPresets.OFF) {
             double targetHeight = level == ElevatorPresets.HOLD ? holdHeight : getMap().elevatorPreset.getValue(level);
             double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
