@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
+import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.DeepClimb;
@@ -52,14 +53,16 @@ public final class Robot extends CommandRobot {
     private Elevator elevator = new Elevator(map.getElevatorMap());
     private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
 
-    private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, outtake);
+    private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
 
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
-        NamedCommands.registerCommand("Score Coral", commandSequences.scoreCoral());
+        NamedCommands.registerCommand("Score Coral L1", commandSequences.scoreL1Auto());
+        NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
+        NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)
@@ -122,10 +125,16 @@ public final class Robot extends CommandRobot {
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
 
-        driveController.a().onTrue(outtake.intake());
-        driveController.b().whileTrue(outtake.score());
-        driveController.x().whileTrue(outtake.scoreL1());
-        driveController.y().whileTrue(algaeDestage.destageAlgae());
+        copilotController.a().onTrue(commandSequences.intake());
+
+        copilotController.x().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1))
+                .onFalse(commandSequences.scoreL1());
+
+        copilotController.b().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2))
+                .onFalse(commandSequences.score());
+
+        copilotController.y().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3))
+                .onFalse(commandSequences.score());
 
         driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
 
