@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +14,7 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     private final double RELEASE_SPEED_L1 = -0.1;
     private final double INTAKE_SPEED = -0.2;
     private final double RELEASE_DELAY = 1;
-    private final double ALIGNMENT_SPEED = 0.06;
+    private final double ALIGNMENT_SPEED = 0.09;
     private final double ALGAE_INTAKE = 0.4;
 
     public CoralManip(CoralManipMap coralManipMap) {

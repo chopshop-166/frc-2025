@@ -2,8 +2,18 @@ package com.chopshop166.chopshoplib.maps;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import edu.wpi.first.math.estimator.PoseEstimator;
+import java.util.Map;
+
+import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionMap {
 
@@ -39,16 +49,48 @@ public class VisionMap {
      * @param <T>       Estimator wheel type.
      * @param estimator The WPIlib estimator object.
      */
-    public <T> void updateData(final PoseEstimator<T> estimator) {
+    public <T> void updateData(Data data) {
+        data.targets.clear();
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
             if (!results.isEmpty()) {
-                var estimate = source.estimator.update(results.get(results.size() - 1));
-                estimate.ifPresent(est -> {
-                    estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
-                            est.timestampSeconds);
-                });
+                for (PhotonPipelineResult result : results) {
+                    if ((result.multitagResult.isPresent()
+                            && result.multitagResult.get().estimatedPose.ambiguity > 0.50)) {
+                        continue;
+                    }
+                    // Put the results measurement into the pose estimator
+                    var estimate = source.estimator.update(result);
+                    estimate.ifPresent(est -> {
+                        Logger.recordOutput("Camera Pose Estimate", est.estimatedPose.toPose2d());
+                        data.estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
+                                est.timestampSeconds);
+                    });
+                }
+                // Now copy the targets that are found
+                PhotonPipelineResult latestResult = results.get(results.size() - 1);
+                for (var target : latestResult.targets) {
+                    int targetID = target.getFiducialId();
+
+                    target.bestCameraToTarget = target.bestCameraToTarget.plus(source.robotToCam);
+                    Transform3d reefToRobot = new Transform3d(target.bestCameraToTarget.getTranslation(),
+                            target.bestCameraToTarget.getRotation().rotateBy(new Rotation3d(0, 0, Math.PI)));
+                    target.bestCameraToTarget = reefToRobot;
+
+                    if (data.targets.containsKey(target.getFiducialId())) {
+                        data.targets.get(targetID).add(target);
+                    } else {
+                        ArrayList<PhotonTrackedTarget> targetList = new ArrayList<>();
+                        targetList.add(target);
+                        data.targets.put(targetID, targetList);
+                    }
+                }
             }
         }
+    }
+
+    public static class Data {
+        public SwerveDrivePoseEstimator estimator;
+        public Map<Integer, List<PhotonTrackedTarget>> targets = new HashMap<>();
     }
 }

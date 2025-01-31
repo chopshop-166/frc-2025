@@ -7,8 +7,10 @@ import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
+import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
@@ -27,6 +29,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -116,6 +120,22 @@ public class ColdStart extends RobotMap {
         return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro2, config, holonomicDrive);
+    }
+
+    public VisionMap getVisionMap() {
+
+        return new VisionMap(
+                new CameraSource("FL_RIPTIDE1_CAM",
+                        new Transform3d(Units.inchesToMeters(9.43), Units.inchesToMeters(10.72),
+                                Units.inchesToMeters(8.24),
+                                new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(-16.76)))),
+                new CameraSource("FR_RIPTIDE1_CAM",
+                        new Transform3d(Units.inchesToMeters(
+                                9.43),
+                                Units.inchesToMeters(
+                                        -10.72),
+                                Units.inchesToMeters(8.24),
+                                new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(16.76)))));
     }
 
     @Override

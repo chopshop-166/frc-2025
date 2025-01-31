@@ -25,35 +25,6 @@ public class FieldConstants {
     public static final double startingLineX = Units.inchesToMeters(299.438); // Measured from the inside of starting
                                                                               // line
 
-    public static class Processor {
-        public static final Pose2d centerFace = new Pose2d(Units.inchesToMeters(235.726), 0,
-                Rotation2d.fromDegrees(90));
-    }
-
-    public static class Barge {
-        public static final Translation2d farCage = new Translation2d(Units.inchesToMeters(345.428),
-                Units.inchesToMeters(286.779));
-        public static final Translation2d middleCage = new Translation2d(Units.inchesToMeters(345.428),
-                Units.inchesToMeters(242.855));
-        public static final Translation2d closeCage = new Translation2d(Units.inchesToMeters(345.428),
-                Units.inchesToMeters(199.947));
-
-        // Measured from floor to bottom of cage
-        public static final double deepHeight = Units.inchesToMeters(3.125);
-        public static final double shallowHeight = Units.inchesToMeters(30.125);
-    }
-
-    public static class CoralStation {
-        public static final Pose2d leftCenterFace = new Pose2d(
-                Units.inchesToMeters(33.526),
-                Units.inchesToMeters(291.176),
-                Rotation2d.fromDegrees(90 - 144.011));
-        public static final Pose2d rightCenterFace = new Pose2d(
-                Units.inchesToMeters(33.526),
-                Units.inchesToMeters(25.824),
-                Rotation2d.fromDegrees(144.011 - 90));
-    }
-
     public static class Reef {
         public static final Translation2d center = new Translation2d(Units.inchesToMeters(176.746),
                 Units.inchesToMeters(158.501));
@@ -93,6 +64,15 @@ public class FieldConstants {
                     Units.inchesToMeters(160.375),
                     Units.inchesToMeters(130.144),
                     Rotation2d.fromDegrees(-120));
+
+            HashMap<Pose2d, Integer> reefTags = new HashMap<Pose2d, Integer>();
+            // Add poses and IDs (pose, ID)
+            reefTags.put(centerFaces[1], 6);
+            reefTags.put(centerFaces[0], 7);
+            reefTags.put(centerFaces[5], 8);
+            reefTags.put(centerFaces[4], 9);
+            reefTags.put(centerFaces[3], 10);
+            reefTags.put(centerFaces[2], 11);
 
             // Initialize branch positions
             for (int face = 0; face < 6; face++) {
@@ -138,6 +118,22 @@ public class FieldConstants {
                 branchPositions.add((face * 2) + 2, fillLeft);
             }
         }
+    }
+
+    public static class Processor {
+        public static final Pose2d centerFace = new Pose2d(Units.inchesToMeters(235.726), 0,
+                Rotation2d.fromDegrees(90));
+    }
+
+    public static class CoralStation {
+        public static final Pose2d leftCenterFace = new Pose2d(
+                Units.inchesToMeters(33.526),
+                Units.inchesToMeters(291.176),
+                Rotation2d.fromDegrees(90 - 144.011));
+        public static final Pose2d rightCenterFace = new Pose2d(
+                Units.inchesToMeters(33.526),
+                Units.inchesToMeters(25.824),
+                Rotation2d.fromDegrees(144.011 - 90));
     }
 
     public static class StagingPositions {

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Vision.Branch;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
@@ -143,14 +144,16 @@ public final class Robot extends CommandRobot {
     @Override
     public void configureButtonBindings() {
         driveController.back().onTrue(drive.resetCmd());
-        driveController.leftBumper()
+        driveController.a()
                 .whileTrue(drive.robotCentricDrive());
+        driveController.rightBumper().whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
+        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
 
         copilotController.a().onTrue(commandSequences.intake());
         elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
 
-        copilotController.getPovButton(POVDirection.UP).onTrue(funnel.rotateForward());
-        copilotController.getPovButton(POVDirection.LEFT).onTrue(funnel.rotateBackward());
+        driveController.x().onTrue(funnel.rotateForward());
+        driveController.y().onTrue(funnel.rotateBackward());
 
         copilotController.x()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))

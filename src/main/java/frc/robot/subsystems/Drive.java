@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -21,38 +22,43 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Vision;
+import frc.robot.Vision.Branch;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
+    private final VisionMap.Data visionData = new VisionMap.Data();
+    private final Vision vision = new Vision();
 
     private final double maxDriveSpeedMetersPerSecond;
     private final double maxRotationRadiansPerSecond;
     private final double SPEED_COEFFICIENT = 1;
     private final double ROTATION_COEFFICIENT = 1;
-    private final double ROTATION_KP = 0.05;
     private final double ROTATION_KS = 0.19;
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(2, 0, 0.0, new Constraints(4.0, 5.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(4.0, 5.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
 
     boolean isBlueAlliance = false;
     boolean isRobotCentric = false;
-    Optional<Translation2d> aimTarget = Optional.empty();
-    boolean isAimingAtReef = false;
+    Branch targetBranch = Branch.NONE;
+    Pose2d targetPose = new Pose2d();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -77,6 +83,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 VecBuilder.fill(0.02, 0.02, 0.01),
                 VecBuilder.fill(0.1, 0.1, 0.01));
 
+        visionData.estimator = estimator;
+
         AutoBuilder.configure(estimator::getEstimatedPosition,
                 this::setPose,
                 this::getSpeeds,
@@ -92,6 +100,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
+        translationPID_X.setTolerance(0.01);
+        translationPID_Y.setTolerance(0.01);
     }
 
     public void setPose(Pose2d pose) {
@@ -117,40 +127,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         });
     }
 
-    public Command aimAtReefCenter() {
-        return startEnd(() -> {
-            aimTarget = Optional.of(getReefCenter());
-        }, () -> {
-            aimTarget = Optional.empty();
-        });
-    }
-
-    // public Command alignToReefBranch
-    // Probably want arguments of leftBranch or rightBranch?
-    // Pull reef coords from FieldConstants somehow
-    // Find nearest reef apriltag (do we need a different method of estimation
-    // rather than global? Might want to just focus on one tag rather than multiple
-    // behind the robot. Reef tags are blue 17-22, red 6-11)
-    // Use coords and move command to move to either left or right branch
-    // (translation to get robotToReef and then move)
-    // Need rotation in here somewhere. Logic from rotateTo command, since ideally
-    // we move and rotate at the same time
-
-    public enum Branch {
-        leftBranch,
-        rightBranch
-    };
-
-    // public Command alignToReefBranch(Branch leftBranch, Branch rightBranch) {
-
-    // };
-
-    public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
-        return run(() -> {
-            move(xSpeed, ySpeed, 0, false);
-        }).withTimeout(seconds).andThen(safeStateCmd());
-    }
-
     @Override
     public void reset() {
         Rotation2d heading = isBlueAlliance ? new Rotation2d() : new Rotation2d(Math.PI);
@@ -171,13 +147,14 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
         estimator.update(getMap().gyro.getRotation2d(), getData().getModulePositions());
 
-        visionMap.updateData(estimator);
+        visionMap.updateData(visionData);
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
-        Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());
         Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
+        Logger.recordOutput("Target Branch", targetBranch);
+
     }
 
     private double calculateRotationSpeed(double targetAngleDegrees) {
@@ -196,19 +173,85 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return rotationSpeed;
     }
 
+    private void visionCalcs() {
+        Optional<Integer> closestReefTag = Optional.empty();
+        if (visionData.targets.size() > 0) {
+            vision.filterReefTags(isBlueAlliance, visionData.targets);
+            PhotonTrackedTarget reefToRobot = vision.pickBestReefLocation(visionData.targets);
+            closestReefTag = Optional.of(reefToRobot.fiducialId);
+
+        } else {
+            // Fall back to picking tag based on global pose
+            closestReefTag = Optional.of(vision.findNearestTagId(isBlueAlliance, estimator));
+        }
+
+        if (closestReefTag.isPresent()) {
+            var chosenTagPoseOption = kTagLayout.getTagPose(closestReefTag.get());
+            if (chosenTagPoseOption.isPresent()) {
+                Pose2d chosenTagPose = chosenTagPoseOption.get().toPose2d();
+                Logger.recordOutput("Chosen Tag", chosenTagPose);
+                chosenTagPose = chosenTagPose.transformBy(targetBranch.getOffset());
+                Logger.recordOutput("Chosen Tag Branch Offset", chosenTagPose);
+                targetPose = chosenTagPose;
+            }
+        }
+    }
+
     private void periodicMove(final double xSpeed, final double ySpeed, final double rotation) {
         double rotationInput = DEADBAND.applyAsDouble(rotation);
         double xInput = DEADBAND.applyAsDouble(xSpeed);
         double yInput = DEADBAND.applyAsDouble(ySpeed);
 
-        double translateXSpeed = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
-        double translateYSpeed = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double translateXSpeedMPS = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double translateYSpeedMPS = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
         double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
-        if (aimTarget.isPresent()) {
-            rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
+
+        if (targetBranch != Branch.NONE) {
+
+            visionCalcs();
+            Pose2d robotPose = estimator.getEstimatedPosition();
+            // soooooooooo x and y are backwards somehow. Values underneath are correct
+            translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
+            translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+
+            // Direction is swapped on Red side so need to negate PID output
+            if (!isBlueAlliance) {
+                translateXSpeedMPS *= -1;
+                translateYSpeedMPS *= -1;
+            }
+            rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
+                    targetPose.getRotation().getDegrees());
         }
 
-        move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
+        move(translateXSpeedMPS, translateYSpeedMPS, rotationSpeed, isRobotCentric);
+    }
+
+    public Command moveToBranch(Branch targetBranch) {
+        return startEnd(() -> {
+            translationPID_X.reset(estimator.getEstimatedPosition().getX());
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
+            rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
+            this.targetBranch = targetBranch;
+            isRobotCentric = false;
+            visionCalcs();
+        }, () -> {
+            this.targetBranch = Branch.NONE;
+        });
+    }
+
+    public Command moveToBranchWait(Branch targetBranch) {
+        return runOnce(() -> {
+            translationPID_X.reset(estimator.getEstimatedPosition().getX());
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
+            rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
+            this.targetBranch = targetBranch;
+        }).andThen(run(() -> {
+        })).until(() -> {
+            return translationPID_X.atSetpoint() && translationPID_Y.atSetpoint() && rotationPID.atSetpoint();
+        }).finallyDo(() -> {
+            this.targetBranch = Branch.NONE;
+        });
+
     }
 
     private void move(final double xSpeed, final double ySpeed,
@@ -235,29 +278,4 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         getData().setDesiredStates(moduleStates);
     }
 
-    private Translation2d getRobotToTarget(Translation2d target) {
-        return target.minus(estimator.getEstimatedPosition().getTranslation());
-    }
-
-    private double calculateRotateSpeedToTarget(Supplier<Translation2d> target) {
-        var robotToTarget = getRobotToTarget(target.get());
-        Logger.recordOutput("Target Pose", robotToTarget);
-        return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
-    }
-
-    private Translation2d getReefCenter() {
-        Translation3d translation;
-        if (isBlueAlliance) {
-            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Blue");
-            translation = poseLeft.plus(poseRight).div(2);
-        } else {
-            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Red");
-            translation = poseLeft.plus(poseRight).div(2);
-        }
-        return translation.toTranslation2d();
-    }
 }
