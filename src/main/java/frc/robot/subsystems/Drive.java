@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -53,6 +55,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     boolean isRobotCentric = false;
     Optional<Translation2d> aimTarget = Optional.empty();
     boolean isAimingAtReef = false;
+    List<Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new ArrayList<>();
+    List<Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new ArrayList<>();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -91,6 +95,18 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.xSpeedSupplier = xSpeed;
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
+
+        for (int i = 6; i < 12; i++) {
+            kTagLayout.getTagPose(i).ifPresent(pose -> {
+                RED_APRIL_TAGS_REEF_POSITIONS.add(pose.toPose2d());
+            });
+        }
+
+        for (int i = 17; i < 22; i++) {
+            kTagLayout.getTagPose(i).ifPresent(pose -> {
+                BLUE_APRIL_TAGS_REEF_POSITIONS.add(pose.toPose2d());
+            });
+        }
 
     }
 
@@ -138,12 +154,28 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public enum Branch {
         leftBranch,
-        rightBranch
+        rightbranch
+
     };
 
-    // public Command alignToReefBranch(Branch leftBranch, Branch rightBranch) {
+    // Function that takes current robot pose and finds the nearest reef apriltag to
+    // it, returning the id
+    /////////////////////// After --> and taking the average pose from both cameras?
 
-    // };
+    public Pose2d findNearestTag() {
+        Pose2d robotPose = estimator.getEstimatedPosition();
+        if (isBlueAlliance) {
+            return robotPose.nearest(BLUE_APRIL_TAGS_REEF_POSITIONS);
+        } else {
+            return robotPose.nearest(RED_APRIL_TAGS_REEF_POSITIONS);
+        }
+    }
+
+    public Command alignToReefBranch(Branch branch) {
+        return run(() -> {
+
+        });
+    }
 
     public Command moveInDirection(double xSpeed, double ySpeed, double seconds) {
         return run(() -> {
