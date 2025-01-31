@@ -60,9 +60,9 @@ public final class Robot extends CommandRobot {
     public void registerNamedCommands() {
 
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
-        NamedCommands.registerCommand("Score Coral L1", commandSequences.scoreL1());
-        NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoral(ElevatorPresets.SCOREL2));
-        NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoral(ElevatorPresets.SCOREL3));
+        NamedCommands.registerCommand("Score Coral L1", commandSequences.scoreL1Auto());
+        NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
+        NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)
@@ -126,10 +126,13 @@ public final class Robot extends CommandRobot {
                 .whileTrue(drive.robotCentricDrive());
 
         copilotController.a().onTrue(commandSequences.intake());
+
+        copilotController.x().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1))
+                .onFalse(commandSequences.scoreL1());
+
         copilotController.b().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2))
                 .onFalse(commandSequences.score());
-        copilotController.x().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1))
-                .onFalse(commandSequences.score());
+
         copilotController.y().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3))
                 .onFalse(commandSequences.score());
 

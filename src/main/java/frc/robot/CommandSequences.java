@@ -31,9 +31,8 @@ public class CommandSequences {
     }
 
     public Command intake() {
-        return led.intaking().andThen(elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
-                coralManip.intake(), led.gamePieceAquired());
-
+        return led.elevatorToPreset().andThen(elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
+                led.intaking(), coralManip.intake(), led.gamePieceAquired());
     }
 
     public Command moveElevator(ElevatorPresets level) {
@@ -45,8 +44,12 @@ public class CommandSequences {
                 led.elevatorAtPreset());
     }
 
-    public Command scoreCoral(ElevatorPresets level) {
+    public Command scoreCoralAuto(ElevatorPresets level) {
         return led.elevatorToPreset().andThen(elevator.moveTo(level), led.elevatorAtPreset(), coralManip.score());
+    }
+
+    public Command scoreL1Auto() {
+        return moveElevator(ElevatorPresets.SCOREL1).andThen(scoreL1());
     }
 
     public Command scoreL1() {
@@ -61,6 +64,6 @@ public class CommandSequences {
     }
 
     public Command resetAll() {
-        return drive.resetCmd().andThen(coralManip.resetCmd(), algaeDestage.resetCmd());
+        return drive.resetCmd().andThen(coralManip.resetCmd(), algaeDestage.resetCmd(), elevator.resetCmd());
     }
 }
