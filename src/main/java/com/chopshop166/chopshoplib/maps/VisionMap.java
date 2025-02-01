@@ -3,6 +3,9 @@ package com.chopshop166.chopshoplib.maps;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import edu.wpi.first.math.estimator.PoseEstimator;
 
 public class VisionMap {
@@ -39,16 +42,24 @@ public class VisionMap {
      * @param <T>       Estimator wheel type.
      * @param estimator The WPIlib estimator object.
      */
-    public <T> void updateData(final PoseEstimator<T> estimator) {
+    public <T> void updateData(Data data) {
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
             if (!results.isEmpty()) {
                 var estimate = source.estimator.update(results.get(results.size() - 1));
+                for (var result : results) {
+                    data.targets = result.targets;
+                }
                 estimate.ifPresent(est -> {
-                    estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
+                    data.estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
                             est.timestampSeconds);
                 });
             }
         }
+    }
+
+    public static class Data<T> {
+        PoseEstimator<T> estimator;
+        List<PhotonTrackedTarget> targets;
     }
 }
