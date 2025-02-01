@@ -57,6 +57,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     boolean isAimingAtReef = false;
     List<Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new ArrayList<>();
     List<Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new ArrayList<>();
+    List<Integer> BLUE_APRIL_TAGS_REEF_IDS = new ArrayList<>();
+    List<Integer> RED_APRIL_TAGS_REEF_IDS = new ArrayList<>();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -173,9 +175,32 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     // funky??)
 
     //
-    public Pose2d getVisibleTags() {
-        
+
+    public boolean filterReefTags() {
+        boolean targetVisible = false;
+        var results = visionMap.visionSources.camera.getAllUnreadResults();
+
+        if (result.hasTargets()) {
+            // At least one AprilTag was seen by the camera
+            for (var target : result.getTargets()) {
+                if (target.getFiducialId() == 7) {
+                    // Found Tag 7, record its information
+                    targetVisible = true;
+                }
+            }
+        }
     }
+    // public Pose2d getVisibleReefTags() {
+    // var targets = visionMap.visionSources.getLatestResult().getTargets();
+    // for (var tgt : targets) {
+    // var tagPose = kTagLayout.getTagPose(tgt.getFiducialId());
+    // if (tagPose.isEmpty())
+    // continue;
+    // numTags++;
+    // avgDist +=
+    // tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+    // }
+    // }
 
     public Pose2d findNearestTag() {
         Pose2d robotPose = estimator.getEstimatedPosition();
