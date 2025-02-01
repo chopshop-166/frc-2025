@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +26,12 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
     public Command spoolOut() {
         return runSafe(() -> {
             getData().motor.setpoint = SPOOL_OUT_SPEED;
+        });
+    }
+
+    // make the command for when the trigger is pressed spool in
+    public Command spoolInJoystick(DoubleSupplier speed) {
+        return runSafe(() -> {
         });
     }
 
