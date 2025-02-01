@@ -96,7 +96,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
-        for (int i = 6; i < 12; i++) {
+        for (int i = 6; i < 11; i++) {
             kTagLayout.getTagPose(i).ifPresent(pose -> {
                 RED_APRIL_TAGS_REEF_POSITIONS.add(pose.toPose2d());
             });
@@ -109,6 +109,11 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         }
 
     }
+
+    public enum Branch {
+        leftBranch,
+        rightBranch
+    };
 
     public void setPose(Pose2d pose) {
         estimator.resetPosition(getMap().gyro.getRotation2d(),
@@ -152,15 +157,25 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     // Need rotation in here somewhere. Logic from rotateTo command, since ideally
     // we move and rotate at the same time
 
-    public enum Branch {
-        leftBranch,
-        rightbranch
-
-    };
-
     // Function that takes current robot pose and finds the nearest reef apriltag to
     // it, returning the id
     /////////////////////// After --> and taking the average pose from both cameras?
+    ///
+    // align to reef branch command part two:
+    // 1. Filter list of apriltags and figure out which ones we see
+    // 2. filter down to reef apriltags and get poses
+    // 3. find best target (nearest tag or tag closest to center of sight? Another
+    // way?)
+    // 4. now we know that best target plane is a reef side. Apriltags are always in
+    // the middle at the same point in relation to the reef side, so then
+    // apply translation offset for left or right branch
+    // 5. With branch pose, use autoBuilder to maneuver to the branch (angle
+    // funky??)
+
+    //
+    public Pose2d getVisibleTags() {
+        
+    }
 
     public Pose2d findNearestTag() {
         Pose2d robotPose = estimator.getEstimatedPosition();
