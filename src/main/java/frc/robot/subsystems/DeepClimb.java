@@ -7,12 +7,16 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.DeepClimbMap.Data;
+import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 
 public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
 
     private final double SPOOL_IN_SPEED = 1.0;
     private final double SPOOL_OUT_SPEED = -0.72;
-
+    final double RAISE_SPEED_COEF = .85;
+    final double MANUAL_LOWER_SPEED_COEF = 0.5;
+    final double SLOW_DOWN_COEF = 0.5;
+    
     public DeepClimb(DeepClimbMap deepClimbMap) {
         super(new Data(), deepClimbMap);
     }
@@ -29,9 +33,17 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
         });
     }
 
-    // make the command for when the trigger is pressed spool in
-    public Command spoolInJoystick(DoubleSupplier speed) {
+    // Get joystick value to control deep climb
+    public Command rotate(DoubleSupplier liftSpeed) {
         return runSafe(() -> {
+            double speed = liftSpeed.getAsDouble();
+            double speedCoef = RAISE_SPEED_COEF;
+            if (speed < 0) {
+                speedCoef = MANUAL_LOWER_SPEED_COEF;
+            }
+            if (Math.abs(speed) > 0) {
+                getData().motor.setpoint = speed * speedCoef;
+            }
         });
     }
 
