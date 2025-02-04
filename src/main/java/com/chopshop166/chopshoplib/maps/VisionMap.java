@@ -42,7 +42,7 @@ public class VisionMap {
      * @param <T>       Estimator wheel type.
      * @param estimator The WPIlib estimator object.
      */
-    public <T> void updateData(Data data) {
+    public <T> void updateData(Data<T> data) {
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
             if (!results.isEmpty()) {
