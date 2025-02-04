@@ -178,6 +178,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public boolean filterReefTags() {
         boolean targetVisible = false;
+        // TODO: Loop over visionSources and get the camera from each one
         var results = visionMap.visionSources.camera.getAllUnreadResults();
 
         if (result.hasTargets()) {
@@ -189,6 +190,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 }
             }
         }
+        return targetVisible;
     }
     // public Pose2d getVisibleReefTags() {
     // var targets = visionMap.visionSources.getLatestResult().getTargets();
