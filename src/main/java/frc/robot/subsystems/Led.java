@@ -35,7 +35,7 @@ public class Led extends LEDSubsystem {
         return setPattern("Intake", new SpinPattern(), "Spinning");
     }
 
-    public Command gamePieceAquired() {
+    public Command gamePieceAcquired() {
         return setPattern("Intake", new FlashPattern(Color.kGreen, 0.125), "Flashing");
     }
 
