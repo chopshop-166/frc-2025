@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.estimator.PoseEstimator;
@@ -43,23 +44,25 @@ public class VisionMap {
      * @param estimator The WPIlib estimator object.
      */
     public <T> void updateData(Data<T> data) {
+        data.targets.clear();
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
             if (!results.isEmpty()) {
-                var estimate = source.estimator.update(results.get(results.size() - 1));
-                for (var result : results) {
-                    data.targets = result.targets;
-                }
+                PhotonPipelineResult latestResult = results.get(results.size() - 1);
+                // Put the results measurement into the pose estimator
+                var estimate = source.estimator.update(latestResult);
                 estimate.ifPresent(est -> {
                     data.estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
                             est.timestampSeconds);
                 });
+                // Now copy the targets that are found
+                data.targets.add(List.copyOf(latestResult.targets));
             }
         }
     }
 
     public static class Data<T> {
         PoseEstimator<T> estimator;
-        List<PhotonTrackedTarget> targets;
+        List<List<PhotonTrackedTarget>> targets = new ArrayList<>();
     }
 }
