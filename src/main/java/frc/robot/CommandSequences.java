@@ -72,7 +72,7 @@ public class CommandSequences {
                 led.elevatorAtPreset());
     }
 
-    // Sets the rumble amount on controlers
+    // Sets the rumble amount on controllers
 
     public Command setRumble(ButtonXboxController controller, int rumbleAmount) {
         return runOnce(() -> {
