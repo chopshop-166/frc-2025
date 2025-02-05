@@ -1,12 +1,15 @@
 package frc.robot.subsystems;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -31,7 +34,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.FieldConstants.Reef;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
@@ -55,10 +57,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     boolean isRobotCentric = false;
     Optional<Translation2d> aimTarget = Optional.empty();
     boolean isAimingAtReef = false;
-    List<Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new ArrayList<>();
-    List<Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new ArrayList<>();
-    List<Integer> BLUE_APRIL_TAGS_REEF_IDS = new ArrayList<>();
-    List<Integer> RED_APRIL_TAGS_REEF_IDS = new ArrayList<>();
+    Map<Integer, Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new HashMap<>();
+    Map<Integer, Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new HashMap<>();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -99,14 +99,16 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.rotationSupplier = rotation;
 
         for (int i = 6; i < 11; i++) {
+            final int tmpI = i;
             kTagLayout.getTagPose(i).ifPresent(pose -> {
-                RED_APRIL_TAGS_REEF_POSITIONS.add(pose.toPose2d());
+                RED_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
             });
         }
 
         for (int i = 17; i < 22; i++) {
+            final int tmpI = i;
             kTagLayout.getTagPose(i).ifPresent(pose -> {
-                BLUE_APRIL_TAGS_REEF_POSITIONS.add(pose.toPose2d());
+                BLUE_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
             });
         }
 
@@ -178,20 +180,23 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public boolean filterReefTags() {
         boolean targetVisible = false;
-        // TODO: Loop over visionSources and get the camera from each one
-        var results = visionMap.visionSources.camera.getAllUnreadResults();
+        for (CameraSource source : visionMap.visionSources) {
+            var results = source.camera.getAllUnreadResults();
 
-        if (result.hasTargets()) {
-            // At least one AprilTag was seen by the camera
-            for (var target : result.getTargets()) {
-                if (target.getFiducialId() == 7) {
-                    // Found Tag 7, record its information
-                    targetVisible = true;
+            if (!results.isEmpty()) {
+                PhotonPipelineResult visionResult = results.get(results.size() - 1);
+                // At least one AprilTag was seen by the camera
+                for (var target : visionResult.targets) {
+                    if (target.getFiducialId() == 7) {
+                        // Found Tag 7, record its information
+                        targetVisible = true;
+                    }
                 }
             }
         }
         return targetVisible;
     }
+
     // public Pose2d getVisibleReefTags() {
     // var targets = visionMap.visionSources.getLatestResult().getTargets();
     // for (var tgt : targets) {
@@ -204,12 +209,11 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     // }
     // }
 
-    public Pose2d findNearestTag() {
-        Pose2d robotPose = estimator.getEstimatedPosition();
+    public int findNearestTagId() {
         if (isBlueAlliance) {
-            return robotPose.nearest(BLUE_APRIL_TAGS_REEF_POSITIONS);
+            return getNearestTagIdImpl(BLUE_APRIL_TAGS_REEF_POSITIONS);
         } else {
-            return robotPose.nearest(RED_APRIL_TAGS_REEF_POSITIONS);
+            return getNearestTagIdImpl(RED_APRIL_TAGS_REEF_POSITIONS);
         }
     }
 
@@ -245,7 +249,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
         estimator.update(getMap().gyro.getRotation2d(), getData().getModulePositions());
 
-        visionMap.updateData(estimator);
+        // visionMap.updateData(estimator);
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
@@ -331,5 +335,18 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             translation = poseLeft.plus(poseRight).div(2);
         }
         return translation.toTranslation2d();
+    }
+
+    private int getNearestTagIdImpl(Map<Integer, Pose2d> poses) {
+        Pose2d robotPose = estimator.getEstimatedPosition();
+        Translation2d robotTranslation = robotPose.getTranslation();
+        Rotation2d robotRotation = robotPose.getRotation();
+        return Collections.min(
+                poses.entrySet(),
+                Comparator.comparing((Map.Entry<Integer, Pose2d> entry) -> {
+                    return robotTranslation.getDistance(entry.getValue().getTranslation());
+                }).thenComparing((Map.Entry<Integer, Pose2d> entry) -> {
+                    return Math.abs(robotRotation.minus(entry.getValue().getRotation()).getRadians());
+                })).getKey();
     }
 }
