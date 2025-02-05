@@ -80,7 +80,7 @@ public class CommandSequences {
         });
     }
 
-    // Resets all comands
+    // Resets all commands
 
     public Command resetAll() {
         return drive.resetCmd().andThen(coralManip.resetCmd(), algaeDestage.resetCmd(), elevator.resetCmd());
