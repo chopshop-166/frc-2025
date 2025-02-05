@@ -31,14 +31,14 @@ public class CommandSequences {
     }
 
     // Moves elevator to intake preset and intakes when preset has been reached
-    // Intakes until sensor tripped, leds indicate that game piece is aquired
+    // Intakes until sensor is tripped, LEDs indicate that game piece is acquired
 
     public Command intake() {
         return led.elevatorToPreset().andThen(elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
-                led.intaking(), coralManip.intake(), led.gamePieceAquired());
+                led.intaking(), coralManip.intake(), led.gamePieceAcquired());
     }
 
-    // Moves elevtor to set coral preset
+    // Moves elevator to set coral preset
 
     public Command moveElevator(ElevatorPresets level) {
         return led.elevatorToPreset().andThen(elevator.moveTo(level), led.elevatorAtPreset());
@@ -58,7 +58,7 @@ public class CommandSequences {
     }
 
     // Moves elevator to L1 preset
-    // L1 is differnt from the other scoring presets which is why its has its own
+    // L1 is different from the other scoring presets which is why its has it own
     // move to and score command
 
     public Command scoreL1Auto() {
