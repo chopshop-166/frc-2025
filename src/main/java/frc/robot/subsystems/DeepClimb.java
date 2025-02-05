@@ -13,10 +13,10 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
 
     private final double SPOOL_IN_SPEED = 1.0;
     private final double SPOOL_OUT_SPEED = -0.72;
-    final double RAISE_SPEED_COEF = .85;
-    final double MANUAL_LOWER_SPEED_COEF = 0.5;
+    final double RAISE_SPEED_COEF = 1.0;
+    final double MANUAL_LOWER_SPEED_COEF = 1.0;
     final double SLOW_DOWN_COEF = 0.5;
-    
+
     public DeepClimb(DeepClimbMap deepClimbMap) {
         super(new Data(), deepClimbMap);
     }
@@ -41,9 +41,9 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
             if (speed < 0) {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }
-            if (Math.abs(speed) > 0) {
-                getData().motor.setpoint = speed * speedCoef;
-            }
+
+            getData().motor.setpoint = speed * speedCoef;
+
         });
     }
 
