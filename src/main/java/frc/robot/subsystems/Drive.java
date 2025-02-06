@@ -39,6 +39,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
+    private final VisionMap.Data<SwerveDrivePoseEstimator> visionData = new VisionMap.Data<>();
 
     private final double maxDriveSpeedMetersPerSecond;
     private final double maxRotationRadiansPerSecond;
@@ -181,6 +182,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     public boolean filterReefTags() {
         boolean targetVisible = false;
         for (CameraSource source : visionMap.visionSources) {
+            // TODO: Fix function to use VisionMap.Data instead of source.camera
+            // getAllUnreadResults is being called both here and in updateData.
+            // This means that one of the two will clear the results and the other will get
+            // nothing.
             var results = source.camera.getAllUnreadResults();
 
             if (!results.isEmpty()) {
@@ -210,11 +215,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     // }
 
     public int findNearestTagId() {
-        if (isBlueAlliance) {
-            return getNearestTagIdImpl(BLUE_APRIL_TAGS_REEF_POSITIONS);
-        } else {
-            return getNearestTagIdImpl(RED_APRIL_TAGS_REEF_POSITIONS);
-        }
+        return getNearestTagIdImpl(getOurReef());
     }
 
     public Command alignToReefBranch(Branch branch) {
@@ -249,7 +250,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
         estimator.update(getMap().gyro.getRotation2d(), getData().getModulePositions());
 
-        // visionMap.updateData(estimator);
+        visionMap.updateData(visionData);
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
@@ -335,6 +336,13 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             translation = poseLeft.plus(poseRight).div(2);
         }
         return translation.toTranslation2d();
+    }
+
+    private Map<Integer, Pose2d> getOurReef() {
+        if (isBlueAlliance) {
+            return BLUE_APRIL_TAGS_REEF_POSITIONS;
+        }
+        return RED_APRIL_TAGS_REEF_POSITIONS;
     }
 
     private int getNearestTagIdImpl(Map<Integer, Pose2d> poses) {
