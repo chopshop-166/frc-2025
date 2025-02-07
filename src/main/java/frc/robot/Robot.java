@@ -136,6 +136,8 @@ public final class Robot extends CommandRobot {
         copilotController.y().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3))
                 .onFalse(commandSequences.score());
 
+        copilotController.back().onTrue(elevator.resetCmd());
+
         driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
 
     }
@@ -158,7 +160,8 @@ public final class Robot extends CommandRobot {
     @Override
     public void setDefaultCommands() {
         elevator.setDefaultCommand(elevator.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY())));
-        deepClimb.setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getRightY())));
+        deepClimb
+                .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getRightY())));
     }
 
     public DoubleUnaryOperator getScaler(double leftRange, double rightRange) {
