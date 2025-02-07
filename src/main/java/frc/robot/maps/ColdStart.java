@@ -52,14 +52,14 @@ public class ColdStart extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
-        final double FLOFFSET = 0;
-        final double FROFFSET = 0;
-        final double RLOFFSET = 0;
-        final double RROFFSET = 0;
+        final double FLOFFSET = 46;
+        final double FROFFSET = 270;
+        final double RLOFFSET = 257.5;
+        final double RROFFSET = 132.2 + 180;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
-        final double MODULE_OFFSET_XY = Units.inchesToMeters(10.875);
+        final double MODULE_OFFSET_XY = Units.inchesToMeters(11.379);
         final PigeonGyro2 pigeonGyro2 = new PigeonGyro2(1);
 
         final CSSparkMax frontLeftSteer = new CSSparkMax(4);
@@ -74,6 +74,7 @@ public class ColdStart extends RobotMap {
 
         SparkMaxConfig steerConfig = new SparkMaxConfig();
         steerConfig.smartCurrentLimit(30);
+        steerConfig.idleMode(IdleMode.kCoast);
         frontLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
                 PersistMode.kPersistParameters);
         frontRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
@@ -89,7 +90,7 @@ public class ColdStart extends RobotMap {
 
         // All Distances are in Meters
         // Front Left Module
-        final AnalogEncoder encoderFL = new AnalogEncoder(0, 360, FLOFFSET);
+        final AnalogEncoder encoderFL = new AnalogEncoder(1, 360, FLOFFSET);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 encoderFL::get, frontLeftSteer, new CSSparkFlex(3), MK4i_L2);
 
@@ -99,12 +100,12 @@ public class ColdStart extends RobotMap {
                 encoderFR::get, frontRightSteer, new CSSparkFlex(7), MK4i_L2);
 
         // Rear Left Module
-        final AnalogEncoder encoderRL = new AnalogEncoder(1, 360, RLOFFSET);
+        final AnalogEncoder encoderRL = new AnalogEncoder(2, 360, RLOFFSET);
         final SDSSwerveModule rearLeft = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 encoderRL::get, rearLeftSteer, new CSSparkFlex(1), MK4i_L2);
 
         // Rear Right Module
-        final AnalogEncoder encoderRR = new AnalogEncoder(2, 360, RROFFSET);
+        final AnalogEncoder encoderRR = new AnalogEncoder(0, 360, RROFFSET);
         final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 encoderRR::get, rearRightSteer, new CSSparkFlex(5), MK4i_L2);
 
@@ -134,15 +135,16 @@ public class ColdStart extends RobotMap {
 
         configRight.follow(leftMotor.getMotorController());
         configRight.voltageCompensation(11.5);
-        configRight.smartCurrentLimit(30);
+        configRight.smartCurrentLimit(50);
+        configRight.idleMode(IdleMode.kBrake);
         rightMotor.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-
         configLeft.voltageCompensation(11.5);
-        configLeft.smartCurrentLimit(30);
+        configLeft.smartCurrentLimit(50);
+        configLeft.idleMode(IdleMode.kBrake);
         configLeft.encoder.velocityConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 60);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        configLeft.encoder.positionConversionFactor((1 / 22.2) * Math.PI * 1.75);
+        configLeft.encoder.positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
@@ -157,7 +159,7 @@ public class ColdStart extends RobotMap {
 
         return new ElevatorMap(leftMotor, leftMotor.getEncoder(),
                 new ElevatorMap.ElevatorPresetValues(19.5, 5, 18, 38, 0, 0, 0),
-                new ValueRange(0, 56), new ValueRange(3, 53), pid, feedForward);
+                new ValueRange(0, 57.5), new ValueRange(3, 53), pid, feedForward);
     }
 
     @Override
@@ -166,6 +168,7 @@ public class ColdStart extends RobotMap {
         CSSparkMax rightWheels = new CSSparkMax(10);
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
         leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kNoPersistParameters);
         rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,

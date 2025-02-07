@@ -93,8 +93,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.heightAbsInches = encoder.getAbsolutePosition(); // need to do math to figure out the
-                                                              // right value
+        data.heightAbsInches = encoder.getDistance(); // need to do math to figure out the
+                                                      // right value
         data.liftingHeightVelocity = encoder.getRate();
     }
 
