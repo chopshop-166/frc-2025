@@ -23,6 +23,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     final double MANUAL_LOWER_SPEED_COEF = 0.5;
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
+    final double ZEROING_SPEED = -0.1;
     double holdHeight = 0;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
@@ -51,6 +52,12 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             }
 
         });
+    }
+
+    public Command zero() {
+        return runSafe(() -> {
+            getData().motor.setpoint = ZEROING_SPEED;
+        }).until(() -> getMap().motor.errored()).andThen(resetCmd());
     }
 
     public Command moveToZero() {

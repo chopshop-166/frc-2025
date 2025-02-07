@@ -137,6 +137,7 @@ public final class Robot extends CommandRobot {
                 .onFalse(commandSequences.score());
 
         copilotController.back().onTrue(elevator.resetCmd());
+        copilotController.start().onTrue(elevator.zero());
 
         driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
 

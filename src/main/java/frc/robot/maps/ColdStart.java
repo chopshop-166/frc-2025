@@ -11,6 +11,7 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
+import com.chopshop166.chopshoplib.motors.validators.EncoderValidator;
 import com.chopshop166.chopshoplib.sensors.CSEncoder;
 import com.chopshop166.chopshoplib.sensors.CtreEncoder;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
@@ -147,11 +148,13 @@ public class ColdStart extends RobotMap {
 
         configLeft.voltageCompensation(11.5);
         configLeft.smartCurrentLimit(30);
-        configLeft.encoder.velocityConversionFactor(((1 / 22.2) * Math.PI * 1.75) / 60);
+        configLeft.encoder.velocityConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 60);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
         configLeft.encoder.positionConversionFactor((1 / 22.2) * Math.PI * 1.75);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
+
+        leftMotor.addValidator(new EncoderValidator(leftMotor.getEncoder()::getRate, 1, 20));
 
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
