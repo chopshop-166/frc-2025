@@ -2,7 +2,9 @@ package com.chopshop166.chopshoplib.maps;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -56,13 +58,23 @@ public class VisionMap {
                             est.timestampSeconds);
                 });
                 // Now copy the targets that are found
-                data.targets.add(List.copyOf(latestResult.targets));
+                // data.targets.add(List.copyOf(latestResult.targets));
+                for (var target : latestResult.targets) {
+                    int targetID = target.getFiducialId();
+                    if (data.targets.containsKey(target.getFiducialId())) {
+                        data.targets.get(targetID).add(target);
+                    } else {
+                        ArrayList<PhotonTrackedTarget> targetList = new ArrayList<>();
+                        targetList.add(target);
+                        data.targets.put(targetID, targetList);
+                    }
+                }
             }
         }
     }
 
     public static class Data<T> {
-        PoseEstimator<T> estimator;
-        List<List<PhotonTrackedTarget>> targets = new ArrayList<>();
+        public PoseEstimator<T> estimator;
+        public Map<Integer, List<PhotonTrackedTarget>> targets = new HashMap<>();
     }
 }
