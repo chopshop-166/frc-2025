@@ -1,6 +1,7 @@
 package frc.robot.maps;
 
-import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
@@ -10,22 +11,15 @@ import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
-import com.chopshop166.chopshoplib.motors.validators.EncoderValidator;
-import com.chopshop166.chopshoplib.sensors.CSEncoder;
-import com.chopshop166.chopshoplib.sensors.CtreEncoder;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -35,23 +29,26 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 
-@RobotMapFor("ColdStart")
+@RobotMapFor("00:80:2F:40:A7:9D")
 public class ColdStart extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
-        final double FLOFFSET = 0;
-        final double FROFFSET = 0;
-        final double RLOFFSET = 0;
-        final double RROFFSET = 0;
+        final double FLOFFSET = 46;
+        final double FROFFSET = 270;
+        final double RLOFFSET = 257.5;
+        final double RROFFSET = 132.2 + 180;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
-        final double MODULE_OFFSET_XY = Units.inchesToMeters(10.875);
+        final double MODULE_OFFSET_XY = Units.inchesToMeters(11.379);
         final PigeonGyro2 pigeonGyro2 = new PigeonGyro2(1);
 
         final CSSparkMax frontLeftSteer = new CSSparkMax(4);
@@ -59,13 +56,10 @@ public class ColdStart extends RobotMap {
         final CSSparkMax rearLeftSteer = new CSSparkMax(2);
         final CSSparkMax rearRightSteer = new CSSparkMax(6);
 
-        frontLeftSteer.setInverted(true);
-        frontRightSteer.setInverted(true);
-        rearLeftSteer.setInverted(true);
-        rearRightSteer.setInverted(true);
-
         SparkMaxConfig steerConfig = new SparkMaxConfig();
         steerConfig.smartCurrentLimit(30);
+        steerConfig.idleMode(IdleMode.kCoast);
+        steerConfig.inverted(true);
         frontLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
                 PersistMode.kPersistParameters);
         frontRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
@@ -81,40 +75,24 @@ public class ColdStart extends RobotMap {
 
         // All Distances are in Meters
         // Front Left Module
-        final CANcoder encoderFL = new CANcoder(2);
-        CANcoderConfiguration encoderFLConfig = new CANcoderConfiguration();
-        encoderFLConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-        encoderFLConfig.MagnetSensor.MagnetOffset = FLOFFSET;
-        encoderFL.getConfigurator().apply(encoderFLConfig);
+        final AnalogEncoder encoderFL = new AnalogEncoder(1, 360, FLOFFSET);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                new CtreEncoder(encoderFL), frontLeftSteer, new CSSparkMax(3), MK4i_L2);
+                encoderFL::get, frontLeftSteer, new CSSparkFlex(3), MK4i_L2);
 
         // Front Right Module
-        final CANcoder encoderFR = new CANcoder(4);
-        CANcoderConfiguration encoderFRConfig = new CANcoderConfiguration();
-        encoderFRConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-        encoderFRConfig.MagnetSensor.MagnetOffset = FROFFSET;
-        encoderFR.getConfigurator().apply(encoderFRConfig);
+        final AnalogEncoder encoderFR = new AnalogEncoder(3, 360, FROFFSET);
         final SDSSwerveModule frontRight = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                new CtreEncoder(encoderFR), frontRightSteer, new CSSparkMax(7), MK4i_L2);
+                encoderFR::get, frontRightSteer, new CSSparkFlex(7), MK4i_L2);
 
         // Rear Left Module
-        final CANcoder encoderRL = new CANcoder(3);
-        CANcoderConfiguration encoderRLConfig = new CANcoderConfiguration();
-        encoderRLConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-        encoderRLConfig.MagnetSensor.MagnetOffset = RLOFFSET;
-        encoderRL.getConfigurator().apply(encoderRLConfig);
+        final AnalogEncoder encoderRL = new AnalogEncoder(2, 360, RLOFFSET);
         final SDSSwerveModule rearLeft = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                new CtreEncoder(encoderRL), rearLeftSteer, new CSSparkMax(1), MK4i_L2);
+                encoderRL::get, rearLeftSteer, new CSSparkFlex(1), MK4i_L2);
 
         // Rear Right Module
-        final CANcoder encoderRR = new CANcoder(1);
-        CANcoderConfiguration encoderRRConfig = new CANcoderConfiguration();
-        encoderRRConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-        encoderRRConfig.MagnetSensor.MagnetOffset = RROFFSET;
-        encoderRR.getConfigurator().apply(encoderRRConfig);
+        final AnalogEncoder encoderRR = new AnalogEncoder(0, 360, RROFFSET);
         final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                new CtreEncoder(encoderRR), rearRightSteer, new CSSparkMax(5), MK4i_L2);
+                encoderRR::get, rearRightSteer, new CSSparkFlex(5), MK4i_L2);
 
         final double maxDriveSpeedMetersPerSecond = Units.feetToMeters(15);
 
@@ -142,30 +120,32 @@ public class ColdStart extends RobotMap {
 
         configRight.follow(leftMotor.getMotorController());
         configRight.voltageCompensation(11.5);
-        configRight.smartCurrentLimit(30);
+        configRight.smartCurrentLimit(50);
+        configRight.idleMode(IdleMode.kBrake);
         rightMotor.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-
         configLeft.voltageCompensation(11.5);
-        configLeft.smartCurrentLimit(30);
-        configLeft.encoder.velocityConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 60);
+        configLeft.smartCurrentLimit(50);
+        configLeft.idleMode(IdleMode.kBrake);
+        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        configLeft.encoder.positionConversionFactor((1 / 22.2) * Math.PI * 1.75);
+        configLeft.encoder.positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        leftMotor.addValidator(new EncoderValidator(leftMotor.getEncoder()::getRate, 1, 20));
+        leftMotor.validateEncoderRate(.2, 10);
 
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
+        ProfiledPIDController pid = new ProfiledPIDController(0.28, 0, 0,
+                new Constraints(45, 150));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0, 0);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.01, 0);
 
         return new ElevatorMap(leftMotor, leftMotor.getEncoder(),
-                new ElevatorMap.ElevatorPresetValues(19.5, 5, 18, 38, 0, 0, 0),
-                new ValueRange(0, 56), new ValueRange(3, 53), pid, feedForward);
+                new ElevatorMap.ElevatorPresetValues(16, 5, 14, 29, 56, 57.5, 1),
+                new ValueRange(0, 57.5), new ValueRange(3, 53), pid, feedForward);
     }
 
     @Override
@@ -174,8 +154,11 @@ public class ColdStart extends RobotMap {
         CSSparkMax rightWheels = new CSSparkMax(10);
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
         leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kNoPersistParameters);
+        // Right is identical to left, but inverted
+        config.inverted(true);
         rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(9);
@@ -187,10 +170,30 @@ public class ColdStart extends RobotMap {
         CSSparkMax motor = new CSSparkMax(13);
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         CSDigitalInput sensor = new CSDigitalInput(8);
         return new DeepClimbMap(motor, sensor::get);
 
     }
 
+    // @Override
+    // public LedMapBase getLedMap() {
+    // var result = new WPILedMap(1, 1);
+    // var leds = result.ledBuffer;
+
+    // SegmentConfig underglow = leds.segment(1).tags();
+    // return result;
+    // }
+
+    @Override
+    public void setupLogging() {
+        // Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB
+        // stick
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());
+        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+    }
 }

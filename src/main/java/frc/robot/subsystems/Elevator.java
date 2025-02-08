@@ -19,7 +19,7 @@ import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     final ProfiledPIDController pid;
-    final double RAISE_SPEED = .85;
+    final double RAISE_SPEED = 1.0;
     final double MANUAL_LOWER_SPEED_COEF = 0.5;
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
@@ -55,9 +55,11 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     }
 
     public Command zero() {
-        return runSafe(() -> {
+        return startSafe(() -> {
+            getMap().motor.resetValidators();
+            level = ElevatorPresets.OFF;
             getData().motor.setpoint = ZEROING_SPEED;
-        }).until(() -> getMap().motor.errored()).andThen(resetCmd());
+        }).until(() -> getMap().motor.validate()).andThen(resetCmd());
     }
 
     public Command moveToZero() {
