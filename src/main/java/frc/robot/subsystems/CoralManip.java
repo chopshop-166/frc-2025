@@ -12,8 +12,9 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
     private final double RELEASE_SPEEDRIGHT = 0.3;
     private final double RELEASE_SPEEDLEFT = 0.1;
-    private final double INTAKE_SPEED = 0.3;
+    private final double INTAKE_SPEED = -0.3;
     private final double RELEASE_DELAY = 1;
+    // private final double SLOW_SPEED = .
     private final double DELAY = 0.0;
 
     public CoralManip(CoralManipMap coralManipMap) {
@@ -39,6 +40,13 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
             getData().leftMotor.setpoint = RELEASE_SPEEDRIGHT;
             getData().rightMotor.setpoint = RELEASE_SPEEDRIGHT;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
+    }
+
+    public Command feed() {
+        return runSafe(() -> {
+            getData().leftMotor.setpoint = RELEASE_SPEEDLEFT;
+            getData().rightMotor.setpoint = RELEASE_SPEEDLEFT;
+        });
     }
 
     public Command intake() {

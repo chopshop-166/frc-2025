@@ -10,8 +10,12 @@ import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
+import com.chopshop166.chopshoplib.leds.SegmentConfig;
+import com.chopshop166.chopshoplib.maps.LedMapBase;
+import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
+import com.chopshop166.chopshoplib.maps.WPILedMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
@@ -142,19 +146,19 @@ public class ColdStart extends RobotMap {
         configLeft.voltageCompensation(11.5);
         configLeft.smartCurrentLimit(50);
         configLeft.idleMode(IdleMode.kBrake);
-        configLeft.encoder.velocityConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 60);
+        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
         configLeft.encoder.positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        leftMotor.validateEncoderRate(1, 20);
+        leftMotor.validateEncoderRate(.2, 10);
 
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.1, 0, 0,
-                new Constraints(15, 100));
+        ProfiledPIDController pid = new ProfiledPIDController(0.28, 0, 0,
+                new Constraints(45, 150));
         pid.setTolerance(0.25);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.01, 0);
 
@@ -174,6 +178,7 @@ public class ColdStart extends RobotMap {
                 PersistMode.kNoPersistParameters);
         rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
+        rightWheels.setInverted(true);
         CSDigitalInput sensor = new CSDigitalInput(9);
         return new CoralManipMap(leftWheels, rightWheels, sensor::get);
     }
@@ -191,6 +196,15 @@ public class ColdStart extends RobotMap {
         return new DeepClimbMap(motor, sensor::get);
 
     }
+
+    // @Override
+    // public LedMapBase getLedMap() {
+    //     var result = new WPILedMap(1, 1);
+    //     var leds = result.ledBuffer;
+
+    //     SegmentConfig underglow = leds.segment(1).tags();
+    //     return result;
+    // }
 
     @Override
     public void setupLogging() {
