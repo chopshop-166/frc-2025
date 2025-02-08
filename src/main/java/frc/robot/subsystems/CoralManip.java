@@ -27,6 +27,13 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
     }
 
+    public Command scoreL4() {
+        return run(() -> {
+            getData().leftMotor.setpoint = RELEASE_SPEEDLEFT;
+            getData().rightMotor.setpoint = RELEASE_SPEEDLEFT;
+        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
+    }
+
     public Command score() {
         return run(() -> {
             getData().leftMotor.setpoint = RELEASE_SPEEDRIGHT;

@@ -25,14 +25,19 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
         SCOREL3,
 
+        SCOREL4,
+
+        HIGHESTPOINT,
+
         STOW,
 
         HOLD
     }
 
-    public record ElevatorPresetValues(double intake, double scoreL1, double scoreL2, double scoreL3, double stow) {
+    public record ElevatorPresetValues(double intake, double scoreL1, double scoreL2, double scoreL3, double scoreL4,
+            double highestPoint, double stow) {
         public ElevatorPresetValues() {
-            this(0, 0, 0, 0, 0);
+            this(0, 0, 0, 0, 0, 0, 0);
         }
 
         public double getValue(ElevatorPresets preset) {
@@ -47,6 +52,10 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
                     return scoreL2;
                 case SCOREL3:
                     return scoreL3;
+                case SCOREL4:
+                    return scoreL4;
+                case HIGHESTPOINT:
+                    return highestPoint;
                 case STOW:
                     return stow;
                 default:
