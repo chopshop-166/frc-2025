@@ -148,14 +148,15 @@ public class ColdStart extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        leftMotor.addValidator(new EncoderValidator(leftMotor.getEncoder()::getRate, 1, 20));
+        leftMotor.validateEncoderRate(1, 20);
 
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
+        ProfiledPIDController pid = new ProfiledPIDController(0.1, 0, 0,
+                new Constraints(15, 100));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0, 0);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.01, 0);
 
         return new ElevatorMap(leftMotor, leftMotor.getEncoder(),
                 new ElevatorMap.ElevatorPresetValues(19.5, 5, 18, 38, 0, 0, 0),

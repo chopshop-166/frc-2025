@@ -12,6 +12,7 @@ import com.chopshop166.chopshoplib.Autonomous;
 import com.chopshop166.chopshoplib.RobotUtils;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
+import com.chopshop166.chopshoplib.controls.ButtonXboxController.POVDirection;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -140,7 +141,8 @@ public final class Robot extends CommandRobot {
         copilotController.start().onTrue(elevator.zero());
 
         driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
-
+        copilotController.getPovButton(POVDirection.RIGHT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL2))
+                .onFalse(elevator.safeStateCmd());
     }
 
     @Override
