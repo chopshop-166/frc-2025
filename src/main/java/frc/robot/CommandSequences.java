@@ -72,6 +72,14 @@ public class CommandSequences {
                 led.elevatorAtPreset());
     }
 
+    // Scores on L4 preset, moving elevator up to score and then stowing elevator
+
+    public Command scoreL4() {
+        return coralManip.scoreL4().andThen(led.elevatorToPreset(), elevator.moveTo(ElevatorPresets.HIGHESTPOINT),
+                elevator.moveTo(ElevatorPresets.STOW),
+                led.elevatorAtPreset());
+    }
+
     // Sets the rumble amount on controllers
 
     public Command setRumble(ButtonXboxController controller, int rumbleAmount) {
