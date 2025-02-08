@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
@@ -75,7 +76,10 @@ public class CommandSequences {
     // Scores on L4 preset, moving elevator up to score and then stowing elevator
 
     public Command scoreL4() {
-        return coralManip.scoreL4().andThen(led.elevatorToPreset(), elevator.moveTo(ElevatorPresets.HIGHESTPOINT),
+        return coralManip.scoreL4().andThen(led.elevatorToPreset(),
+                // kick elevator up so that it actually scores (knocks coral onto reef)
+                elevator.moveTo(ElevatorPresets.HIGHESTPOINT),
+                waitSeconds(0.5),
                 elevator.moveTo(ElevatorPresets.STOW),
                 led.elevatorAtPreset());
     }
