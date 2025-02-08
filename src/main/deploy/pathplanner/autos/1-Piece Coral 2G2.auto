@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Zero Da Elevatah"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -17,7 +23,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Position Coral L1"
+                  "name": "Position Coral L2"
                 }
               }
             ]
@@ -26,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Score Coral L1"
+            "name": "Score Coral L2"
           }
         }
       ]
