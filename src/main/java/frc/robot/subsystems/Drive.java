@@ -180,17 +180,12 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     //
 
     public void filterReefTags() {
+        var reef = getOurReef();
         for (var key : visionData.targets.keySet()) {
-            if (isBlueAlliance) {
-                if (key < 6 || key > 11) {
-                    visionData.targets.remove(key);
-                }
-                // Pull in keySet from targets HashMap
-                // Remove all IDs / keys which aren't blue reef
-            } else {
-                if (key < 17 || key > 22) {
-                    visionData.targets.remove(key);
-                }
+            // Pull in keySet from targets HashMap
+            // Remove all IDs / keys which aren't our reef
+            if (reef.keySet().contains(key)) {
+                visionData.targets.remove(key);
             }
         }
     }
