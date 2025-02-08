@@ -1,42 +1,27 @@
 package frc.robot.maps;
 
-import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.opencv.core.Mat.Tuple2;
 
 import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
-import com.chopshop166.chopshoplib.leds.SegmentConfig;
-import com.chopshop166.chopshoplib.maps.LedMapBase;
-import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
-import com.chopshop166.chopshoplib.maps.WPILedMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
-import com.chopshop166.chopshoplib.motors.validators.EncoderValidator;
-import com.chopshop166.chopshoplib.sensors.CSEncoder;
-import com.chopshop166.chopshoplib.sensors.CtreEncoder;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -71,14 +56,10 @@ public class ColdStart extends RobotMap {
         final CSSparkMax rearLeftSteer = new CSSparkMax(2);
         final CSSparkMax rearRightSteer = new CSSparkMax(6);
 
-        frontLeftSteer.setInverted(true);
-        frontRightSteer.setInverted(true);
-        rearLeftSteer.setInverted(true);
-        rearRightSteer.setInverted(true);
-
         SparkMaxConfig steerConfig = new SparkMaxConfig();
         steerConfig.smartCurrentLimit(30);
         steerConfig.idleMode(IdleMode.kCoast);
+        steerConfig.inverted(true);
         frontLeftSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
                 PersistMode.kPersistParameters);
         frontRightSteer.getMotorController().configure(steerConfig, ResetMode.kNoResetSafeParameters,
@@ -176,9 +157,10 @@ public class ColdStart extends RobotMap {
         config.idleMode(IdleMode.kBrake);
         leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kNoPersistParameters);
+        // Right is identical to left, but inverted
+        config.inverted(true);
         rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        rightWheels.setInverted(true);
         CSDigitalInput sensor = new CSDigitalInput(9);
         return new CoralManipMap(leftWheels, rightWheels, sensor::get);
     }
@@ -189,8 +171,8 @@ public class ColdStart extends RobotMap {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        motor.setInverted(true);
 
         CSDigitalInput sensor = new CSDigitalInput(8);
         return new DeepClimbMap(motor, sensor::get);
@@ -199,11 +181,11 @@ public class ColdStart extends RobotMap {
 
     // @Override
     // public LedMapBase getLedMap() {
-    //     var result = new WPILedMap(1, 1);
-    //     var leds = result.ledBuffer;
+    // var result = new WPILedMap(1, 1);
+    // var leds = result.ledBuffer;
 
-    //     SegmentConfig underglow = leds.segment(1).tags();
-    //     return result;
+    // SegmentConfig underglow = leds.segment(1).tags();
+    // return result;
     // }
 
     @Override
