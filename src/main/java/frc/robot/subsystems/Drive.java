@@ -179,27 +179,20 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     //
 
-    public boolean filterReefTags() {
-        boolean targetVisible = false;
-        for (CameraSource source : visionMap.visionSources) {
-            // TODO: Fix function to use VisionMap.Data instead of source.camera
-            // getAllUnreadResults is being called both here and in updateData.
-            // This means that one of the two will clear the results and the other will get
-            // nothing.
-            var results = source.camera.getAllUnreadResults();
-
-            if (!results.isEmpty()) {
-                PhotonPipelineResult visionResult = results.get(results.size() - 1);
-                // At least one AprilTag was seen by the camera
-                for (var target : visionResult.targets) {
-                    if (target.getFiducialId() == 7) {
-                        // Found Tag 7, record its information
-                        targetVisible = true;
-                    }
+    public void filterReefTags() {
+        for (var key : visionData.targets.keySet()) {
+            if (isBlueAlliance) {
+                if (key < 6 || key > 11) {
+                    visionData.targets.remove(key);
+                }
+                // Pull in keySet from targets HashMap
+                // Remove all IDs / keys which aren't blue reef
+            } else {
+                if (key < 17 || key > 22) {
+                    visionData.targets.remove(key);
                 }
             }
         }
-        return targetVisible;
     }
 
     // public Pose2d getVisibleReefTags() {
