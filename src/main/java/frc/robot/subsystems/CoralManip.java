@@ -61,17 +61,13 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
         return run(() -> {
             getData().leftMotor.setpoint = INTAKE_SPEED;
             getData().rightMotor.setpoint = INTAKE_SPEED;
-        }).until(() -> getData().gamePieceDetected).andThen(() -> {
-            getMap().leftMotor.getEncoder().reset();
-            getMap().rightMotor.getEncoder().reset();
-            safeState();
-        },
-                startSafe(() -> {
+        }).until(() -> getData().gamePieceDetected).andThen(
+                resetCmd(), safeStateCmd(), startSafe(() -> {
                     getData().leftMotor.setpoint = ALIGNMENT_SPEED;
                     getData().rightMotor.setpoint = ALIGNMENT_SPEED;
                 }).until(() -> {
-                    return getMap().leftMotor.getEncoder().getDistance() < ALIGNMENT_DISTANCE;
-                    return getMap().rightMotor.getEncoder().getDistance() < ALIGNMENT_DISTANCE;
+                    return getMap().leftMotor.getEncoder().getDistance() < ALIGNMENT_DISTANCE
+                            && getMap().rightMotor.getEncoder().getDistance() < ALIGNMENT_DISTANCE;
                 }));
     }
 
