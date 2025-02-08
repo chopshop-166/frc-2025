@@ -62,8 +62,8 @@ public class CommandSequences {
     // L1 is different from the other scoring presets which is why its has it own
     // move to and score command
 
-    public Command positionL1Auto() {
-        return moveElevator(ElevatorPresets.SCOREL1);
+    public Command positionAuto(ElevatorPresets level) {
+        return elevator.moveTo(level);
     }
 
     public Command scoreL1Auto() {
@@ -72,6 +72,14 @@ public class CommandSequences {
 
     public Command positionL2Auto() {
         return moveElevator(ElevatorPresets.SCOREL2);
+    }
+
+    public Command positionL3Auto() {
+        return moveElevator(ElevatorPresets.SCOREL3);
+    }
+
+    public Command positionL4Auto() {
+        return moveElevator(ElevatorPresets.SCOREL4);
     }
 
     // Scores on L1 preset, then stows elevator

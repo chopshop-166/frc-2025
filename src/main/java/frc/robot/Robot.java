@@ -62,11 +62,14 @@ public final class Robot extends CommandRobot {
     public void registerNamedCommands() {
 
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
-        NamedCommands.registerCommand("Position Coral L1", commandSequences.positionL1Auto());
-        NamedCommands.registerCommand("Position Coral L2", commandSequences.positionL2Auto());
+        NamedCommands.registerCommand("Position Coral L1", commandSequences.positionAuto(ElevatorPresets.SCOREL1));
+        NamedCommands.registerCommand("Position Coral L2", commandSequences.positionAuto(ElevatorPresets.SCOREL2));
+        NamedCommands.registerCommand("Position Coral L3", commandSequences.positionAuto(ElevatorPresets.SCOREL3));
+        NamedCommands.registerCommand("Position Coral L4", commandSequences.positionAuto(ElevatorPresets.SCOREL4));
         NamedCommands.registerCommand("Score Coral L1", commandSequences.scoreL1Auto());
         NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
         NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
+        NamedCommands.registerCommand("Score Coral L4", commandSequences.scoreL4());
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
     }
 
