@@ -42,7 +42,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     private final double ROTATION_COEFFICIENT = 1;
     private final double ROTATION_KP = 0.05;
     private final double ROTATION_KS = 0.19;
-    final Modifier DEADBAND = Modifier.scalingDeadband(0.05);
+    final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
     DoubleSupplier xSpeedSupplier;

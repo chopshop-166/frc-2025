@@ -126,7 +126,7 @@ public final class Robot extends CommandRobot {
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
 
-        copilotController.a().onTrue(coralManip.intake());
+        copilotController.a().onTrue(commandSequences.intake());
 
         copilotController.x().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1))
                 .onFalse(commandSequences.scoreL1());
@@ -136,7 +136,8 @@ public final class Robot extends CommandRobot {
 
         copilotController.y().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3))
                 .onFalse(commandSequences.score());
-
+        copilotController.leftBumper().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4))
+                .onFalse(commandSequences.scoreL4());
         copilotController.back().onTrue(elevator.resetCmd());
         copilotController.start().onTrue(elevator.zero());
 
