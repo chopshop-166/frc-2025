@@ -3,10 +3,10 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Reef to StationL",
-    "Reef to StationR",
-    "StationL to Reef",
-    "StationR to Reef",
+    "CoralStationL to Reef",
+    "CoralStationR to Reef",
+    "Reef to Coral StationL",
+    "Reef to CoralStationR",
     "Start1 to Reef",
     "Start3 to Reef"
   ],
