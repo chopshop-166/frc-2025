@@ -1,15 +1,10 @@
 package frc.robot.subsystems;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -26,7 +21,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -34,6 +28,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Vision;
+import frc.robot.Vision.Branch;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
@@ -45,7 +41,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     private final double maxRotationRadiansPerSecond;
     private final double SPEED_COEFFICIENT = 1;
     private final double ROTATION_COEFFICIENT = 1;
-    private final double ROTATION_KP = 0.05;
     private final double ROTATION_KS = 0.19;
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
@@ -58,8 +53,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     boolean isRobotCentric = false;
     Optional<Translation2d> aimTarget = Optional.empty();
     boolean isAimingAtReef = false;
-    Map<Integer, Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new HashMap<>();
-    Map<Integer, Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new HashMap<>();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -99,26 +92,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
-        for (int i = 6; i < 11; i++) {
-            final int tmpI = i;
-            kTagLayout.getTagPose(i).ifPresent(pose -> {
-                RED_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
-            });
-        }
-
-        for (int i = 17; i < 22; i++) {
-            final int tmpI = i;
-            kTagLayout.getTagPose(i).ifPresent(pose -> {
-                BLUE_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
-            });
-        }
-
     }
-
-    public enum Branch {
-        leftBranch,
-        rightBranch
-    };
 
     public void setPose(Pose2d pose) {
         estimator.resetPosition(getMap().gyro.getRotation2d(),
@@ -145,70 +119,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public Command aimAtReefCenter() {
         return startEnd(() -> {
-            aimTarget = Optional.of(getReefCenter());
+            aimTarget = Optional.of(Vision.getReefCenter(isBlueAlliance));
         }, () -> {
+
             aimTarget = Optional.empty();
-        });
-    }
-
-    // public Command alignToReefBranch
-    // Probably want arguments of leftBranch or rightBranch?
-    // Pull reef coords from FieldConstants somehow
-    // Find nearest reef apriltag (do we need a different method of estimation
-    // rather than global? Might want to just focus on one tag rather than multiple
-    // behind the robot. Reef tags are blue 17-22, red 6-11)
-    // Use coords and move command to move to either left or right branch
-    // (translation to get robotToReef and then move)
-    // Need rotation in here somewhere. Logic from rotateTo command, since ideally
-    // we move and rotate at the same time
-
-    // Function that takes current robot pose and finds the nearest reef apriltag to
-    // it, returning the id
-    /////////////////////// After --> and taking the average pose from both cameras?
-    ///
-    // align to reef branch command part two:
-    // 1. Filter list of apriltags and figure out which ones we see
-    // 2. filter down to reef apriltags and get poses
-    // 3. find best target (nearest tag or tag closest to center of sight? Another
-    // way?)
-    // 4. now we know that best target plane is a reef side. Apriltags are always in
-    // the middle at the same point in relation to the reef side, so then
-    // apply translation offset for left or right branch
-    // 5. With branch pose, use autoBuilder to maneuver to the branch (angle
-    // funky??)
-
-    //
-
-    public void filterReefTags() {
-        var reef = getOurReef();
-        for (var key : visionData.targets.keySet()) {
-            // Pull in keySet from targets HashMap
-            // Remove all IDs / keys which aren't our reef
-            if (reef.keySet().contains(key)) {
-                visionData.targets.remove(key);
-            }
-        }
-    }
-
-    // public Pose2d getVisibleReefTags() {
-    // var targets = visionMap.visionSources.getLatestResult().getTargets();
-    // for (var tgt : targets) {
-    // var tagPose = kTagLayout.getTagPose(tgt.getFiducialId());
-    // if (tagPose.isEmpty())
-    // continue;
-    // numTags++;
-    // avgDist +=
-    // tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
-    // }
-    // }
-
-    public int findNearestTagId() {
-        return getNearestTagIdImpl(getOurReef());
-    }
-
-    public Command alignToReefBranch(Branch branch) {
-        return run(() -> {
-
         });
     }
 
@@ -310,39 +224,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
     }
 
-    private Translation2d getReefCenter() {
-        Translation3d translation;
-        if (isBlueAlliance) {
-            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Blue");
-            translation = poseLeft.plus(poseRight).div(2);
-        } else {
-            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Red");
-            translation = poseLeft.plus(poseRight).div(2);
-        }
-        return translation.toTranslation2d();
+    public Command alignToReefBranch(Branch branch) {
+        return run(() -> {
+
+        });
     }
 
-    private Map<Integer, Pose2d> getOurReef() {
-        if (isBlueAlliance) {
-            return BLUE_APRIL_TAGS_REEF_POSITIONS;
-        }
-        return RED_APRIL_TAGS_REEF_POSITIONS;
-    }
-
-    private int getNearestTagIdImpl(Map<Integer, Pose2d> poses) {
-        Pose2d robotPose = estimator.getEstimatedPosition();
-        Translation2d robotTranslation = robotPose.getTranslation();
-        Rotation2d robotRotation = robotPose.getRotation();
-        return Collections.min(
-                poses.entrySet(),
-                Comparator.comparing((Map.Entry<Integer, Pose2d> entry) -> {
-                    return robotTranslation.getDistance(entry.getValue().getTranslation());
-                }).thenComparing((Map.Entry<Integer, Pose2d> entry) -> {
-                    return Math.abs(robotRotation.minus(entry.getValue().getRotation()).getRadians());
-                })).getKey();
-    }
 }
