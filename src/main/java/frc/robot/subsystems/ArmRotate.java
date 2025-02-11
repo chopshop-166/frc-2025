@@ -80,7 +80,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().motor.setpoint = LOWER_SPEED;
             level = ArmRotatePresets.OFF;
         }).until(() -> {
-            return getArmAngle() < getMap().armRotatePreset.getValue(ArmRotatePresets.STOW);
+            return getArmAngle() > getMap().armRotatePreset.getValue(ArmRotatePresets.STOW);
         });
     }
 
