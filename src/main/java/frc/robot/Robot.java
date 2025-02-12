@@ -70,6 +70,7 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
         NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
         NamedCommands.registerCommand("Score Coral L4", commandSequences.scoreL4());
+        NamedCommands.registerCommand("Stow", commandSequences.moveElevator(ElevatorPresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
     }
 
