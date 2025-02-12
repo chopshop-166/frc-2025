@@ -8,7 +8,6 @@ import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.sensors.IEncoder;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import edu.wpi.first.math.controller.ArmFeedforward;
 
 public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {

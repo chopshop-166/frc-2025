@@ -7,7 +7,6 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.DeepClimbMap.Data;
-import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 
 public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
 

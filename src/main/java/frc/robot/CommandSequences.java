@@ -12,7 +12,6 @@ import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Led;
-import frc.robot.subsystems.Outtake;
 
 public class CommandSequences {
 
