@@ -133,5 +133,4 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         Logger.recordOutput("DesiredElevatorPosition", pid.getSetpoint().position);
 
     }
-
 }
