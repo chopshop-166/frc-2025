@@ -98,7 +98,7 @@ public class ColdStart extends RobotMap {
 
         final double maxRotationRadianPerSecond = Math.PI;
 
-        RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
+        RobotConfig config = new RobotConfig(68, 58, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
@@ -144,7 +144,7 @@ public class ColdStart extends RobotMap {
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.01, 0);
 
         return new ElevatorMap(leftMotor, leftMotor.getEncoder(),
-                new ElevatorMap.ElevatorPresetValues(16, 5, 14, 29, 56, 57.5, 1),
+                new ElevatorMap.ElevatorPresetValues(16, 5, 14, 29.5, 56, 57.5, 1),
                 new ValueRange(0, 57.5), new ValueRange(3, 53), pid, feedForward);
     }
 

@@ -19,6 +19,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
@@ -61,9 +62,16 @@ public final class Robot extends CommandRobot {
     public void registerNamedCommands() {
 
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
+        NamedCommands.registerCommand("Position Coral L1", commandSequences.positionAuto(ElevatorPresets.SCOREL1));
+        NamedCommands.registerCommand("Position Coral L2", commandSequences.positionAuto(ElevatorPresets.SCOREL2));
+        NamedCommands.registerCommand("Position Coral L3", commandSequences.positionAuto(ElevatorPresets.SCOREL3));
+        NamedCommands.registerCommand("Position Coral L4", commandSequences.positionAuto(ElevatorPresets.SCOREL4));
         NamedCommands.registerCommand("Score Coral L1", commandSequences.scoreL1Auto());
         NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
         NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
+        NamedCommands.registerCommand("Score Coral L4", commandSequences.scoreL4());
+        NamedCommands.registerCommand("Stow", commandSequences.moveElevator(ElevatorPresets.STOW));
+        NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)
@@ -154,7 +162,7 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void populateDashboard() {
-
+        SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
     /**

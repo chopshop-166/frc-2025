@@ -62,8 +62,24 @@ public class CommandSequences {
     // L1 is different from the other scoring presets which is why its has it own
     // move to and score command
 
+    public Command positionAuto(ElevatorPresets level) {
+        return elevator.moveTo(level);
+    }
+
     public Command scoreL1Auto() {
-        return moveElevator(ElevatorPresets.SCOREL1).andThen(scoreL1());
+        return scoreL1();
+    }
+
+    public Command positionL2Auto() {
+        return moveElevator(ElevatorPresets.SCOREL2);
+    }
+
+    public Command positionL3Auto() {
+        return moveElevator(ElevatorPresets.SCOREL3);
+    }
+
+    public Command positionL4Auto() {
+        return moveElevator(ElevatorPresets.SCOREL4);
     }
 
     // Scores on L1 preset, then stows elevator
@@ -95,6 +111,6 @@ public class CommandSequences {
     // Resets all commands
 
     public Command resetAll() {
-        return drive.resetCmd().andThen(coralManip.resetCmd(), algaeDestage.resetCmd(), elevator.resetCmd());
+        return drive.resetCmd().andThen(coralManip.resetCmd(), algaeDestage.resetCmd());
     }
 }
