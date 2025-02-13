@@ -98,7 +98,7 @@ public class ColdStart extends RobotMap {
 
         final double maxRotationRadianPerSecond = Math.PI;
 
-        RobotConfig config = new RobotConfig(68, 4.889, new ModuleConfig(
+        RobotConfig config = new RobotConfig(68, 58, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
