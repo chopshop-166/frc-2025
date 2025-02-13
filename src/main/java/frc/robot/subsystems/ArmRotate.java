@@ -62,7 +62,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command zero() {
         return runSafe(() -> {
             getData().motor.setpoint = ZEROING_SPEED;
-        }).until(() -> getMap().motor.errored()).andThen(resetCmd());
+        }).until(() -> getMap().motor.validate()).andThen(resetCmd());
     }
 
     public Command moveToZero() {
@@ -70,7 +70,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().motor.setpoint = ZEROING_SPEED;
             preset = ArmRotatePresets.OFF;
         }).until(() -> {
-            return getArmAngle() < getMap().armRotatePreset.getValue(ArmRotatePresets.STOW);
+            return getArmAngle() > getMap().armRotatePreset.getValue(ArmRotatePresets.STOW);
         });
     }
 
