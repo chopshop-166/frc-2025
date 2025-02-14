@@ -7,12 +7,14 @@ import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Led;
+import frc.robot.subsystems.ArmRotate;
 
 public class CommandSequences {
 
@@ -21,6 +23,7 @@ public class CommandSequences {
     AlgaeDestage algaeDestage;
     CoralManip coralManip;
     Elevator elevator;
+    ArmRotate armRotate;
 
     public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator) {
         this.drive = drive;
@@ -28,13 +31,15 @@ public class CommandSequences {
         this.algaeDestage = algaeDestage;
         this.coralManip = coralManip;
         this.elevator = elevator;
+        this.armRotate = armRotate;
     }
 
     // Moves elevator to intake preset and intakes when preset has been reached
     // Intakes until sensor is tripped, LEDs indicate that game piece is acquired
 
     public Command intake() {
-        return led.elevatorToPreset().andThen(elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
+        return armRotate.moveTo(ArmRotatePresets.INTAKE).andThen(led.elevatorToPreset(),
+                elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
                 led.intaking(), coralManip.intake(), led.gamePieceAcquired());
     }
 
@@ -47,7 +52,8 @@ public class CommandSequences {
     // Scores on set coral preset, then stows elevator
 
     public Command score() {
-        return coralManip.score().andThen(led.elevatorToPreset(), elevator.moveTo(ElevatorPresets.INTAKE),
+        return armRotate.moveTo(ArmRotatePresets.SCOREL23).andThen(coralManip.score(), (led.elevatorToPreset()),
+                elevator.moveTo(ElevatorPresets.STOW),
                 led.elevatorAtPreset());
     }
 
@@ -84,7 +90,8 @@ public class CommandSequences {
     // Scores on L1 preset, then stows elevator
 
     public Command scoreL1() {
-        return coralManip.scoreL1().andThen(led.elevatorToPreset(), elevator.moveTo(ElevatorPresets.STOW),
+        return armRotate.moveTo(ArmRotatePresets.SCOREL1).andThen(coralManip.scoreL1(), (led.elevatorToPreset()),
+                elevator.moveTo(ElevatorPresets.STOW),
                 led.elevatorAtPreset());
     }
 
@@ -93,6 +100,7 @@ public class CommandSequences {
     public Command scoreL4() {
         return coralManip.scoreL4().andThen(led.elevatorToPreset(),
                 // kick elevator up so that it actually scores (knocks coral onto reef)
+                armRotate.moveTo(ArmRotatePresets.SCOREL4),
                 elevator.moveTo(ElevatorPresets.HIGHESTPOINT),
                 waitSeconds(0.5),
                 elevator.moveTo(ElevatorPresets.STOW),
