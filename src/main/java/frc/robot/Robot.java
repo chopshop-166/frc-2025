@@ -148,13 +148,13 @@ public final class Robot extends CommandRobot {
                 .onFalse(commandSequences.scoreL4());
         copilotController.back().onTrue(elevator.resetCmd());
         copilotController.start().onTrue(elevator.zero());
-
-        driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
         copilotController.getPovButton(POVDirection.RIGHT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL2))
                 .onFalse(elevator.safeStateCmd());
         copilotController.getPovButton(POVDirection.UP).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL3))
                 .onFalse(elevator.safeStateCmd());
         copilotController.getPovButton(POVDirection.LEFT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL1))
+                .onFalse(elevator.safeStateCmd());
+        copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
                 .onFalse(elevator.safeStateCmd());
 
         copilotController.rightBumper().whileTrue(coralManip.feed());
