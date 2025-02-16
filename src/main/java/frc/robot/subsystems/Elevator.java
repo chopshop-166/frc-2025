@@ -105,6 +105,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     @Override
     public void reset() {
+        level = ElevatorPresets.OFF;
         getMap().encoder.reset();
     }
 
@@ -132,5 +133,4 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         Logger.recordOutput("DesiredElevatorPosition", pid.getSetpoint().position);
 
     }
-
 }

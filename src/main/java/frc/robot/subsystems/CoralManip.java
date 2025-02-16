@@ -10,7 +10,7 @@ import frc.robot.maps.subsystems.CoralManipMap.Data;
 
 public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
-    private final double RELEASE_SPEEDRIGHT = 0.3;
+    private final double RELEASE_SPEEDRIGHT = 0.5;
     private final double RELEASE_SPEEDLEFT = 0.1;
     private final double INTAKE_SPEED = -0.3;
     private final double RELEASE_DELAY = 1;

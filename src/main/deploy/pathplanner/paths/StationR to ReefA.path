@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "StationR to Reef",
+  "folder": "CoralStationR to Reef",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 55.0
