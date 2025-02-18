@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 
 public class Vision {
 
@@ -31,13 +32,14 @@ public class Vision {
 
     public enum Branch {
         LEFT_BRANCH(new Transform2d(
-                -0.1524,
-                -0.4318,
+                Units.inchesToMeters(-12.94 / 2), // distance between branches div by 2
+                Units.inchesToMeters(-17), // robot center to reef (w/ bumpers)
                 new Rotation2d())),
         RIGHT_BRANCH(new Transform2d(
-                0.1524,
-                -0.4318,
-                new Rotation2d()));
+                Units.inchesToMeters(12.94 / 2),
+                Units.inchesToMeters(-17),
+                new Rotation2d())),
+        NONE(null);
 
         private Transform2d offset;
 
