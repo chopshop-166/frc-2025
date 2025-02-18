@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Vision.Branch;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
@@ -141,6 +142,9 @@ public final class Robot extends CommandRobot {
         driveController.back().onTrue(commandSequences.resetAll());
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
+        driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
+        driveController.rightTrigger().whileTrue(drive.alignToReefBranch(Branch.RIGHT_BRANCH));
+        driveController.leftTrigger().whileTrue(drive.alignToReefBranch(Branch.LEFT_BRANCH));
 
         copilotController.a().onTrue(commandSequences.intake());
         elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
@@ -162,6 +166,7 @@ public final class Robot extends CommandRobot {
         // .onFalse(commandSequences.scoreL4());
         copilotController.back().onTrue(elevator.safeStateCmd());
         copilotController.start().onTrue(elevator.zero());
+
         copilotController.getPovButton(POVDirection.RIGHT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL2))
                 .onFalse(elevator.safeStateCmd());
         copilotController.getPovButton(POVDirection.UP).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL3))
