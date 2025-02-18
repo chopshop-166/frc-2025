@@ -11,6 +11,7 @@ import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
 import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
+import com.chopshop166.chopshoplib.maps.VisionMap.Data;
 import com.chopshop166.chopshoplib.motors.Modifier;
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -20,6 +21,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -36,6 +38,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
     private final VisionMap.Data<SwerveDrivePoseEstimator> visionData = new VisionMap.Data<>();
+    private final Vision vision = new Vision();
 
     private final double maxDriveSpeedMetersPerSecond;
     private final double maxRotationRadiansPerSecond;
@@ -45,6 +48,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(0, 0, 0, new Constraints(1, 3));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(0, 0, 0, new Constraints(1, 3));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -53,6 +58,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     boolean isRobotCentric = false;
     Optional<Translation2d> aimTarget = Optional.empty();
     boolean isAimingAtReef = false;
+    Branch targetBranch = Branch.NONE;
 
     SwerveDrivePoseEstimator estimator;
 
@@ -121,8 +127,22 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return startEnd(() -> {
             aimTarget = Optional.of(Vision.getReefCenter(isBlueAlliance));
         }, () -> {
-
             aimTarget = Optional.empty();
+        });
+    }
+
+    // Need vision command that takes all info about reef tags and branches
+    // (filterReefTags, pickBestReefLocation, adjustTranslationForBranch)
+
+    public Command alignToReefBranch(Branch branch) {
+        return run(() -> {
+            vision.filterReefTags(isBlueAlliance, visionData.targets);
+            Transform2d robotToBranch = vision
+                    .adjustTranslationForBranch(vision.pickBestReefLocation(visionData.targets), branch);
+            double XSpeed = translationPID_X.calculate(robotToBranch.getX());
+            double YSpeed = translationPID_Y.calculate(robotToBranch.getY());
+            double rotationSpeed = rotationPID.calculate(robotToBranch.getRotation().getDegrees());
+            move(XSpeed, YSpeed, rotationSpeed, true);
         });
     }
 
@@ -188,8 +208,28 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         if (aimTarget.isPresent()) {
             rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
         }
+        if (targetBranch != Branch.NONE) {
+            alignToReefBranch(targetBranch);
+            vision.filterReefTags(isBlueAlliance, visionData.targets);
+            Transform2d robotToBranch = vision
+                    .adjustTranslationForBranch(vision.pickBestReefLocation(visionData.targets), targetBranch);
+            translateXSpeed = translationPID_X.calculate(robotToBranch.getX());
+            translateYSpeed = translationPID_Y.calculate(robotToBranch.getY());
+            rotationSpeed = rotationPID.calculate(robotToBranch.getRotation().getDegrees());
+        }
 
         move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
+    }
+
+    public Command moveToBranch(Branch targetBranch) {
+        return startEnd(() -> {
+            this.targetBranch = targetBranch;
+            isRobotCentric = true;
+
+        }, () -> {
+            this.targetBranch = Branch.NONE;
+            isRobotCentric = false;
+        });
     }
 
     private void move(final double xSpeed, final double ySpeed,
@@ -222,12 +262,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         var robotToTarget = getRobotToTarget(target.get());
         Logger.recordOutput("Target Pose", robotToTarget);
         return calculateRotationSpeed(robotToTarget.getAngle().getDegrees());
-    }
-
-    public Command alignToReefBranch(Branch branch) {
-        return run(() -> {
-
-        });
     }
 
 }

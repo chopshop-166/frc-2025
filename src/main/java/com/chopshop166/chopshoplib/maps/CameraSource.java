@@ -16,6 +16,8 @@ public class CameraSource {
     public final PhotonCamera camera;
     /** The pose estimator. */
     public final PhotonPoseEstimator estimator;
+    /** The robotToCam object. */
+    public final Transform3d robotToCam;
 
     /**
      * Constructor.
@@ -35,6 +37,7 @@ public class CameraSource {
      */
     public CameraSource(final PhotonCamera camera, final Transform3d robotToCam) {
         this.camera = camera;
+        this.robotToCam = robotToCam;
         this.estimator = new PhotonPoseEstimator(DEFAULT_FIELD,
                 PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
         this.estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);

@@ -61,6 +61,7 @@ public class VisionMap {
                 // data.targets.add(List.copyOf(latestResult.targets));
                 for (var target : latestResult.targets) {
                     int targetID = target.getFiducialId();
+                    target.bestCameraToTarget = target.bestCameraToTarget.plus(source.robotToCam);
                     if (data.targets.containsKey(target.getFiducialId())) {
                         data.targets.get(targetID).add(target);
                     } else {
