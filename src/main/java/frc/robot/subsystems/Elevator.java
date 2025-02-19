@@ -20,7 +20,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     final ProfiledPIDController pid;
     final double RAISE_SPEED = 1.0;
-    final double MANUAL_LOWER_SPEED_COEF = 0.5;
+    final double MANUAL_LOWER_SPEED_COEF = 1.0;
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
     final double ZEROING_SPEED = -0.1;
@@ -60,15 +60,6 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             level = ElevatorPresets.OFF;
             getData().motor.setpoint = ZEROING_SPEED;
         }).until(() -> getMap().motor.validate()).andThen(resetCmd());
-    }
-
-    public Command moveToZero() {
-        return startSafe(() -> {
-            getData().motor.setpoint = LOWER_SPEED;
-            level = ElevatorPresets.OFF;
-        }).until(() -> {
-            return getElevatorHeight() < getMap().elevatorPreset.getValue(ElevatorPresets.STOW);
-        });
     }
 
     public Command moveTo(ElevatorPresets level) {
