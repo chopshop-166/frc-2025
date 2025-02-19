@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.estimator.PoseEstimator;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 
 public class VisionMap {
 
@@ -45,8 +47,7 @@ public class VisionMap {
      * @param <T>       Estimator wheel type.
      * @param estimator The WPIlib estimator object.
      */
-    public <T> void updateData(Data<T> data) {
-        data.targets.clear();
+    public <T> void updateData(Data data) {
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
             if (!results.isEmpty()) {
@@ -58,10 +59,14 @@ public class VisionMap {
                             est.timestampSeconds);
                 });
                 // Now copy the targets that are found
-                // data.targets.add(List.copyOf(latestResult.targets));
+                if (latestResult.targets.size() != 0) {
+                    data.targets.clear();
+                }
                 for (var target : latestResult.targets) {
                     int targetID = target.getFiducialId();
+                    Logger.recordOutput("target" + targetID, target.bestCameraToTarget);
                     target.bestCameraToTarget = target.bestCameraToTarget.plus(source.robotToCam);
+                    Logger.recordOutput("targetOffset" + targetID, target.bestCameraToTarget);
                     if (data.targets.containsKey(target.getFiducialId())) {
                         data.targets.get(targetID).add(target);
                     } else {
@@ -74,8 +79,8 @@ public class VisionMap {
         }
     }
 
-    public static class Data<T> {
-        public PoseEstimator<T> estimator;
+    public static class Data {
+        public SwerveDrivePoseEstimator estimator;
         public Map<Integer, List<PhotonTrackedTarget>> targets = new HashMap<>();
     }
 }

@@ -31,13 +31,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Vision;
+import frc.robot.FieldConstants.Reef;
 import frc.robot.Vision.Branch;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
-    private final VisionMap.Data<SwerveDrivePoseEstimator> visionData = new VisionMap.Data<>();
+    private final VisionMap.Data visionData = new VisionMap.Data();
     private final Vision vision = new Vision();
 
     private final double maxDriveSpeedMetersPerSecond;
@@ -82,6 +83,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                 new Pose2d(),
                 VecBuilder.fill(0.02, 0.02, 0.01),
                 VecBuilder.fill(0.1, 0.1, 0.01));
+
+        visionData.estimator = estimator;
 
         AutoBuilder.configure(estimator::getEstimatedPosition,
                 this::setPose,
@@ -179,6 +182,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Pose Angle", estimator.getEstimatedPosition().getRotation());
         Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
+        Logger.recordOutput("Target Branch", targetBranch);
+
     }
 
     private double calculateRotationSpeed(double targetAngleDegrees) {
@@ -209,13 +214,18 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
         }
         if (targetBranch != Branch.NONE) {
-            alignToReefBranch(targetBranch);
             vision.filterReefTags(isBlueAlliance, visionData.targets);
+            Transform2d reefLocation = vision.pickBestReefLocation(visionData.targets);
             Transform2d robotToBranch = vision
-                    .adjustTranslationForBranch(vision.pickBestReefLocation(visionData.targets), targetBranch);
-            translateXSpeed = translationPID_X.calculate(robotToBranch.getX());
-            translateYSpeed = translationPID_Y.calculate(robotToBranch.getY());
-            rotationSpeed = rotationPID.calculate(robotToBranch.getRotation().getDegrees());
+                    .adjustTranslationForBranch(reefLocation, targetBranch);
+            Logger.recordOutput("Reef Location Transform2d", estimator.getEstimatedPosition().plus(reefLocation));
+            Logger.recordOutput("Robot To Branch Transform2d", estimator.getEstimatedPosition().plus(robotToBranch));
+            Pose2d robotPose = estimator.getEstimatedPosition();
+            translateXSpeed = translationPID_X.calculate(robotPose.getX(), robotPose.getX() + robotToBranch.getX());
+            translateYSpeed = translationPID_Y.calculate(robotPose.getY(), robotPose.getY() + robotToBranch.getY());
+            rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
+                    robotPose.getRotation().getDegrees() - robotToBranch.getRotation().getDegrees());
+            Logger.recordOutput("Robot To Branch Angle", robotToBranch.getRotation().getDegrees());
         }
 
         move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);

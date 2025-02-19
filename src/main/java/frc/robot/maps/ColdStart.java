@@ -29,6 +29,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -122,8 +123,12 @@ public class ColdStart extends RobotMap {
     public VisionMap getVisionMap() {
 
         return new VisionMap(
-                new CameraSource("FLCamera", new Transform3d()),
-                new CameraSource("FRCamera", new Transform3d()));
+                new CameraSource("FLCamera",
+                        new Transform3d(Units.inchesToMeters(9.43), Units.inchesToMeters(10.72),
+                                Units.inchesToMeters(8.24), new Rotation3d(0, -68, -16.76))),
+                new CameraSource("FRCamera", new Transform3d(Units.inchesToMeters(-10.72), Units.inchesToMeters(9.43),
+                        Units.inchesToMeters(8.24),
+                        new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(16.76)))));
     }
 
     @Override

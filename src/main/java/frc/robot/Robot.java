@@ -142,9 +142,8 @@ public final class Robot extends CommandRobot {
         driveController.back().onTrue(commandSequences.resetAll());
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
-        driveController.rightBumper().whileTrue(drive.aimAtReefCenter());
-        driveController.rightTrigger().whileTrue(drive.alignToReefBranch(Branch.RIGHT_BRANCH));
-        driveController.leftTrigger().whileTrue(drive.alignToReefBranch(Branch.LEFT_BRANCH));
+        driveController.rightTrigger().whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
+        driveController.leftTrigger().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
 
         copilotController.a().onTrue(commandSequences.intake());
         elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
