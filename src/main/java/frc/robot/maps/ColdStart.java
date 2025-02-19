@@ -11,6 +11,7 @@ import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
+import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -134,8 +135,6 @@ public class ColdStart extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        leftMotor.validateEncoderRate(.2, 10);
-
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
 
@@ -144,7 +143,11 @@ public class ColdStart extends RobotMap {
         pid.setTolerance(0.25);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.01, 0);
 
-        return new ElevatorMap(leftMotor, leftMotor.getEncoder(),
+        var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
+
+        elevatorMotors.validateEncoderRate(.2, 10);
+        return new ElevatorMap(
+                elevatorMotors, leftMotor.getEncoder(),
                 new ElevatorMap.ElevatorPresetValues(16.6, 5, 14, 29.5, 56, 57.5, 1),
                 new ValueRange(0, 57.5), new ValueRange(6, 53), pid, feedForward);
     }
@@ -157,7 +160,7 @@ public class ColdStart extends RobotMap {
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
         leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kNoPersistParameters);
+                PersistMode.kPersistParameters);
         // Right is identical to left, but inverted
         config.inverted(true);
         rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,

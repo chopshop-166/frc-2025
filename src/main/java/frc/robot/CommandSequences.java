@@ -47,7 +47,7 @@ public class CommandSequences {
     // Scores on set coral preset, then stows elevator
 
     public Command score() {
-        return coralManip.score().andThen(led.elevatorToPreset(), elevator.moveTo(ElevatorPresets.STOW),
+        return coralManip.score().andThen(led.elevatorToPreset(), elevator.moveTo(ElevatorPresets.INTAKE),
                 led.elevatorAtPreset());
     }
 

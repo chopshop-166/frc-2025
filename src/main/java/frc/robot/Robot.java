@@ -146,7 +146,7 @@ public final class Robot extends CommandRobot {
                 .onFalse(commandSequences.score());
         copilotController.leftBumper().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4))
                 .onFalse(commandSequences.scoreL4());
-        copilotController.back().onTrue(elevator.resetCmd());
+        copilotController.back().onTrue(elevator.safeStateCmd());
         copilotController.start().onTrue(elevator.zero());
         copilotController.getPovButton(POVDirection.RIGHT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL2))
                 .onFalse(elevator.safeStateCmd());

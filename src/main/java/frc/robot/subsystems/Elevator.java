@@ -62,15 +62,6 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         }).until(() -> getMap().motor.validate()).andThen(resetCmd());
     }
 
-    public Command moveToZero() {
-        return startSafe(() -> {
-            getData().motor.setpoint = LOWER_SPEED;
-            level = ElevatorPresets.OFF;
-        }).until(() -> {
-            return getElevatorHeight() < getMap().elevatorPreset.getValue(ElevatorPresets.STOW);
-        });
-    }
-
     public Command moveTo(ElevatorPresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(30, pid::atGoal);
         return runOnce(() -> {
