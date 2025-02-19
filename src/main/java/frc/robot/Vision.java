@@ -131,6 +131,9 @@ public class Vision {
         // Find the closest april tag target
         // For now we only look at a single camera's data
         // In the future we may want to combine the pose data for the april tags?
+        if (targets.size() == 0) {
+            return new Transform2d();
+        }
         var closestTarget = Collections.min(
                 targets.entrySet(),
                 Comparator.comparing((Map.Entry<Integer, List<PhotonTrackedTarget>> entry) -> {
