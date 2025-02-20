@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.PersistenceCheck;
+import com.chopshop166.chopshoplib.boxes.GenericBox;
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -25,6 +26,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
     final double ZEROING_SPEED = -0.1;
+    final int ZEROING_DELAY = 5;
     double holdHeight = 0;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
@@ -61,20 +63,23 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     }
 
     public Command zero() {
-        return startSafe(() -> {
+        final GenericBox<Integer> box = new GenericBox<>(0);
+        return runOnce(() -> {
             getMap().motor.resetValidators();
             level = ElevatorPresets.OFF;
-                getData().motor.setpoint = ZEROING_SPEED;
-            
-        }).until(() -> getMap().motor.validate() && armSafeSub.getAsBoolean()).andThen(resetCmd());
+            getData().motor.setpoint = ZEROING_SPEED;
+            box.accept(0);
+        }).andThen(run(() -> {
+            box.accept(box.get() + 1);
+        }).until(() -> box.get() > ZEROING_DELAY && getMap().motor.validate() && armSafeSub.getAsBoolean()))
+                .andThen(safeStateCmd(), resetCmd());
     }
 
     public Command moveTo(ElevatorPresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(30, pid::atGoal);
         return runOnce(() -> {
-                this.level = level;
-                pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
-            
+            this.level = level;
+            pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
         }).andThen(run(() -> {
             Logger.recordOutput("PID at goal", pid.atGoal());
         })).until(() -> {
