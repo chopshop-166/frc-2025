@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.AlgaeDestage;
+import frc.robot.subsystems.ArmRotate;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.DeepClimb;
 import frc.robot.subsystems.Drive;
@@ -54,6 +55,7 @@ public final class Robot extends CommandRobot {
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
     private Elevator elevator = new Elevator(map.getElevatorMap());
     private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
+    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator);
 

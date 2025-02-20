@@ -6,8 +6,10 @@ import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.sensors.IEncoder;
+import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.controller.ArmFeedforward;
 
 public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
@@ -62,6 +64,13 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     public final ValueRange hardLimits;
     public final ValueRange softLimits;
     public final ArmFeedforward armFeedforward;
+
+    public ArmRotateMap() {
+        this(new SmartMotorController(), new MockEncoder(), new ArmRotatePresetValues(),
+                new ProfiledPIDController(0, 0, 0, new Constraints(0, 0)), new ValueRange(0, 0), new ValueRange(0, 0),
+                new ArmFeedforward(0, 0, 0));
+
+    }
 
     public ArmRotateMap(SmartMotorController motor, IEncoder encoder, ArmRotatePresetValues armRotatePreset,
             ProfiledPIDController pid, ValueRange hardLimits, ValueRange softLimits, ArmFeedforward armFeedforward) {

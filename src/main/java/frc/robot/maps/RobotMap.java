@@ -11,6 +11,7 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 
 import frc.robot.maps.subsystems.AlgaeDestageMap;
+import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
@@ -48,6 +49,10 @@ public class RobotMap {
 
     public DeepClimbMap getDeepClimbMap() {
         return new DeepClimbMap();
+    }
+
+    public ArmRotateMap getArmRotateMap() {
+        return new ArmRotateMap();
     }
 
     public void setupLogging() {
