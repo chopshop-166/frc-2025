@@ -9,6 +9,7 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +29,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
+    BooleanSubscriber armSafeSub = instance.getBooleanTopic("Arm/Safe").subscribe(false);
 
     ElevatorPresets level = ElevatorPresets.OFF;
 
@@ -41,13 +43,17 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         return run(() -> {
             double speed = liftSpeed.getAsDouble();
             double speedCoef = RAISE_SPEED;
-            if (speed < 0) {
-                speedCoef = MANUAL_LOWER_SPEED_COEF;
-            }
-            if (Math.abs(speed) > 0) {
-                level = ElevatorPresets.OFF;
-                getData().motor.setpoint = limits(speed * speedCoef);
-            } else if (level == ElevatorPresets.OFF) {
+            if (armSafeSub.getAsBoolean()) {
+                if (speed < 0) {
+                    speedCoef = MANUAL_LOWER_SPEED_COEF;
+                }
+                if (Math.abs(speed) > 0) {
+                    level = ElevatorPresets.OFF;
+                    getData().motor.setpoint = limits(speed * speedCoef);
+                } else if (level == ElevatorPresets.OFF) {
+                    getData().motor.setpoint = 0.0;
+                }
+            } else {
                 getData().motor.setpoint = 0.0;
             }
 
@@ -58,18 +64,23 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         return startSafe(() -> {
             getMap().motor.resetValidators();
             level = ElevatorPresets.OFF;
-            getData().motor.setpoint = ZEROING_SPEED;
-        }).until(() -> getMap().motor.validate()).andThen(resetCmd());
+                getData().motor.setpoint = ZEROING_SPEED;
+            
+        }).until(() -> getMap().motor.validate() && armSafeSub.getAsBoolean()).andThen(resetCmd());
     }
 
     public Command moveTo(ElevatorPresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(30, pid::atGoal);
         return runOnce(() -> {
-            this.level = level;
-            pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
+                this.level = level;
+                pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
+            
         }).andThen(run(() -> {
             Logger.recordOutput("PID at goal", pid.atGoal());
-        })).until(setPointPersistenceCheck).withName("Move to set height");
+        })).until(() -> {
+            return setPointPersistenceCheck.getAsBoolean() && armSafeSub.getAsBoolean();
+        }).withName("Move to set height");
+
     }
 
     public Command hold() {
