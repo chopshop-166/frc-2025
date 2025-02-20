@@ -126,8 +126,8 @@ public class Shrimp extends RobotMap {
                         Units.inchesToMeters(9.75)),
                 new Rotation3d(0, Units.degreesToRadians(-64.752), Units.degreesToRadians(-45)));
 
-        return new VisionMap(new CameraSource("ShrimpCamFL", robotToCamFL),
-                new CameraSource("ShrimpCamFR", robotToCamFR));
+        return new VisionMap(new CameraSource("FLCamera", robotToCamFL),
+                new CameraSource("FRCamera", robotToCamFR));
     }
 
     @Override

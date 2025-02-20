@@ -60,6 +60,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     Optional<Translation2d> aimTarget = Optional.empty();
     boolean isAimingAtReef = false;
     Branch targetBranch = Branch.NONE;
+    Pose2d targetPose = new Pose2d();
 
     SwerveDrivePoseEstimator estimator;
 
@@ -213,19 +214,23 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         if (aimTarget.isPresent()) {
             rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
         }
-        if (targetBranch != Branch.NONE) {
+        if (visionData.targets.size() > 0) {
             vision.filterReefTags(isBlueAlliance, visionData.targets);
             Transform2d reefLocation = vision.pickBestReefLocation(visionData.targets);
             Transform2d robotToBranch = vision
-                    .adjustTranslationForBranch(reefLocation, targetBranch);
+                    .adjustTranslationForBranch(reefLocation, Branch.LEFT_BRANCH);
             Logger.recordOutput("Reef Location Transform2d", estimator.getEstimatedPosition().plus(reefLocation));
-            Logger.recordOutput("Robot To Branch Transform2d", estimator.getEstimatedPosition().plus(robotToBranch));
+            Logger.recordOutput("Robot To Branch Transform2d",
+                    estimator.getEstimatedPosition().plus(robotToBranch));
+            targetPose = estimator.getEstimatedPosition().plus(robotToBranch);
+        }
+        if (targetBranch != Branch.NONE) {
             Pose2d robotPose = estimator.getEstimatedPosition();
-            translateXSpeed = translationPID_X.calculate(robotPose.getX(), robotPose.getX() + robotToBranch.getX());
-            translateYSpeed = translationPID_Y.calculate(robotPose.getY(), robotPose.getY() + robotToBranch.getY());
+            translateXSpeed = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
+            translateYSpeed = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
             rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
-                    robotPose.getRotation().getDegrees() - robotToBranch.getRotation().getDegrees());
-            Logger.recordOutput("Robot To Branch Angle", robotToBranch.getRotation().getDegrees());
+                    targetPose.getRotation().getDegrees());
+            Logger.recordOutput("Rotation PID Error", rotationPID.getPositionError());
         }
 
         move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
