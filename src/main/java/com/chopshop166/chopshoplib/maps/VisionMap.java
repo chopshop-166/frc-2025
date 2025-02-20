@@ -12,6 +12,9 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 
 public class VisionMap {
 
@@ -48,6 +51,7 @@ public class VisionMap {
      * @param estimator The WPIlib estimator object.
      */
     public <T> void updateData(Data data) {
+        data.targets.clear();
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
             if (!results.isEmpty()) {
@@ -59,13 +63,14 @@ public class VisionMap {
                             est.timestampSeconds);
                 });
                 // Now copy the targets that are found
-                if (latestResult.targets.size() != 0) {
-                    data.targets.clear();
-                }
                 for (var target : latestResult.targets) {
                     int targetID = target.getFiducialId();
                     Logger.recordOutput("target" + targetID, target.bestCameraToTarget);
-                    target.bestCameraToTarget = target.bestCameraToTarget.plus(source.robotToCam);
+                    Transform3d robotToCam = new Transform3d(source.robotToCam.getX(), source.robotToCam.getY(),
+                            source.robotToCam.getZ(),
+                            new Rotation3d(source.robotToCam.getRotation().getX(),
+                                    source.robotToCam.getRotation().getY(), -source.robotToCam.getRotation().getZ()));
+                    target.bestCameraToTarget = target.bestCameraToTarget.plus(robotToCam);
                     Logger.recordOutput("targetOffset" + targetID, target.bestCameraToTarget);
                     if (data.targets.containsKey(target.getFiducialId())) {
                         data.targets.get(targetID).add(target);
