@@ -154,19 +154,15 @@ public class ColdStart extends RobotMap {
 
     @Override
     public CoralManipMap getCoralManipMap() {
-        CSSparkMax leftWheels = new CSSparkMax(9);
-        CSSparkMax rightWheels = new CSSparkMax(10);
+        CSSparkMax motor = new CSSparkMax(9);
+
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
-        leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        // Right is identical to left, but inverted
-        config.inverted(true);
-        rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(9);
-        return new CoralManipMap(leftWheels, rightWheels, sensor::get);
+        return new CoralManipMap(motor, sensor::get);
     }
 
     @Override
