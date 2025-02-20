@@ -5,6 +5,7 @@ import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
+import com.chopshop166.chopshoplib.sensors.IAbsolutePosition;
 import com.chopshop166.chopshoplib.sensors.IEncoder;
 import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
@@ -58,7 +59,7 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     }
 
     public SmartMotorController motor;
-    public final IEncoder encoder;
+    public final IAbsolutePosition encoder;
     public final ArmRotatePresetValues armRotatePreset;
     public final ProfiledPIDController pid;
     public final ValueRange hardLimits;
@@ -72,7 +73,7 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
     }
 
-    public ArmRotateMap(SmartMotorController motor, IEncoder encoder, ArmRotatePresetValues armRotatePreset,
+    public ArmRotateMap(SmartMotorController motor, IAbsolutePosition encoder, ArmRotatePresetValues armRotatePreset,
             ProfiledPIDController pid, ValueRange hardLimits, ValueRange softLimits, ArmFeedforward armFeedforward) {
         this.motor = motor;
         this.encoder = encoder;
@@ -87,12 +88,10 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     public void updateData(Data data) {
         data.motor.updateData(motor);
         data.rotationAbsAngleDegrees = encoder.getAbsolutePosition();
-        data.rotatingAngleVelocity = encoder.getRate();
     }
 
     public static class Data extends DataWrapper {
         public MotorControllerData motor = new MotorControllerData();
         public double rotationAbsAngleDegrees;
-        public double rotatingAngleVelocity;
     }
 }

@@ -157,18 +157,18 @@ public class ColdStart extends RobotMap {
                 new ValueRange(0, 57.5), new ValueRange(6, 53), pid, feedForward);
     }
 
-    // @Override
-    // public ArmRotateMap getArmRotateMap() {
-    //     CSSparkFlex motor = new CSSparkFlex(10);
-    //     DutyCycleEncoder absEncoder = new DutyCycleEncoder(1);
-    //     SparkFlexConfig config = new SparkFlexConfig();
-    //     config.smartCurrentLimit(30);
-    //     config.idleMode(IdleMode.kBrake);
-    //     motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    //     ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
-    //     ArmFeedforward feedForward = new ArmFeedforward(0, 0, 0);
-    //     return new ArmRotateMap(motor, absEncoder, new ArmRotateMap.ArmRotatePresetValues(0, 0, 0, 0, 0), pid, new ValueRange(0, 0), new ValueRange(0, 0), feedForward);
-    // }
+    @Override
+    public ArmRotateMap getArmRotateMap() {
+        CSSparkFlex motor = new CSSparkFlex(10);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(1);
+        SparkFlexConfig config = new SparkFlexConfig();
+        config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
+        motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
+        ArmFeedforward feedForward = new ArmFeedforward(0, 0, 0);
+        return new ArmRotateMap(motor, absEncoder::get, new ArmRotateMap.ArmRotatePresetValues(0, 0, 0, 0, 0), pid, new ValueRange(0, 0), new ValueRange(0, 0), feedForward);
+    }
 
     @Override
     public CoralManipMap getCoralManipMap() {
