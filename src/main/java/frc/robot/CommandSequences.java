@@ -39,10 +39,14 @@ public class CommandSequences {
     // Intakes until sensor is tripped, LEDs indicate that game piece is acquired
 
     public Command intake() {
-        return armRotate.moveTo(ArmRotatePresets.OUT).andThen(led.elevatorToPreset(),
+        return armRotate.moveIntaking().andThen(led.elevatorToPreset(),
                 elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
                 armRotate.moveTo(ArmRotatePresets.INTAKE),
                 led.intaking(), coralManip.intake(), led.gamePieceAcquired());
+    }
+
+    public Command intakeBottom() {
+        return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.intake());
     }
 
     // Moves elevator to set coral preset

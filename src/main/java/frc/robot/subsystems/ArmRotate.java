@@ -66,6 +66,15 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         }).until(setPointPersistenceCheck)).withName("Move To Set Angle");
     }
 
+    public Command moveIntaking() {
+        return runOnce(() -> {
+            this.preset = ArmRotatePresets.OUT;
+            pid.reset(getArmAngle(), 0.0);
+        }).andThen(run(() -> {
+            Logger.recordOutput("Arm pid at goal", pid.atGoal());
+        }).until(() -> (getData().rotationAbsAngleDegrees < 67))).withName("Move To Set Angle");
+    }
+
     public Command zero() {
         return runSafe(() -> {
             getData().motor.setpoint = ZEROING_SPEED;

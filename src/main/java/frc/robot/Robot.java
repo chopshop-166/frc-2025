@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
@@ -39,6 +40,7 @@ public final class Robot extends CommandRobot {
     private RobotMap map = getRobotMap(RobotMap.class, new RobotMap());
     private ButtonXboxController driveController = new ButtonXboxController(0);
     private ButtonXboxController copilotController = new ButtonXboxController(1);
+    private Trigger elevatorSafeTrigger;
 
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
@@ -88,6 +90,7 @@ public final class Robot extends CommandRobot {
         super();
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
+        elevatorSafeTrigger = new Trigger(() -> elevator.elevatorSafeTrigger().getAsBoolean());
     }
 
     @Override
@@ -140,6 +143,7 @@ public final class Robot extends CommandRobot {
                 .whileTrue(drive.robotCentricDrive());
 
         copilotController.a().onTrue(commandSequences.intake());
+        elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
 
         copilotController.x()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
