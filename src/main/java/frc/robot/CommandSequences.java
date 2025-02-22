@@ -79,11 +79,11 @@ public class CommandSequences {
     }
 
     public Command positionL2Auto() {
-        return moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL23);
+        return moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2);
     }
 
     public Command positionL3Auto() {
-        return moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL23);
+        return moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3);
     }
 
     public Command positionL4Auto() {

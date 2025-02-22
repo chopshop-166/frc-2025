@@ -143,15 +143,15 @@ public final class Robot extends CommandRobot {
 
         copilotController.x()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
-                .onFalse(commandSequences.scoreL1());
+                .onFalse(coralManip.score());
 
         copilotController.b()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL23))
-                .onFalse(commandSequences.score(ArmRotatePresets.SCOREL23));
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2))
+                .onFalse(coralManip.score());
 
         copilotController.y()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL23))
-                .onFalse(commandSequences.score(ArmRotatePresets.SCOREL23));
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3))
+                .onFalse(coralManip.score());
         // copilotController.leftBumper()
         // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4,
         // ArmRotatePresets.SCOREL4))
@@ -162,13 +162,16 @@ public final class Robot extends CommandRobot {
                 .onFalse(elevator.safeStateCmd());
         copilotController.getPovButton(POVDirection.UP).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL3))
                 .onFalse(elevator.safeStateCmd());
-        copilotController.getPovButton(POVDirection.LEFT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL1))
+        copilotController.getPovButton(POVDirection.LEFT).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
                 .onFalse(elevator.safeStateCmd());
-        copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
-                .onFalse(elevator.safeStateCmd());
+        // copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
+        // .onFalse(elevator.safeStateCmd());
+        copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
 
         copilotController.rightBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
-        copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.INTAKE));
+        copilotController.leftBumper()
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
+                .onFalse(coralManip.score());
     }
 
     @Override

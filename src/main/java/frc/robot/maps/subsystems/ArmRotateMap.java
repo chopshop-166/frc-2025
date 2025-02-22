@@ -24,7 +24,9 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
         SCOREL1,
 
-        SCOREL23,
+        SCOREL2,
+
+        SCOREL3,
 
         SCOREL4,
 
@@ -36,10 +38,11 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
     }
 
-    public record ArmRotatePresetValues(double intake, double scoreL1, double scoreL23, double scoreL4, double out,
+    public record ArmRotatePresetValues(double intake, double scoreL1, double scoreL2, double scoreL3, double scoreL4,
+            double out,
             double stow) {
         public ArmRotatePresetValues() {
-            this(0, 0, 0, 0, 0, 0);
+            this(0, 0, 0, 0, 0, 0, 0);
         }
 
         public double getValue(ArmRotatePresets preset) {
@@ -50,8 +53,10 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
                     return intake;
                 case SCOREL1:
                     return scoreL1;
-                case SCOREL23:
-                    return scoreL23;
+                case SCOREL2:
+                    return scoreL2;
+                case SCOREL3:
+                    return scoreL3;
                 case SCOREL4:
                     return scoreL4;
                 case OUT:

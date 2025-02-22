@@ -153,8 +153,8 @@ public class ColdStart extends RobotMap {
         elevatorMotors.validateEncoderRate(.2, 10);
         return new ElevatorMap(
                 elevatorMotors, leftMotor.getEncoder(),
-                new ElevatorMap.ElevatorPresetValues(0, 5, 14, 29.5, 56, 57.5, 1),
-                new ValueRange(0, 57.5), new ValueRange(6, 53), pid, feedForward);
+                new ElevatorMap.ElevatorPresetValues(0, 15, 19.5, 34.5, 57.5, 57.5, 1),
+                new ValueRange(0, 58.25), new ValueRange(6, 53), pid, feedForward);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ColdStart extends RobotMap {
         pid.setTolerance(1);
         ArmFeedforward feedForward = new ArmFeedforward(0.04, 0.0, 0.0018);
         return new ArmRotateMap(motor, absEncoder,
-                new ArmRotateMap.ArmRotatePresetValues(96.3, 0, 66, 0, 66, 96.3), pid,
+                new ArmRotateMap.ArmRotatePresetValues(96.3, 66, 66, 66, 66, 66, 96.3), pid,
                 new ValueRange(5, 97), new ValueRange(0, 94), feedForward);
     }
 
