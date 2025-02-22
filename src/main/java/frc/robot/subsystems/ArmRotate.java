@@ -9,6 +9,8 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
@@ -16,12 +18,16 @@ import frc.robot.maps.subsystems.ArmRotateMap.Data;
 
 public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     final ProfiledPIDController pid;
-    private final double RAISE_SPEED = 0.5;
-    private final double LOWER_SPEED = 0.3;
+    private final double RAISE_SPEED_COEF = 0.5;
+    private final double LOWER_SPEED_COEF = 0.3;
     private final double MANUAL_LOWER_SPEED_COEF = 0.3;
     private final double SLOW_DOWN_COEF = 0.3;
     private final double ZEROING_SPEED = 0.5;
+    private final double SAFE_ANGLE = 0;
     double holdAngle = 0;
+
+    NetworkTableInstance instance = NetworkTableInstance.getDefault();
+    BooleanPublisher armSafePub = instance.getBooleanTopic("Arm/Safe").publish();
 
     ArmRotatePresets preset = ArmRotatePresets.OFF;
 
@@ -34,7 +40,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
 
         return run(() -> {
             double speed = rotateSpeed.getAsDouble();
-            double speedCoef = RAISE_SPEED;
+            double speedCoef = RAISE_SPEED_COEF;
             if (speed < 0) {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }
@@ -95,6 +101,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     @Override
     public void periodic() {
         super.periodic();
+        armSafePub.set(getData().rotationAbsAngleDegrees >= SAFE_ANGLE);
         if (preset != ArmRotatePresets.OFF) {
             double targetHeight = preset == ArmRotatePresets.HOLD ? holdAngle
                     : getMap().armRotatePreset.getValue(preset);
