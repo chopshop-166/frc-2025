@@ -177,8 +177,15 @@ public class ColdStart extends RobotMap {
         ProfiledPIDController pid = new ProfiledPIDController(0.025, 0, 0, new Constraints(90, 300));
         pid.setTolerance(1);
         ArmFeedforward feedForward = new ArmFeedforward(0.04, 0.0, 0.0018);
-        return new ArmRotateMap(motor, absEncoder,
-                new ArmRotateMap.ArmRotatePresetValues(96.3, 66, 66, 66, 66, 66, 96.3), pid,
+
+        ArmRotateMap.PresetValue presets = p -> switch (p) {
+            case INTAKE -> 96.3;
+            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 66;
+            case STOW -> 96.3;
+            default -> Double.NaN;
+        };
+
+        return new ArmRotateMap(motor, absEncoder, presets, pid,
                 new ValueRange(5, 97), new ValueRange(0, 94), feedForward);
     }
 

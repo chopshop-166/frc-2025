@@ -86,7 +86,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().motor.setpoint = ZEROING_SPEED;
             preset = ArmRotatePresets.OFF;
         }).until(() -> {
-            return getArmAngle() > getMap().armRotatePreset.getValue(ArmRotatePresets.STOW);
+            return getArmAngle() > getMap().armRotatePreset.applyAsDouble(ArmRotatePresets.STOW);
         });
     }
 
@@ -114,7 +114,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         armSafePub.set(getData().rotationAbsAngleDegrees >= SAFE_ANGLE);
         if (preset != ArmRotatePresets.OFF) {
             double targetHeight = preset == ArmRotatePresets.HOLD ? holdAngle
-                    : getMap().armRotatePreset.getValue(preset);
+                    : getMap().armRotatePreset.applyAsDouble(preset);
             double setpoint = pid.calculate(getArmAngle(), new State(targetHeight, 0));
             setpoint += getMap().armFeedforward.calculate(
                     pid.getSetpoint().position,
