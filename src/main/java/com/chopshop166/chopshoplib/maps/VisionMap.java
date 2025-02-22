@@ -68,8 +68,9 @@ public class VisionMap {
                     Logger.recordOutput("target" + targetID, target.bestCameraToTarget);
                     Transform3d robotToCam = new Transform3d(source.robotToCam.getX(), source.robotToCam.getY(),
                             source.robotToCam.getZ(),
-                            new Rotation3d(source.robotToCam.getRotation().getX(),
-                                    source.robotToCam.getRotation().getY(), -source.robotToCam.getRotation().getZ()));
+                            new Rotation3d(0,
+                                    0, source.robotToCam.getRotation().getZ() + Math.PI));
+                    Logger.recordOutput("Fucking Z", -source.robotToCam.getRotation().getZ());
                     target.bestCameraToTarget = target.bestCameraToTarget.plus(robotToCam);
                     Logger.recordOutput("targetOffset" + targetID, target.bestCameraToTarget);
                     if (data.targets.containsKey(target.getFiducialId())) {

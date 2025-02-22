@@ -27,6 +27,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,8 +50,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(0, 0, 0, new Constraints(1, 3));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(0, 0, 0, new Constraints(1, 3));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(0.05, 0, 0.0, new Constraints(2, 4));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(0.05, 0, 0.0, new Constraints(2, 4));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -254,7 +255,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
         } else {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
-                    rotation, estimator.getEstimatedPosition().getRotation());
+                    rotation, isBlueAlliance ? estimator.getEstimatedPosition().getRotation()
+                            : estimator.getEstimatedPosition().getRotation()
+                                    .plus(new Rotation2d(Units.degreesToRadians(180))));
         }
 
         move(speeds);
