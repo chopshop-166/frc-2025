@@ -8,24 +8,21 @@ import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
 public class CoralManipMap implements LoggableMap<CoralManipMap.Data> {
-    public final SmartMotorController leftMotor;
-    public final SmartMotorController rightMotor;
+    public final SmartMotorController motor;
     public final BooleanSupplier sensor;
 
     public CoralManipMap() {
-        this(new SmartMotorController(), new SmartMotorController(), () -> false);
+        this(new SmartMotorController(), () -> false);
     }
 
-    public CoralManipMap(SmartMotorController leftMotor, SmartMotorController rightMotor, BooleanSupplier sensor) {
-        this.leftMotor = leftMotor;
-        this.rightMotor = rightMotor;
+    public CoralManipMap(SmartMotorController motor, BooleanSupplier sensor) {
+        this.motor = motor;
         this.sensor = sensor;
     }
 
     @Override
     public void updateData(Data data) {
-        data.leftMotor.updateData(leftMotor);
-        data.rightMotor.updateData(rightMotor);
+        data.leftMotor.updateData(motor);
         data.gamePieceDetected = sensor.getAsBoolean();
 
     }

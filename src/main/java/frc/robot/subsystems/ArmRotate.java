@@ -59,10 +59,20 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command moveTo(ArmRotatePresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(30, pid::atGoal);
         return runOnce(() -> {
-            pid.reset(getArmAngle(), getData().rotatingAngleVelocity);
+            this.preset = level;
+            pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
-            Logger.recordOutput("Pid at goal", pid.atGoal());
+            Logger.recordOutput("Arm pid at goal", pid.atGoal());
         }).until(setPointPersistenceCheck)).withName("Move To Set Angle");
+    }
+
+    public Command moveIntaking() {
+        return runOnce(() -> {
+            this.preset = ArmRotatePresets.OUT;
+            pid.reset(getArmAngle(), 0.0);
+        }).andThen(run(() -> {
+            Logger.recordOutput("Arm pid at goal", pid.atGoal());
+        }).until(() -> (getData().rotationAbsAngleDegrees < 67))).withName("Move To Set Angle");
     }
 
     public Command zero() {
@@ -120,7 +130,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
 
     @Override
     public void reset() {
-        getMap().encoder.reset();
+        // Nothing to reset
     }
 
     @Override

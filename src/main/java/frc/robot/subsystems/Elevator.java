@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -64,23 +65,30 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         return startSafe(() -> {
             getMap().motor.resetValidators();
             level = ElevatorPresets.OFF;
-                getData().motor.setpoint = ZEROING_SPEED;
-            
+            getData().motor.setpoint = ZEROING_SPEED;
+
         }).until(() -> getMap().motor.validate() && armSafeSub.getAsBoolean()).andThen(resetCmd());
     }
 
     public Command moveTo(ElevatorPresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(30, pid::atGoal);
         return runOnce(() -> {
-                this.level = level;
-                pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
-            
+            this.level = level;
+            pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
+
         }).andThen(run(() -> {
             Logger.recordOutput("PID at goal", pid.atGoal());
+            hold();
         })).until(() -> {
             return setPointPersistenceCheck.getAsBoolean() && armSafeSub.getAsBoolean();
         }).withName("Move to set height");
 
+    }
+
+    public BooleanSupplier elevatorSafeTrigger() {
+        return () -> {
+            return (getData().heightAbsInches < 12 && level == ElevatorPresets.INTAKE);
+        };
     }
 
     public Command hold() {

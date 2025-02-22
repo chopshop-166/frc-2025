@@ -12,6 +12,8 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
+import com.chopshop166.chopshoplib.sensors.CSEncoder;
+import com.chopshop166.chopshoplib.sensors.IEncoder;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -24,6 +26,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -31,8 +34,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
@@ -148,25 +153,40 @@ public class ColdStart extends RobotMap {
         elevatorMotors.validateEncoderRate(.2, 10);
         return new ElevatorMap(
                 elevatorMotors, leftMotor.getEncoder(),
-                new ElevatorMap.ElevatorPresetValues(16.6, 5, 14, 29.5, 56, 57.5, 1),
-                new ValueRange(0, 57.5), new ValueRange(6, 53), pid, feedForward);
+                new ElevatorMap.ElevatorPresetValues(0, 15, 19.5, 34.5, 57.5, 57.5, 1),
+                new ValueRange(0, 58.25), new ValueRange(6, 53), pid, feedForward);
+    }
+
+    @Override
+    public ArmRotateMap getArmRotateMap() {
+        CSSparkFlex motor = new CSSparkFlex(10);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 212);
+        SparkFlexConfig config = new SparkFlexConfig();
+
+        config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
+        config.voltageCompensation(11.5);
+        motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        ProfiledPIDController pid = new ProfiledPIDController(0.025, 0, 0, new Constraints(90, 300));
+        pid.setTolerance(1);
+        ArmFeedforward feedForward = new ArmFeedforward(0.04, 0.0, 0.0018);
+        return new ArmRotateMap(motor, absEncoder,
+                new ArmRotateMap.ArmRotatePresetValues(96.3, 66, 66, 66, 66, 66, 96.3), pid,
+                new ValueRange(5, 97), new ValueRange(0, 94), feedForward);
     }
 
     @Override
     public CoralManipMap getCoralManipMap() {
-        CSSparkMax leftWheels = new CSSparkMax(9);
-        CSSparkMax rightWheels = new CSSparkMax(10);
+        CSSparkMax motor = new CSSparkMax(9);
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
-        leftWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        // Right is identical to left, but inverted
         config.inverted(true);
-        rightWheels.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(9);
-        return new CoralManipMap(leftWheels, rightWheels, sensor::get);
+        return new CoralManipMap(motor, sensor::get);
     }
 
     @Override

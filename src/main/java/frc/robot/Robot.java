@@ -22,9 +22,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
+import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.AlgaeDestage;
+import frc.robot.subsystems.ArmRotate;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.DeepClimb;
 import frc.robot.subsystems.Drive;
@@ -37,6 +40,7 @@ public final class Robot extends CommandRobot {
     private RobotMap map = getRobotMap(RobotMap.class, new RobotMap());
     private ButtonXboxController driveController = new ButtonXboxController(0);
     private ButtonXboxController copilotController = new ButtonXboxController(1);
+    private Trigger elevatorSafeTrigger;
 
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
@@ -54,8 +58,10 @@ public final class Robot extends CommandRobot {
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
     private Elevator elevator = new Elevator(map.getElevatorMap());
     private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
+    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap());
 
-    private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator);
+    private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator,
+            armRotate);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -70,7 +76,8 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
         NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
         NamedCommands.registerCommand("Score Coral L4", commandSequences.scoreL4());
-        NamedCommands.registerCommand("Stow", commandSequences.moveElevator(ElevatorPresets.STOW));
+        NamedCommands.registerCommand("Stow",
+                commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
     }
 
@@ -83,6 +90,7 @@ public final class Robot extends CommandRobot {
         super();
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
+        elevatorSafeTrigger = new Trigger(() -> elevator.elevatorSafeTrigger().getAsBoolean());
     }
 
     @Override
@@ -135,29 +143,39 @@ public final class Robot extends CommandRobot {
                 .whileTrue(drive.robotCentricDrive());
 
         copilotController.a().onTrue(commandSequences.intake());
+        elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
 
-        copilotController.x().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1))
-                .onFalse(commandSequences.scoreL1());
+        copilotController.x()
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
+                .onFalse(coralManip.score());
 
-        copilotController.b().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2))
-                .onFalse(commandSequences.score());
+        copilotController.b()
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2))
+                .onFalse(coralManip.score());
 
-        copilotController.y().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3))
-                .onFalse(commandSequences.score());
-        copilotController.leftBumper().whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4))
-                .onFalse(commandSequences.scoreL4());
+        copilotController.y()
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3))
+                .onFalse(coralManip.score());
+        // copilotController.leftBumper()
+        // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4,
+        // ArmRotatePresets.SCOREL4))
+        // .onFalse(commandSequences.scoreL4());
         copilotController.back().onTrue(elevator.safeStateCmd());
         copilotController.start().onTrue(elevator.zero());
         copilotController.getPovButton(POVDirection.RIGHT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL2))
                 .onFalse(elevator.safeStateCmd());
         copilotController.getPovButton(POVDirection.UP).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL3))
                 .onFalse(elevator.safeStateCmd());
-        copilotController.getPovButton(POVDirection.LEFT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL1))
+        copilotController.getPovButton(POVDirection.LEFT).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
                 .onFalse(elevator.safeStateCmd());
-        copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
-                .onFalse(elevator.safeStateCmd());
+        // copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
+        // .onFalse(elevator.safeStateCmd());
+        copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
 
-        copilotController.rightBumper().whileTrue(coralManip.feed());
+        copilotController.rightBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
+        copilotController.leftBumper()
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
+                .onFalse(coralManip.score());
     }
 
     @Override
@@ -178,8 +196,12 @@ public final class Robot extends CommandRobot {
     @Override
     public void setDefaultCommands() {
         elevator.setDefaultCommand(elevator.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY())));
-        deepClimb
-                .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getRightY())));
+        armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY())));
+
+        // deepClimb
+        // .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () ->
+        // copilotController.getRightY())));
+
     }
 
     public DoubleUnaryOperator getScaler(double leftRange, double rightRange) {

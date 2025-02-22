@@ -25,7 +25,8 @@ public class CommandSequences {
     Elevator elevator;
     ArmRotate armRotate;
 
-    public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator) {
+    public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator,
+            ArmRotate armRotate) {
         this.drive = drive;
         this.led = led;
         this.algaeDestage = algaeDestage;
@@ -38,21 +39,27 @@ public class CommandSequences {
     // Intakes until sensor is tripped, LEDs indicate that game piece is acquired
 
     public Command intake() {
-        return armRotate.moveTo(ArmRotatePresets.INTAKE).andThen(led.elevatorToPreset(),
+        return armRotate.moveIntaking().andThen(led.elevatorToPreset(),
                 elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
+                armRotate.moveTo(ArmRotatePresets.INTAKE),
                 led.intaking(), coralManip.intake(), led.gamePieceAcquired());
+    }
+
+    public Command intakeBottom() {
+        return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.intake());
     }
 
     // Moves elevator to set coral preset
 
-    public Command moveElevator(ElevatorPresets level) {
-        return led.elevatorToPreset().andThen(elevator.moveTo(level), led.elevatorAtPreset());
+    public Command moveElevator(ElevatorPresets level, ArmRotatePresets preset) {
+        return led.elevatorToPreset().andThen(armRotate.moveTo(ArmRotatePresets.OUT), elevator.moveTo(level),
+                led.elevatorAtPreset(), armRotate.moveTo(preset));
     }
 
     // Scores on set coral preset, then stows elevator
 
-    public Command score() {
-        return armRotate.moveTo(ArmRotatePresets.SCOREL23).andThen(coralManip.score(), (led.elevatorToPreset()),
+    public Command score(ArmRotatePresets preset) {
+        return coralManip.score().andThen((led.elevatorToPreset()),
                 elevator.moveTo(ElevatorPresets.STOW),
                 led.elevatorAtPreset());
     }
@@ -76,15 +83,15 @@ public class CommandSequences {
     }
 
     public Command positionL2Auto() {
-        return moveElevator(ElevatorPresets.SCOREL2);
+        return moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2);
     }
 
     public Command positionL3Auto() {
-        return moveElevator(ElevatorPresets.SCOREL3);
+        return moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3);
     }
 
     public Command positionL4Auto() {
-        return moveElevator(ElevatorPresets.SCOREL4);
+        return moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4);
     }
 
     // Scores on L1 preset, then stows elevator
