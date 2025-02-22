@@ -220,9 +220,12 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             Transform2d reefLocation = vision.pickBestReefLocation(visionData.targets);
             Transform2d robotToBranch = vision
                     .adjustTranslationForBranch(reefLocation, Branch.LEFT_BRANCH);
-            Logger.recordOutput("Reef Location Transform2d", estimator.getEstimatedPosition().plus(reefLocation));
+            Pose2d robotPose = new Pose2d(estimator.getEstimatedPosition().getTranslation(),
+                    robotToBranch.getRotation().minus(Rotation2d.fromDegrees(180)));
+            Logger.recordOutput("Reef Location Transform2d", robotPose.plus(reefLocation));
             Logger.recordOutput("Robot To Branch Transform2d",
-                    estimator.getEstimatedPosition().plus(robotToBranch));
+                    robotPose.plus(robotToBranch));
+            Logger.recordOutput("Robot Pose", robotPose);
             targetPose = estimator.getEstimatedPosition().plus(robotToBranch);
         }
         if (targetBranch != Branch.NONE) {
