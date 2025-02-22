@@ -12,10 +12,6 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
-import com.chopshop166.chopshoplib.sensors.CSEncoder;
-import com.chopshop166.chopshoplib.sensors.IEncoder;
-import com.chopshop166.chopshoplib.motors.validators.EncoderValidator;
-import com.chopshop166.chopshoplib.sensors.CtreEncoder;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -40,8 +36,6 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.ArmRotateMap;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
@@ -154,10 +148,18 @@ public class ColdStart extends RobotMap {
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
+        ElevatorMap.PresetValues presets = preset -> switch (preset) {
+            case STOW -> 1;
+            case INTAKE -> 0;
+            case SCOREL1 -> 15;
+            case SCOREL2 -> 19.5;
+            case SCOREL3 -> 34.5;
+            case SCOREL4, HIGHESTPOINT -> 57.5;
+            default -> Double.NaN;
+        };
+
         elevatorMotors.validateEncoderRate(.2, 10);
-        return new ElevatorMap(
-                elevatorMotors, leftMotor.getEncoder(),
-                new ElevatorMap.ElevatorPresetValues(0, 15, 19.5, 34.5, 57.5, 57.5, 1),
+        return new ElevatorMap(elevatorMotors, leftMotor.getEncoder(), presets,
                 new ValueRange(0, 58.25), new ValueRange(6, 53), pid, feedForward);
     }
 
