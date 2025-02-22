@@ -14,6 +14,8 @@ import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
 import com.chopshop166.chopshoplib.sensors.CSEncoder;
 import com.chopshop166.chopshoplib.sensors.IEncoder;
+import com.chopshop166.chopshoplib.motors.validators.EncoderValidator;
+import com.chopshop166.chopshoplib.sensors.CtreEncoder;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -38,6 +40,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.ArmRotateMap;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
@@ -203,15 +207,6 @@ public class ColdStart extends RobotMap {
 
     }
 
-    // @Override
-    // public LedMapBase getLedMap() {
-    // var result = new WPILedMap(1, 1);
-    // var leds = result.ledBuffer;
-
-    // SegmentConfig underglow = leds.segment(1).tags();
-    // return result;
-    // }
-
     @Override
     public void setupLogging() {
         // Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB
@@ -220,4 +215,5 @@ public class ColdStart extends RobotMap {
         Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());
         new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     }
+
 }

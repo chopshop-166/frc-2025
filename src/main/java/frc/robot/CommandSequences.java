@@ -42,11 +42,11 @@ public class CommandSequences {
         return armRotate.moveIntaking().andThen(led.elevatorToPreset(),
                 elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset(),
                 armRotate.moveTo(ArmRotatePresets.INTAKE),
-                led.intaking(), coralManip.intake(), led.gamePieceAcquired());
+                led.intaking(), coralManip.betterintake(), led.gamePieceAcquired());
     }
 
     public Command intakeBottom() {
-        return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.intake());
+        return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.betterintake());
     }
 
     // Moves elevator to set coral preset

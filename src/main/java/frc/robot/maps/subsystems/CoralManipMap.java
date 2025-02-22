@@ -22,14 +22,13 @@ public class CoralManipMap implements LoggableMap<CoralManipMap.Data> {
 
     @Override
     public void updateData(Data data) {
-        data.leftMotor.updateData(motor);
+        data.motor.updateData(motor);
         data.gamePieceDetected = sensor.getAsBoolean();
 
     }
 
     public static class Data extends DataWrapper {
-        public MotorControllerData leftMotor = new MotorControllerData();
-        public MotorControllerData rightMotor = new MotorControllerData();
+        public MotorControllerData motor = new MotorControllerData();
         public boolean gamePieceDetected;
     }
 
