@@ -153,21 +153,27 @@ public class ColdStart extends RobotMap {
         elevatorMotors.validateEncoderRate(.2, 10);
         return new ElevatorMap(
                 elevatorMotors, leftMotor.getEncoder(),
-                new ElevatorMap.ElevatorPresetValues(16.6, 5, 14, 29.5, 56, 57.5, 1),
+                new ElevatorMap.ElevatorPresetValues(0, 5, 14, 29.5, 56, 57.5, 1),
                 new ValueRange(0, 57.5), new ValueRange(6, 53), pid, feedForward);
     }
 
     @Override
     public ArmRotateMap getArmRotateMap() {
         CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(1);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 212);
         SparkFlexConfig config = new SparkFlexConfig();
+
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
+        config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0, 0, 0, new Constraints(0, 0));
-        ArmFeedforward feedForward = new ArmFeedforward(0, 0, 0);
-        return new ArmRotateMap(motor, absEncoder::get, new ArmRotateMap.ArmRotatePresetValues(0, 0, 0, 0, 0), pid, new ValueRange(0, 0), new ValueRange(0, 0), feedForward);
+        ProfiledPIDController pid = new ProfiledPIDController(0.025, 0, 0, new Constraints(90, 300));
+        pid.setTolerance(1);
+        ArmFeedforward feedForward = new ArmFeedforward(0.04, 0.0, 0.0018);
+        return new ArmRotateMap(motor, absEncoder,
+                new ArmRotateMap.ArmRotatePresetValues(96.3, 0, 66, 0, 66, 96.3), pid,
+                new ValueRange(5, 97), new ValueRange(0, 94), feedForward);
     }
 
     @Override
@@ -176,6 +182,7 @@ public class ColdStart extends RobotMap {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(9);

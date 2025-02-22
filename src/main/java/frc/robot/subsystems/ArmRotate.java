@@ -59,9 +59,10 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command moveTo(ArmRotatePresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(30, pid::atGoal);
         return runOnce(() -> {
+            this.preset = level;
             pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
-            Logger.recordOutput("Pid at goal", pid.atGoal());
+            Logger.recordOutput("Arm pid at goal", pid.atGoal());
         }).until(setPointPersistenceCheck)).withName("Move To Set Angle");
     }
 

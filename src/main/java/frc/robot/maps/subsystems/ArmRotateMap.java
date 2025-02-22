@@ -11,6 +11,7 @@ import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 
 public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
@@ -27,15 +28,18 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
         SCOREL4,
 
+        OUT,
+
         STOW,
 
         HOLD
 
     }
 
-    public record ArmRotatePresetValues(double intake, double scoreL1, double scoreL23, double scoreL4, double stow) {
+    public record ArmRotatePresetValues(double intake, double scoreL1, double scoreL23, double scoreL4, double out,
+            double stow) {
         public ArmRotatePresetValues() {
-            this(0, 0, 0, 0, 0);
+            this(0, 0, 0, 0, 0, 0);
         }
 
         public double getValue(ArmRotatePresets preset) {
@@ -50,6 +54,8 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
                     return scoreL23;
                 case SCOREL4:
                     return scoreL4;
+                case OUT:
+                    return out;
                 case STOW:
                     return stow;
                 default:
@@ -59,7 +65,7 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     }
 
     public SmartMotorController motor;
-    public final IAbsolutePosition encoder;
+    public final DutyCycleEncoder encoder;
     public final ArmRotatePresetValues armRotatePreset;
     public final ProfiledPIDController pid;
     public final ValueRange hardLimits;
@@ -67,13 +73,13 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     public final ArmFeedforward armFeedforward;
 
     public ArmRotateMap() {
-        this(new SmartMotorController(), new MockEncoder(), new ArmRotatePresetValues(),
+        this(new SmartMotorController(), new DutyCycleEncoder(0), new ArmRotatePresetValues(),
                 new ProfiledPIDController(0, 0, 0, new Constraints(0, 0)), new ValueRange(0, 0), new ValueRange(0, 0),
                 new ArmFeedforward(0, 0, 0));
 
     }
 
-    public ArmRotateMap(SmartMotorController motor, IAbsolutePosition encoder, ArmRotatePresetValues armRotatePreset,
+    public ArmRotateMap(SmartMotorController motor, DutyCycleEncoder encoder, ArmRotatePresetValues armRotatePreset,
             ProfiledPIDController pid, ValueRange hardLimits, ValueRange softLimits, ArmFeedforward armFeedforward) {
         this.motor = motor;
         this.encoder = encoder;
@@ -87,11 +93,13 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.rotationAbsAngleDegrees = encoder.getAbsolutePosition();
+        data.rotationVelocity = (data.rotationAbsAngleDegrees - encoder.get()) / .02;
+        data.rotationAbsAngleDegrees = encoder.get();
     }
 
     public static class Data extends DataWrapper {
         public MotorControllerData motor = new MotorControllerData();
         public double rotationAbsAngleDegrees;
+        public double rotationVelocity;
     }
 }
