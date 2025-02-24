@@ -130,7 +130,8 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         super.periodic();
         heightPub.set(getData().heightAbsInches / getMap().hardLimits.max());
         if (level != ElevatorPresets.OFF) {
-            double targetHeight = level == ElevatorPresets.HOLD ? holdHeight : getMap().elevatorPreset.getValue(level);
+            double targetHeight = level == ElevatorPresets.HOLD ? holdHeight
+                    : getMap().presetValues.applyAsDouble(level);
             double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
             setpoint += getMap().feedForward.calculate(
                     pid.getSetpoint().position,
