@@ -32,12 +32,12 @@ public class Vision {
 
     public enum Branch {
         LEFT_BRANCH(new Transform2d(
-                Units.inchesToMeters(-12.94 / 2), // distance between branches div by 2
-                Units.inchesToMeters(-17), // robot center to reef (w/ bumpers)
+                Units.inchesToMeters(-17), // distance between branches div by 2
+                Units.inchesToMeters(12.94 / 2), // bot center to reef (w/ bumpers)
                 new Rotation2d())),
         RIGHT_BRANCH(new Transform2d(
-                Units.inchesToMeters(12.94 / 2),
                 Units.inchesToMeters(-17),
+                Units.inchesToMeters(-12.94 / 2),
                 new Rotation2d())),
         NONE(null);
 
@@ -142,7 +142,8 @@ public class Vision {
 
         Transform3d tagToCamera = closestTarget.getValue().get(0).getBestCameraToTarget();
         Rotation3d tagToCameraRotation = tagToCamera.getRotation();
-        return new Transform2d(tagToCamera.getX(), tagToCamera.getY(), new Rotation2d(tagToCameraRotation.getZ()));
+        return new Transform2d(tagToCamera.getX(), tagToCamera.getY(),
+                new Rotation2d(tagToCameraRotation.getZ()));
     }
 
     public Transform2d adjustTranslationForBranch(Transform2d tagToCamera, Branch branch) {

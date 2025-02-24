@@ -17,6 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,6 +28,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -50,8 +52,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(0.05, 0, 0.0, new Constraints(2, 4));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(0.05, 0, 0.0, new Constraints(2, 4));
+    PIDController translationPID_X = new PIDController(0.3, 0, 0.0);
+    PIDController translationPID_Y = new PIDController(0.3, 0, 0.0);
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -204,47 +206,56 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         return rotationSpeed;
     }
 
-    private void periodicMove(final double xSpeed, final double ySpeed, final double rotation) {
-        double rotationInput = DEADBAND.applyAsDouble(rotation);
-        double xInput = DEADBAND.applyAsDouble(xSpeed);
-        double yInput = DEADBAND.applyAsDouble(ySpeed);
-
-        double translateXSpeed = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
-        double translateYSpeed = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
-        double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
-        if (aimTarget.isPresent()) {
-            rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
-        }
+    private void visionCalcs() {
         if (visionData.targets.size() > 0) {
             vision.filterReefTags(isBlueAlliance, visionData.targets);
             Transform2d reefLocation = vision.pickBestReefLocation(visionData.targets);
             Transform2d robotToBranch = vision
                     .adjustTranslationForBranch(reefLocation, Branch.LEFT_BRANCH);
-            Pose2d robotPose = new Pose2d(estimator.getEstimatedPosition().getTranslation(),
-                    robotToBranch.getRotation().minus(Rotation2d.fromDegrees(180)));
+            Pose2d robotPose = estimator.getEstimatedPosition();
             Logger.recordOutput("Reef Location Transform2d", robotPose.plus(reefLocation));
             Logger.recordOutput("Robot To Branch Transform2d",
                     robotPose.plus(robotToBranch));
-            Logger.recordOutput("Robot Pose", robotPose);
             targetPose = estimator.getEstimatedPosition().plus(robotToBranch);
+            Logger.recordOutput("Target Pose", targetPose);
         }
+    }
+
+    private void periodicMove(final double xSpeed, final double ySpeed, final double rotation) {
+        double rotationInput = DEADBAND.applyAsDouble(rotation);
+        double xInput = DEADBAND.applyAsDouble(xSpeed);
+        double yInput = DEADBAND.applyAsDouble(ySpeed);
+
+        double translateXSpeedMPS = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double translateYSpeedMPS = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
+        if (aimTarget.isPresent()) {
+            rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
+        }
+        // visionCalcs();
         if (targetBranch != Branch.NONE) {
             Pose2d robotPose = estimator.getEstimatedPosition();
-            translateXSpeed = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
-            translateYSpeed = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+            Logger.recordOutput("Robot Pose", robotPose);
+            translateXSpeedMPS = -translationPID_X.calculate(robotPose.getX(), targetPose.getX());
+            translateYSpeedMPS = -translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+            Logger.recordOutput("X PID Error", translationPID_X.getError());
+            Logger.recordOutput("Y PID Error", translationPID_Y.getError());
             rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
                     targetPose.getRotation().getDegrees());
             Logger.recordOutput("Rotation PID Error", rotationPID.getPositionError());
         }
 
-        move(translateXSpeed, translateYSpeed, rotationSpeed, isRobotCentric);
+        move(translateXSpeedMPS, translateYSpeedMPS, rotationSpeed, isRobotCentric);
     }
 
     public Command moveToBranch(Branch targetBranch) {
         return startEnd(() -> {
+            translationPID_X.reset();
+            translationPID_Y.reset();
+            rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
             isRobotCentric = true;
-
+            visionCalcs();
         }, () -> {
             this.targetBranch = Branch.NONE;
             isRobotCentric = false;

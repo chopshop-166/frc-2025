@@ -88,9 +88,9 @@ public class Shrimp extends RobotMap {
         final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 () -> encoderRR.get(), rearRightSteer, new CSSparkMax(8), MK4_L2);
 
-        final double maxDriveSpeedMetersPerSecond = Units.feetToMeters(12);
+        final double maxDriveSpeedMetersPerSecond = Units.feetToMeters(14);
 
-        final double maxRotationRadianPerSecond = Math.PI;
+        final double maxRotationRadianPerSecond = 2 * Math.PI;
 
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNEO(1), 50, 1),
