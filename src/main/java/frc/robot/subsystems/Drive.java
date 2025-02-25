@@ -52,8 +52,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    PIDController translationPID_X = new PIDController(0.3, 0, 0.0);
-    PIDController translationPID_Y = new PIDController(0.3, 0, 0.0);
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(2, 0, 0.0, new Constraints(4.0, 5.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(4.0, 5.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -105,6 +105,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
+        translationPID_X.setTolerance(0.001);
+        translationPID_Y.setTolerance(0.001);
     }
 
     public void setPose(Pose2d pose) {
@@ -229,17 +231,19 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         double translateXSpeedMPS = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
         double translateYSpeedMPS = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
         double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
-        if (aimTarget.isPresent()) {
-            rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
-        }
+        // if (aimTarget.isPresent()) {
+        // rotationSpeed = calculateRotateSpeedToTarget(aimTarget::get);
+        // }
         // visionCalcs();
+        Logger.recordOutput("Robot Pose", estimator.getEstimatedPosition());
         if (targetBranch != Branch.NONE) {
             Pose2d robotPose = estimator.getEstimatedPosition();
-            Logger.recordOutput("Robot Pose", robotPose);
-            translateXSpeedMPS = -translationPID_X.calculate(robotPose.getX(), targetPose.getX());
-            translateYSpeedMPS = -translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
-            Logger.recordOutput("X PID Error", translationPID_X.getError());
-            Logger.recordOutput("Y PID Error", translationPID_Y.getError());
+            // soooooooooo x and y are backwards somehow. Values underneath are correct
+            translateYSpeedMPS = -translationPID_X.calculate(robotPose.getX(), targetPose.getX());
+            translateXSpeedMPS = -translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+
+            Logger.recordOutput("X PID Position Error", translationPID_X.getPositionError());
+            Logger.recordOutput("Y PID Position Error", translationPID_Y.getPositionError());
             rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
                     targetPose.getRotation().getDegrees());
             Logger.recordOutput("Rotation PID Error", rotationPID.getPositionError());
@@ -250,15 +254,14 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public Command moveToBranch(Branch targetBranch) {
         return startEnd(() -> {
-            translationPID_X.reset();
-            translationPID_Y.reset();
+            translationPID_X.reset(estimator.getEstimatedPosition().getX());
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
             rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
-            isRobotCentric = true;
+            isRobotCentric = false;
             visionCalcs();
         }, () -> {
             this.targetBranch = Branch.NONE;
-            isRobotCentric = false;
         });
     }
 
