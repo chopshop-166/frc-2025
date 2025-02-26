@@ -72,7 +72,8 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
             Logger.recordOutput("Arm pid at goal", pid.atGoal());
-        }).until(() -> (getData().rotationAbsAngleDegrees < 67))).withName("Move To Set Angle");
+        }).until(() -> (getData().rotationAbsAngleDegrees <= getMap().armRotatePreset
+                .applyAsDouble(ArmRotatePresets.OUT)))).withName("Move To Set Angle");
     }
 
     public Command zero() {
