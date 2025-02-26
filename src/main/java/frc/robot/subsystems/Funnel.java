@@ -18,7 +18,7 @@ public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
         super(new Data(), funnelMap);
     }
 
-    Command move(DoubleSupplier rotateSpeed) {
+    public Command move(DoubleSupplier rotateSpeed) {
 
         return run(() -> {
             double speed = rotateSpeed.getAsDouble();
@@ -38,8 +38,8 @@ public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
 
     private double limits(double speed) {
         double height = getFunnelAngle();
-        speed = getMap().hardLimits.filterSpeed(height, speed);
-        speed = getMap().softLimits.scaleSpeed(height, speed, SLOW_DOWN_COEF);
+        // speed = getMap().hardLimits.filterSpeed(height, speed);
+        // speed = getMap().softLimits.scaleSpeed(height, speed, SLOW_DOWN_COEF);
         return speed;
     }
 

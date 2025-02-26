@@ -16,11 +16,16 @@ import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.OuttakeMap;
+import frc.robot.maps.subsystems.FunnelMap;
 
 public class RobotMap {
 
     public SwerveDriveMap getDriveMap() {
         return new SwerveDriveMap();
+    }
+
+    public FunnelMap getFunnelMap() {
+        return new FunnelMap();
     }
 
     public VisionMap getVisionMap() {

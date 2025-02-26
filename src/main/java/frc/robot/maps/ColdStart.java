@@ -5,12 +5,14 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
+import com.chopshop166.chopshoplib.digital.MockDigitalOutput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
+import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
@@ -39,6 +41,7 @@ import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
+import frc.robot.maps.subsystems.FunnelMap;
 
 @RobotMapFor("00:80:2F:40:A7:9D")
 public class ColdStart extends RobotMap {
@@ -117,6 +120,17 @@ public class ColdStart extends RobotMap {
     }
 
     @Override
+    public FunnelMap getFunnelMap() {
+        CSSparkMax motor = new CSSparkMax(15);
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
+        config.inverted(false);
+        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        return (new FunnelMap(motor, motor.getEncoder()));
+    }
+
+    @Override
     public ElevatorMap getElevatorMap() {
         CSSparkFlex leftMotor = new CSSparkFlex(11);
         CSSparkFlex rightMotor = new CSSparkFlex(12);
@@ -166,27 +180,27 @@ public class ColdStart extends RobotMap {
     @Override
     public ArmRotateMap getArmRotateMap() {
         CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 212);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 0);
         SparkFlexConfig config = new SparkFlexConfig();
-
+        absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
         config.inverted(true);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.025, 0, 0, new Constraints(90, 300));
+        ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
         pid.setTolerance(1);
-        ArmFeedforward feedForward = new ArmFeedforward(0.04, 0.0, 0.0018);
+        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
-            case INTAKE -> 96.3;
-            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 66;
-            case STOW -> 96.3;
+            case INTAKE -> 302;
+            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 272;
+            case STOW -> 302;
             default -> Double.NaN;
         };
 
         return new ArmRotateMap(motor, absEncoder, presets, pid,
-                new ValueRange(5, 97), new ValueRange(0, 94), feedForward);
+                new ValueRange(203, 302), new ValueRange(210, 295), feedForward);
     }
 
     @Override
@@ -204,15 +218,19 @@ public class ColdStart extends RobotMap {
 
     @Override
     public DeepClimbMap getDeepClimbMap() {
-        CSSparkMax motor = new CSSparkMax(13);
+        CSSparkMax leftMotor = new CSSparkMax(13);
+        CSSparkMax rightMotor = new CSSparkMax(14);
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
         config.inverted(true);
-        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+        leftMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+        config.follow(leftMotor.getMotorController(), true);
+        rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(8);
-        return new DeepClimbMap(motor, sensor::get);
+        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), sensor::get);
 
     }
 
