@@ -98,6 +98,10 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         });
     }
 
+    public boolean atPreset(ElevatorPresets preset) {
+        return preset == level && pid.atSetpoint();
+    }
+
     private double limits(double speed) {
         double height = getElevatorHeight();
 
