@@ -18,7 +18,7 @@ public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
         super(new Data(), funnelMap);
     }
 
-    Command move(DoubleSupplier rotateSpeed) {
+    public Command move(DoubleSupplier rotateSpeed) {
 
         return run(() -> {
             double speed = rotateSpeed.getAsDouble();

@@ -125,7 +125,7 @@ public class ColdStart extends RobotMap {
         SparkMaxConfig config = new SparkMaxConfig();
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
+        config.inverted(false);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         return (new FunnelMap(motor, motor.getEncoder()));
     }
@@ -180,27 +180,27 @@ public class ColdStart extends RobotMap {
     @Override
     public ArmRotateMap getArmRotateMap() {
         CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 212);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 0);
         SparkFlexConfig config = new SparkFlexConfig();
-
+        absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
         config.inverted(true);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.025, 0, 0, new Constraints(90, 300));
+        ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
         pid.setTolerance(1);
-        ArmFeedforward feedForward = new ArmFeedforward(0.04, 0.0, 0.0018);
+        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
-            case INTAKE -> 96.3;
-            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 66;
-            case STOW -> 96.3;
+            case INTAKE -> 302;
+            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 272;
+            case STOW -> 302;
             default -> Double.NaN;
         };
 
         return new ArmRotateMap(motor, absEncoder, presets, pid,
-                new ValueRange(5, 97), new ValueRange(0, 94), feedForward);
+                new ValueRange(203, 302), new ValueRange(210, 295), feedForward);
     }
 
     @Override

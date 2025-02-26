@@ -32,6 +32,7 @@ import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.DeepClimb;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.Led;
 import frc.robot.subsystems.Outtake;
 
@@ -59,6 +60,7 @@ public final class Robot extends CommandRobot {
     private Elevator elevator = new Elevator(map.getElevatorMap());
     private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap());
+    private Funnel funnel = new Funnel(map.getFunnelMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator,
             armRotate);
@@ -196,11 +198,12 @@ public final class Robot extends CommandRobot {
     @Override
     public void setDefaultCommands() {
         elevator.setDefaultCommand(elevator.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY())));
-        armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY())));
-
-        // deepClimb
-        // .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () ->
-        // copilotController.getRightY())));
+        // armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () ->
+        // -copilotController.getRightY())));
+        // funnel.setDefaultCommand(funnel.move(RobotUtils.deadbandAxis(.1, () ->
+        // -copilotController.getRightY())));
+        deepClimb
+                .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getRightY())));
 
     }
 

@@ -24,6 +24,7 @@ public class CommandSequences {
     CoralManip coralManip;
     Elevator elevator;
     ArmRotate armRotate;
+    // Funnel funnel;
 
     public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator,
             ArmRotate armRotate) {
