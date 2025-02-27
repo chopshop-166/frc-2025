@@ -9,7 +9,6 @@ import org.littletonrobotics.junction.Logger;
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.CoralManipMap.Data;
 
@@ -74,17 +73,13 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
                     getData().motor.setpoint = INTAKE_SPEED;
                 }),
                 waitUntil(() -> getData().gamePieceDetected),
-                Commands.print("Running align"),
                 runOnce(() -> {
                     getData().motor.setpoint = ALIGNMENT_SPEED;
                 }),
-                Commands.print("Checking for not game piece detected"),
                 waitUntil(() -> !getData().gamePieceDetected),
-                Commands.print("Running negative align"),
                 runOnce(() -> {
                     getData().motor.setpoint = -ALIGNMENT_SPEED;
                 }),
-                Commands.print("Checking for game piece detected"),
                 waitUntil(() -> getData().gamePieceDetected),
                 safeStateCmd());
     }
