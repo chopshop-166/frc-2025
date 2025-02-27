@@ -34,17 +34,11 @@
           "data": {
             "name": "Score Coral"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Retreat From ReefE"
-          }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }
