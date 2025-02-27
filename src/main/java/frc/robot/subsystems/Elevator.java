@@ -67,7 +67,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             level = ElevatorPresets.OFF;
             getData().motor.setpoint = ZEROING_SPEED;
 
-        }).until(() -> getMap().motor.validate() && armSafeSub.getAsBoolean()).andThen(resetCmd());
+        }).until(() -> getMap().motor.validate()).andThen(resetCmd());
     }
 
     public Command moveTo(ElevatorPresets level) {

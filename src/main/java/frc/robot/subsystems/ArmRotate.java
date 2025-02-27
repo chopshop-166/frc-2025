@@ -112,7 +112,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     @Override
     public void periodic() {
         super.periodic();
-        armSafePub.set(getData().rotationAbsAngleDegrees >= SAFE_ANGLE);
+        armSafePub.set(getData().rotationAbsAngleDegrees < SAFE_ANGLE);
         if (preset != ArmRotatePresets.OFF) {
             double targetHeight = preset == ArmRotatePresets.HOLD ? holdAngle
                     : getMap().armRotatePreset.applyAsDouble(preset);
