@@ -1,12 +1,13 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+import static edu.wpi.first.wpilibj2.command.Commands.waitUntil;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.CoralManipMap.Data;
@@ -67,17 +68,20 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     }
 
     public Command betterintake() {
-        return run(() -> {
-            getData().motor.setpoint = INTAKE_SPEED;
-        }).until(() -> getData().gamePieceDetected).andThen(
-                run(() -> {
+        return sequence(
+                runOnce(() -> {
+                    getData().motor.setpoint = INTAKE_SPEED;
+                }),
+                waitUntil(() -> getData().gamePieceDetected),
+                runOnce(() -> {
                     getData().motor.setpoint = ALIGNMENT_SPEED;
-                }).until(() -> !getData().gamePieceDetected),
-                run(() -> {
+                }),
+                waitUntil(() -> !getData().gamePieceDetected),
+                runOnce(() -> {
                     getData().motor.setpoint = -ALIGNMENT_SPEED;
-                }).until(() -> getData().gamePieceDetected),
+                }),
+                waitUntil(() -> getData().gamePieceDetected),
                 safeStateCmd());
-
     }
 
     @Override
