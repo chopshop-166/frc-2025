@@ -70,14 +70,22 @@ public final class Robot extends CommandRobot {
     public void registerNamedCommands() {
 
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
-        NamedCommands.registerCommand("Position Coral L1", commandSequences.positionAuto(ElevatorPresets.SCOREL1));
-        NamedCommands.registerCommand("Position Coral L2", commandSequences.positionAuto(ElevatorPresets.SCOREL2));
-        NamedCommands.registerCommand("Position Coral L3", commandSequences.positionAuto(ElevatorPresets.SCOREL3));
-        NamedCommands.registerCommand("Position Coral L4", commandSequences.positionAuto(ElevatorPresets.SCOREL4));
-        NamedCommands.registerCommand("Score Coral L1", commandSequences.scoreL1Auto());
-        NamedCommands.registerCommand("Score Coral L2", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
-        NamedCommands.registerCommand("Score Coral L3", commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
-        NamedCommands.registerCommand("Score Coral L4", commandSequences.scoreL4());
+        NamedCommands.registerCommand("Position Coral L1",
+                commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1));
+        NamedCommands.registerCommand("Position Coral L2",
+                commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2));
+        NamedCommands.registerCommand("Position Coral L3",
+                commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3));
+        NamedCommands.registerCommand("Position Coral L4",
+                commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4));
+        // NamedCommands.registerCommand("Score Coral L1",
+        // commandSequences.scoreL1Auto());
+        NamedCommands.registerCommand("Score Coral", coralManip.score());
+        // NamedCommands.registerCommand("Score Coral L2",
+        // commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL2));
+        // NamedCommands.registerCommand("Score Coral L3",
+        // commandSequences.scoreCoralAuto(ElevatorPresets.SCOREL3));
+        // NamedCommands.registerCommand("Score Coral L4", commandSequences.scoreL4());
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());

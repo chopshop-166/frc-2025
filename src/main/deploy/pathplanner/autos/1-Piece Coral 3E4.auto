@@ -17,13 +17,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Start1 to ReefI"
+                  "pathName": "Start3 to ReefE"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Position Coral L3"
+                  "name": "Position Coral L4"
                 }
               }
             ]
@@ -34,11 +34,17 @@
           "data": {
             "name": "Score Coral"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Retreat From ReefE"
+          }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }
