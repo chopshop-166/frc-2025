@@ -80,7 +80,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             Logger.recordOutput("PID at goal", pid.atGoal());
             hold();
         })).until(() -> {
-            return setPointPersistenceCheck.getAsBoolean() && armSafeSub.getAsBoolean();
+            return setPointPersistenceCheck.getAsBoolean();
         }).withName("Move to set height");
 
     }
