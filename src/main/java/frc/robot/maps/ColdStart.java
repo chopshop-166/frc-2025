@@ -167,7 +167,7 @@ public class ColdStart extends RobotMap {
             case INTAKE -> 0;
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
-            case SCOREL3 -> 34.5;
+            case SCOREL3 -> 36;
             case SCOREL4, HIGHESTPOINT -> 57.5;
             default -> Double.NaN;
         };
@@ -189,12 +189,13 @@ public class ColdStart extends RobotMap {
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
-        pid.setTolerance(1);
+        pid.setTolerance(3);
         ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;
-            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 272;
+            case SCOREL3 -> 285;
+            case SCOREL1, SCOREL2, SCOREL4, OUT -> 272;
             case STOW -> 302;
             default -> Double.NaN;
         };

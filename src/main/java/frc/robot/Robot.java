@@ -172,18 +172,14 @@ public final class Robot extends CommandRobot {
         // .onFalse(commandSequences.scoreL4());
         copilotController.back().onTrue(elevator.safeStateCmd());
         copilotController.start().onTrue(elevator.zero());
-        copilotController.getPovButton(POVDirection.RIGHT).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL2))
-                .onFalse(elevator.safeStateCmd());
-        copilotController.getPovButton(POVDirection.UP).whileTrue(elevator.moveTo(ElevatorPresets.SCOREL3))
-                .onFalse(elevator.safeStateCmd());
-        copilotController.getPovButton(POVDirection.LEFT).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
-                .onFalse(elevator.safeStateCmd());
+
         // copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
         // .onFalse(elevator.safeStateCmd());
+        copilotController.getPovButton(POVDirection.RIGHT).whileTrue(coralManip.feedBack());
         copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
 
-        copilotController.rightBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
-        copilotController.leftBumper()
+        copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
+        copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
                 .onFalse(coralManip.score());
     }
@@ -206,12 +202,12 @@ public final class Robot extends CommandRobot {
     @Override
     public void setDefaultCommands() {
         elevator.setDefaultCommand(elevator.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY())));
-        // armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () ->
-        // -copilotController.getRightY())));
+        armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY())));
         // funnel.setDefaultCommand(funnel.move(RobotUtils.deadbandAxis(.1, () ->
         // -copilotController.getRightY())));
-        deepClimb
-                .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getRightY())));
+        // deepClimb
+        // .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () ->
+        // copilotController.getRightY())));
 
     }
 

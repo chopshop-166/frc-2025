@@ -52,6 +52,13 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
         });
     }
 
+    public Command feedBack() {
+        return runSafe(() -> {
+            getData().motor.setpoint = -RELEASE_SPEEDLEFT;
+
+        });
+    }
+
     public Command intake() {
         return runSafe(() -> {
             getData().motor.setpoint = INTAKE_SPEED;
@@ -67,7 +74,7 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
                     getData().motor.setpoint = ALIGNMENT_SPEED;
                 }).until(() -> !getData().gamePieceDetected),
                 startSafe(() -> {
-                    getData().motor.setpoint = ALIGNMENT_SPEED;
+                    getData().motor.setpoint = -ALIGNMENT_SPEED;
                 }).until(() -> getData().gamePieceDetected));
 
     }
