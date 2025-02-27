@@ -23,7 +23,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     private final double MANUAL_LOWER_SPEED_COEF = 0.3;
     private final double SLOW_DOWN_COEF = 0.3;
     private final double ZEROING_SPEED = 0.5;
-    private final double SAFE_ANGLE = 0;
+    private final double SAFE_ANGLE = 275.0;
     double holdAngle = 0;
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
