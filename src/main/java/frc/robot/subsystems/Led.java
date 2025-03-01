@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.chopshop166.chopshoplib.leds.LEDSubsystem;
-import com.chopshop166.chopshoplib.leds.Pattern;
 import com.chopshop166.chopshoplib.leds.patterns.AlliancePattern;
 import com.chopshop166.chopshoplib.leds.patterns.FirePattern;
 import com.chopshop166.chopshoplib.leds.patterns.FlashPattern;

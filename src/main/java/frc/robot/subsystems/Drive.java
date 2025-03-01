@@ -29,7 +29,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.FieldConstants.Reef;
 
 public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 

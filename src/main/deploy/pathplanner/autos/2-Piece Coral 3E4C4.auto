@@ -46,18 +46,24 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "Stow"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
                   "pathName": "ReefE to StationR"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Game Piece"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Game Piece"
           }
         },
         {
@@ -65,15 +71,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "StationR to ReefC"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Position Coral L4"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "StationR to ReefC"
                 }
               }
             ]

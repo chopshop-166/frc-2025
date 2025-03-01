@@ -6,7 +6,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.CoralManipMap.Data;
@@ -77,7 +76,6 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
                     getData().motor.setpoint = -ALIGNMENT_SPEED;
                 }).until(() -> getData().gamePieceDetected),
                 safeStateCmd());
-
     }
 
     @Override
