@@ -19,6 +19,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public enum ElevatorPresets {
         OFF,
 
+        ZEROING,
+
         INTAKE,
 
         SCOREL1,

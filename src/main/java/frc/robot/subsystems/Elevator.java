@@ -21,50 +21,49 @@ import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
     final ProfiledPIDController pid;
-    final double RAISE_SPEED = 1.0;
-    final double MANUAL_LOWER_SPEED_COEF = 1.0;
     final double SLOW_DOWN_COEF = 0.5;
     final double LOWER_SPEED = -0.15;
     final double ZEROING_SPEED = -0.1;
     double holdHeight = 0;
 
+    final static double BAD_HEIGHT_LOWER = 12;
+    final static double BAD_HEIGHT_UPPER = 15;
+
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
     BooleanSubscriber armSafeSub = instance.getBooleanTopic("Arm/Safe").subscribe(false);
 
+    DoubleSupplier elevatorSpeed;
     ElevatorPresets level = ElevatorPresets.OFF;
 
-    public Elevator(ElevatorMap elevatorMap) {
+    public Elevator(ElevatorMap elevatorMap, DoubleSupplier elevatorSpeed) {
         super(new Data(), elevatorMap);
         pid = elevatorMap.pid;
+        this.elevatorSpeed = elevatorSpeed;
     }
 
     public Command move(DoubleSupplier liftSpeed) {
-
         return run(() -> {
             double speed = liftSpeed.getAsDouble();
-            double speedCoef = RAISE_SPEED;
-            if (armSafeSub.getAsBoolean()) {
-                if (speed < 0) {
-                    speedCoef = MANUAL_LOWER_SPEED_COEF;
-                }
+            if (armSafeSub.getAsBoolean()
+                    || (getElevatorHeight() < BAD_HEIGHT_LOWER && speed < 0)
+                    || (getElevatorHeight() > BAD_HEIGHT_UPPER && speed > 0)) {
                 if (Math.abs(speed) > 0) {
                     level = ElevatorPresets.OFF;
-                    getData().motor.setpoint = limits(speed * speedCoef);
+                    getData().motor.setpoint = limits(speed);
                 } else if (level == ElevatorPresets.OFF) {
                     getData().motor.setpoint = 0.0;
                 }
-            } else {
+            } else if (level == ElevatorPresets.OFF) {
                 getData().motor.setpoint = 0.0;
             }
-
         });
     }
 
     public Command zero() {
         return startSafe(() -> {
             getMap().motor.resetValidators();
-            level = ElevatorPresets.OFF;
+            level = ElevatorPresets.ZEROING;
             getData().motor.setpoint = ZEROING_SPEED;
 
         }).until(() -> getMap().motor.validate()).andThen(resetCmd());
@@ -75,18 +74,16 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         return runOnce(() -> {
             this.level = level;
             pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
-
         }).andThen(run(() -> {
             Logger.recordOutput("PID at goal", pid.atGoal());
         })).until(() -> {
             return setPointPersistenceCheck.getAsBoolean();
         }).withName("Move to set height");
-
     }
 
     public BooleanSupplier elevatorSafeTrigger() {
         return () -> {
-            return (getData().heightAbsInches < 12 && level == ElevatorPresets.INTAKE);
+            return (getData().heightAbsInches < BAD_HEIGHT_LOWER && level == ElevatorPresets.INTAKE);
         };
     }
 
@@ -128,7 +125,19 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     public void periodic() {
         super.periodic();
         heightPub.set(getData().heightAbsInches / getMap().hardLimits.max());
-        if (level != ElevatorPresets.OFF) {
+        double speed = elevatorSpeed.getAsDouble();
+
+        if (Math.abs(speed) > 0) {
+            level = ElevatorPresets.OFF;
+
+            if (armSafeSub.getAsBoolean()
+                    || (getElevatorHeight() < BAD_HEIGHT_LOWER && speed < 0)
+                    || (getElevatorHeight() > BAD_HEIGHT_UPPER && speed > 0)) {
+                getData().motor.setpoint = limits(speed);
+            }
+        } else if (level == ElevatorPresets.ZEROING) {
+            // Do nothing
+        } else if (level != ElevatorPresets.OFF) {
             double targetHeight = level == ElevatorPresets.HOLD ? holdHeight
                     : getMap().presetValues.applyAsDouble(level);
             double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
@@ -136,6 +145,8 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
                     pid.getSetpoint().position,
                     pid.getSetpoint().velocity);
             getData().motor.setpoint = setpoint;
+        } else {
+            getData().motor.setpoint = 0;
         }
 
         Logger.recordOutput("Elevator preset", level);
