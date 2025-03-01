@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Start2 to ReefG "
+                  "pathName": "Start1 to ReefI"
                 }
               },
               {
@@ -33,12 +33,6 @@
           "type": "named",
           "data": {
             "name": "Score Coral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Backup"
           }
         }
       ]
