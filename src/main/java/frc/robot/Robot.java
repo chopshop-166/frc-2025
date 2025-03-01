@@ -63,7 +63,7 @@ public final class Robot extends CommandRobot {
     private Funnel funnel = new Funnel(map.getFunnelMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator,
-            armRotate);
+            armRotate, funnel);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -148,12 +148,15 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void configureButtonBindings() {
-        driveController.back().onTrue(commandSequences.resetAll());
+        driveController.back().onTrue(drive.resetCmd());
         driveController.leftBumper()
                 .whileTrue(drive.robotCentricDrive());
 
         copilotController.a().onTrue(commandSequences.intake());
         elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
+
+        copilotController.rightStick().onTrue(funnel.rotateForward());
+        copilotController.leftStick().onTrue(funnel.rotateBackward());
 
         copilotController.x()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
@@ -170,7 +173,7 @@ public final class Robot extends CommandRobot {
         // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4,
         // ArmRotatePresets.SCOREL4))
         // .onFalse(commandSequences.scoreL4());
-        copilotController.back().onTrue(elevator.safeStateCmd());
+        copilotController.back().onTrue(commandSequences.resetCopilot());
         copilotController.start().onTrue(elevator.zero());
 
         // copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
@@ -203,11 +206,12 @@ public final class Robot extends CommandRobot {
     public void setDefaultCommands() {
         elevator.setDefaultCommand(elevator.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY())));
         armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY())));
-        // funnel.setDefaultCommand(funnel.move(RobotUtils.deadbandAxis(.1, () ->
-        // -copilotController.getRightY())));
-        // deepClimb
-        // .setDefaultCommand(deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () ->
-        // copilotController.getRightY())));
+        // funnel.setDefaultCommand(
+        // funnel.move(RobotUtils.deadbandAxis(.1, () ->
+        // -copilotController.getLeftTriggerAxis())));
+        deepClimb
+                .setDefaultCommand(
+                        deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getTriggers())));
 
     }
 
