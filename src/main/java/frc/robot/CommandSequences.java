@@ -13,6 +13,7 @@ import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.Led;
 import frc.robot.subsystems.ArmRotate;
 
@@ -24,16 +25,17 @@ public class CommandSequences {
     CoralManip coralManip;
     Elevator elevator;
     ArmRotate armRotate;
-    // Funnel funnel;
+    Funnel funnel;
 
     public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator,
-            ArmRotate armRotate) {
+            ArmRotate armRotate, Funnel funnel) {
         this.drive = drive;
         this.led = led;
         this.algaeDestage = algaeDestage;
         this.coralManip = coralManip;
         this.elevator = elevator;
         this.armRotate = armRotate;
+        this.funnel = funnel;
     }
 
     // Moves elevator to intake preset and intakes when preset has been reached
@@ -125,7 +127,7 @@ public class CommandSequences {
 
     // Resets all commands
 
-    public Command resetAll() {
-        return drive.resetCmd().andThen(coralManip.resetCmd(), algaeDestage.resetCmd());
+    public Command resetCopilot() {
+        return funnel.resetCmd();
     }
 }
