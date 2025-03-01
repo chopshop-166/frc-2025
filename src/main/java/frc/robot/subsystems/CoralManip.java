@@ -12,8 +12,8 @@ import frc.robot.maps.subsystems.CoralManipMap.Data;
 
 public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
-    private final double RELEASE_SPEEDRIGHT = -0.3;
-    private final double RELEASE_SPEEDLEFT = -0.1;
+    private final double RELEASE_SPEED = -0.3;
+    private final double RELEASE_SPEED_L1 = -0.1;
     private final double INTAKE_SPEED = -0.3;
     private final double RELEASE_DELAY = 1;
     private final double ALIGNMENT_SPEED = 0.08;
@@ -24,31 +24,25 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
     public Command scoreL1() {
         return run(() -> {
-            getData().motor.setpoint = RELEASE_SPEEDLEFT;
-        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
-    }
-
-    public Command scoreL4() {
-        return run(() -> {
-            getData().motor.setpoint = RELEASE_SPEEDLEFT;
+            getData().motor.setpoint = RELEASE_SPEED_L1;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
     }
 
     public Command score() {
         return run(() -> {
-            getData().motor.setpoint = RELEASE_SPEEDRIGHT;
+            getData().motor.setpoint = RELEASE_SPEED;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
     }
 
     public Command feed() {
         return runSafe(() -> {
-            getData().motor.setpoint = RELEASE_SPEEDLEFT;
+            getData().motor.setpoint = RELEASE_SPEED_L1;
         });
     }
 
     public Command feedBack() {
         return runSafe(() -> {
-            getData().motor.setpoint = -RELEASE_SPEEDLEFT;
+            getData().motor.setpoint = -RELEASE_SPEED_L1;
 
         });
     }

@@ -153,7 +153,7 @@ public final class Robot extends CommandRobot {
 
         copilotController.x()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
-                .onFalse(coralManip.score());
+                .onFalse(coralManip.scoreL1());
 
         copilotController.b()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2))
