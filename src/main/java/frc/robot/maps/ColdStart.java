@@ -162,7 +162,7 @@ public class ColdStart extends RobotMap {
 
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
-            case INTAKE -> 0;
+            case INTAKE -> 1;
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
             case SCOREL3 -> 36;

@@ -148,8 +148,8 @@ public final class Robot extends CommandRobot {
         copilotController.a().onTrue(commandSequences.intake());
         elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
 
-        copilotController.rightStick().onTrue(funnel.rotateForward());
-        copilotController.leftStick().onTrue(funnel.rotateBackward());
+        copilotController.getPovButton(POVDirection.UP).onTrue(funnel.rotateForward());
+        copilotController.getPovButton(POVDirection.LEFT).onTrue(funnel.rotateBackward());
 
         copilotController.x()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))

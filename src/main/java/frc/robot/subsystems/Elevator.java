@@ -78,7 +78,6 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
 
         }).andThen(run(() -> {
             Logger.recordOutput("PID at goal", pid.atGoal());
-            hold();
         })).until(() -> {
             return setPointPersistenceCheck.getAsBoolean();
         }).withName("Move to set height");
