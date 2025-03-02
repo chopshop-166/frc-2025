@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -217,7 +218,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
         } else {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
-                    rotation, estimator.getEstimatedPosition().getRotation());
+                    rotation, isBlueAlliance ? estimator.getEstimatedPosition().getRotation()
+                            : estimator.getEstimatedPosition().getRotation()
+                                    .plus(new Rotation2d(Units.degreesToRadians(180))));
         }
 
         move(speeds);
