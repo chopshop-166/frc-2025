@@ -229,8 +229,7 @@ public class ColdStart extends RobotMap {
         config.follow(leftMotor.getMotorController(), true);
         rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        CSDigitalInput sensor = new CSDigitalInput(8);
-        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), sensor::get);
+        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), () -> false);
 
     }
 

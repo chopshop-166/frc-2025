@@ -79,7 +79,5 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     @Override
     public void periodic() {
         super.periodic();
-        Logger.recordOutput("Intake encoder distance", getMap().motor.getEncoder().getDistance());
-        Logger.recordOutput("Game piece detected", getData().gamePieceDetected);
     }
 }

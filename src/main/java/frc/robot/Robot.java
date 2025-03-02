@@ -64,7 +64,7 @@ public final class Robot extends CommandRobot {
     private Funnel funnel = new Funnel(map.getFunnelMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator,
-            armRotate, funnel);
+            armRotate, funnel, deepClimb);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -163,22 +163,18 @@ public final class Robot extends CommandRobot {
         copilotController.y()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3))
                 .onFalse(coralManip.score());
-        // copilotController.leftBumper()
-        // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4,
-        // ArmRotatePresets.SCOREL4))
-        // .onFalse(commandSequences.scoreL4());
+
         copilotController.back().onTrue(commandSequences.resetCopilot());
         copilotController.start().onTrue(elevator.zero());
 
-        // copilotController.getPovButton(POVDirection.DOWN).whileTrue(elevator.moveTo(ElevatorPresets.STOW))
-        // .onFalse(elevator.safeStateCmd());
         copilotController.getPovButton(POVDirection.RIGHT).whileTrue(coralManip.feedBack());
         copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
 
-        copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
+        // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
         copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
                 .onFalse(coralManip.score());
+        copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
     }
 
     @Override

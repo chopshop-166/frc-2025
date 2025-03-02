@@ -11,6 +11,7 @@ import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.ArmRotate;
 import frc.robot.subsystems.CoralManip;
+import frc.robot.subsystems.DeepClimb;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Funnel;
@@ -25,9 +26,10 @@ public class CommandSequences {
     Elevator elevator;
     ArmRotate armRotate;
     Funnel funnel;
+    DeepClimb deepClimb;
 
     public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator,
-            ArmRotate armRotate, Funnel funnel) {
+            ArmRotate armRotate, Funnel funnel, DeepClimb deepClimb) {
         this.drive = drive;
         this.led = led;
         this.algaeDestage = algaeDestage;
@@ -35,6 +37,7 @@ public class CommandSequences {
         this.elevator = elevator;
         this.armRotate = armRotate;
         this.funnel = funnel;
+        this.deepClimb = deepClimb;
     }
 
     // Moves elevator to intake preset and intakes when preset has been reached
@@ -68,6 +71,6 @@ public class CommandSequences {
     // Resets all commands
 
     public Command resetCopilot() {
-        return funnel.resetCmd();
+        return funnel.resetCmd().andThen(deepClimb.resetCmd());
     }
 }

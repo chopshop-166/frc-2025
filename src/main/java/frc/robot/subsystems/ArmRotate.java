@@ -29,8 +29,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     BooleanPublisher armSafePub = instance.getBooleanTopic("Arm/Safe").publish();
 
-    ArmRotatePresets preset = ArmRotatePresets.OFF;
-
     public ArmRotate(ArmRotateMap armRotateMap) {
         super(new Data(), armRotateMap);
         pid = armRotateMap.pid;
@@ -45,9 +43,9 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }
             if (Math.abs(speed) > 0) {
-                preset = ArmRotatePresets.OFF;
+                getData().preset = ArmRotatePresets.OFF;
                 getData().motor.setpoint = (limits(speed * speedCoef));
-            } else if (preset == ArmRotatePresets.OFF) {
+            } else if (getData().preset == ArmRotatePresets.OFF) {
                 getData().motor.setpoint = 0.0;
             } else {
                 getData().motor.setpoint = 0.0;
@@ -59,7 +57,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command moveTo(ArmRotatePresets level) {
         PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(15, pid::atGoal);
         return runOnce(() -> {
-            this.preset = level;
+            getData().preset = level;
             pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
             Logger.recordOutput("Arm pid at goal", pid.atGoal());
@@ -68,7 +66,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
 
     public Command moveOut() {
         return runOnce(() -> {
-            this.preset = ArmRotatePresets.OUT;
+            getData().preset = ArmRotatePresets.OUT;
             pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
             Logger.recordOutput("Arm pid at goal", pid.atGoal());
@@ -85,7 +83,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command moveToZero() {
         return startSafe(() -> {
             getData().motor.setpoint = ZEROING_SPEED;
-            preset = ArmRotatePresets.OFF;
+            getData().preset = ArmRotatePresets.OFF;
         }).until(() -> {
             return getArmAngle() > getMap().armRotatePreset.applyAsDouble(ArmRotatePresets.STOW);
         });
@@ -94,7 +92,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command hold() {
         return runOnce(() -> {
             holdAngle = getArmAngle();
-            this.preset = ArmRotatePresets.HOLD;
+            getData().preset = ArmRotatePresets.HOLD;
         });
     }
 
@@ -113,9 +111,9 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public void periodic() {
         super.periodic();
         armSafePub.set(getData().rotationAbsAngleDegrees < SAFE_ANGLE);
-        if (preset != ArmRotatePresets.OFF) {
-            double targetHeight = preset == ArmRotatePresets.HOLD ? holdAngle
-                    : getMap().armRotatePreset.applyAsDouble(preset);
+        if (getData().preset != ArmRotatePresets.OFF) {
+            double targetHeight = getData().preset == ArmRotatePresets.HOLD ? holdAngle
+                    : getMap().armRotatePreset.applyAsDouble(getData().preset);
             double setpoint = pid.calculate(getArmAngle(), new State(targetHeight, 0));
             setpoint += getMap().armFeedforward.calculate(
                     pid.getSetpoint().position,
@@ -123,7 +121,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().motor.setpoint = setpoint;
         }
 
-        Logger.recordOutput("Arm preset", preset);
         Logger.recordOutput("DesiredArmVelocity", pid.getSetpoint().velocity);
         Logger.recordOutput("DesiredArmPosition", pid.getSetpoint().position);
 
@@ -137,6 +134,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     @Override
     public void safeState() {
         getData().motor.setpoint = 0;
-        preset = ArmRotatePresets.OFF;
+        getData().preset = ArmRotatePresets.OFF;
     }
 }
