@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Start3 to ReefE"
+            "name": "Intake Game Piece"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Score Coral L2"
+            "pathName": "StationR to ReefC"
           }
         }
       ]

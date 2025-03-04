@@ -77,5 +77,6 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
         public MotorControllerData motor = new MotorControllerData();
         public double rotationAbsAngleDegrees;
         public double rotationVelocity;
+        public ArmRotatePresets preset = ArmRotatePresets.OFF;
     }
 }

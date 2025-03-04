@@ -19,6 +19,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public enum ElevatorPresets {
         OFF,
 
+        ZEROING,
+
         INTAKE,
 
         SCOREL1,
@@ -77,5 +79,6 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
         public MotorControllerData motor = new MotorControllerData();
         public double heightAbsInches;
         public double liftingHeightVelocity;
+        public ElevatorPresets preset = ElevatorPresets.OFF;
     }
 }

@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Start2 to ReefG "
+                  "pathName": "Start3 to ReefE"
                 }
               },
               {
@@ -38,7 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Backup"
+            "pathName": "Retreat From ReefE"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
           }
         }
       ]

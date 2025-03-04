@@ -26,14 +26,12 @@ public class FunnelMap implements LoggableMap<FunnelMap.Data> {
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.rotationAbsAngleDegrees = encoder.getAbsolutePosition();
-        data.rotatingAngleVelocity = encoder.getRate();
+        data.rotationDistance = encoder.getDistance();
     }
 
     public static class Data extends DataWrapper {
         public MotorControllerData motor = new MotorControllerData();
-        public double rotationAbsAngleDegrees;
-        public double rotatingAngleVelocity;
+        public double rotationDistance;
     }
 
 }

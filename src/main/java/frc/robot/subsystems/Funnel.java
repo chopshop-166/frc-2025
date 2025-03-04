@@ -10,9 +10,10 @@ import frc.robot.maps.subsystems.FunnelMap.Data;
 
 public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
     private final double RAISE_SPEED = 0.5;
-    private final double LOWER_SPEED = 0.3;
     private final double MANUAL_LOWER_SPEED_COEF = 0.3;
-    private final double SLOW_DOWN_COEF = 0.3;
+    private final double FUNNEL_ROTATE_SPEED = 0.2;
+    private final double FUNNEL_ROTATION_FORWARD_LIMIT = 60;
+    private final double FUNNEL_ROTATION_BACKWARD_LIMIT = 2;
 
     public Funnel(FunnelMap funnelMap) {
         super(new Data(), funnelMap);
@@ -27,7 +28,7 @@ public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }
             if (Math.abs(speed) > 0) {
-                getData().motor.setpoint = (limits(speed * speedCoef));
+                getData().motor.setpoint = (speed * speedCoef);
 
             } else {
                 getData().motor.setpoint = 0.0;
@@ -36,15 +37,18 @@ public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
         });
     }
 
-    private double limits(double speed) {
-        double height = getFunnelAngle();
-        // speed = getMap().hardLimits.filterSpeed(height, speed);
-        // speed = getMap().softLimits.scaleSpeed(height, speed, SLOW_DOWN_COEF);
-        return speed;
+    public Command rotateForward() {
+        return startSafe(() -> {
+            getData().motor.setpoint = FUNNEL_ROTATE_SPEED;
+
+        }).until(() -> getData().rotationDistance > FUNNEL_ROTATION_FORWARD_LIMIT);
     }
 
-    private double getFunnelAngle() {
-        return getData().rotationAbsAngleDegrees;
+    public Command rotateBackward() {
+        return startSafe(() -> {
+            getData().motor.setpoint = -FUNNEL_ROTATE_SPEED;
+
+        }).until(() -> getData().rotationDistance < FUNNEL_ROTATION_BACKWARD_LIMIT);
     }
 
     @Override

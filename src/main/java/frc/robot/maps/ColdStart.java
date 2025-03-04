@@ -5,14 +5,12 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
-import com.chopshop166.chopshoplib.digital.MockDigitalOutput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
@@ -114,6 +112,7 @@ public class ColdStart extends RobotMap {
                 new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY));
         PPHolonomicDriveController holonomicDrive = new PPHolonomicDriveController(new PIDConstants(2.0, 0.0, 0.05),
                 new PIDConstants(1.0, 0.0, 0.0));
+
         return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro2, config, holonomicDrive);
@@ -164,10 +163,10 @@ public class ColdStart extends RobotMap {
 
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
-            case INTAKE -> 0;
+            case INTAKE -> 1;
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
-            case SCOREL3 -> 34.5;
+            case SCOREL3 -> 36;
             case SCOREL4, HIGHESTPOINT -> 57.5;
             default -> Double.NaN;
         };
@@ -189,12 +188,13 @@ public class ColdStart extends RobotMap {
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
-        pid.setTolerance(1);
+        pid.setTolerance(3);
         ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;
-            case SCOREL1, SCOREL2, SCOREL3, SCOREL4, OUT -> 272;
+            case SCOREL3 -> 285;
+            case SCOREL1, SCOREL2, SCOREL4, OUT -> 272;
             case STOW -> 302;
             default -> Double.NaN;
         };
@@ -229,8 +229,7 @@ public class ColdStart extends RobotMap {
         config.follow(leftMotor.getMotorController(), true);
         rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        CSDigitalInput sensor = new CSDigitalInput(8);
-        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), sensor::get);
+        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), () -> false);
 
     }
 
