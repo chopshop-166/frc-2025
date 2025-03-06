@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.DeepClimbMap.Data;
@@ -13,11 +14,20 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
     private final double SPOOL_IN_SPEED = 0.2;
     private final double SPOOL_OUT_SPEED = -0.72;
     final double SLOW_DOWN_COEF = 0.5;
-
     final double MIN_ENCODER_READING = -12;
+
+    private BangBangController bangBangController = new BangBangController();
 
     public DeepClimb(DeepClimbMap deepClimbMap) {
         super(new Data(), deepClimbMap);
+    }
+
+    public Command hold() {
+        return runOnce(() -> {
+            bangBangController.setSetpoint(MIN_ENCODER_READING);
+        }).andThen(run(() -> {
+            getData().motor.setpoint = bangBangController.calculate(getData().encoderReading);
+        }));
     }
 
     public Command spoolIn() {
