@@ -140,9 +140,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             double targetHeight = getData().preset == ElevatorPresets.HOLD ? holdHeight
                     : getMap().presetValues.applyAsDouble(getData().preset);
             double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
-            setpoint += getMap().feedForward.calculate(
-                    pid.getSetpoint().position,
-                    pid.getSetpoint().velocity);
+            setpoint += getMap().feedForward.calculate(pid.getSetpoint().velocity);
             getData().motor.setpoint = setpoint;
         } else {
             getData().motor.setpoint = 0;
