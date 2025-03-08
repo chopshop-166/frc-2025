@@ -8,9 +8,14 @@
     "Reef to Coral StationL",
     "Reef to CoralStationR",
     "Start1 to Reef",
-    "Start3 to Reef"
+    "Start3 to Reef",
+    "Vision - Start1,3 to Reef",
+    "Vision - StationL,R to Reef"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Vision Autos Start3",
+    "Vision Autos Start1"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 6.0,
   "defaultMaxAngVel": 540.0,

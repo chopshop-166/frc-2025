@@ -17,13 +17,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Start3 to ReefF"
+                  "pathName": "V - Start1 to ReefI&J"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Position Coral L2"
+                  "name": "Position Coral L4"
                 }
               }
             ]
@@ -32,13 +32,13 @@
         {
           "type": "named",
           "data": {
-            "name": null
+            "name": "Score Coral"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Vision Autos Start1",
   "choreoAuto": false
 }
