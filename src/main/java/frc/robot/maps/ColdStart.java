@@ -154,7 +154,7 @@ public class ColdStart extends RobotMap {
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.02, 0, 0,
+        ProfiledPIDController pid = new ProfiledPIDController(0.1, 0, 0,
                 new Constraints(45, 150));
         pid.setTolerance(0.25);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.012, 0.02);
