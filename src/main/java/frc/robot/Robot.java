@@ -71,7 +71,8 @@ public final class Robot extends CommandRobot {
 
     public void registerNamedCommands() {
 
-        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
+        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intakeAuto());
+        // ^^^ Wrong rn, don't use yet
         NamedCommands.registerCommand("Position Coral L1",
                 commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1));
         NamedCommands.registerCommand("Position Coral L2",
@@ -84,6 +85,7 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
+        NamedCommands.registerCommand("Elevator to intake", elevator.moveTo(ElevatorPresets.INTAKE));
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)

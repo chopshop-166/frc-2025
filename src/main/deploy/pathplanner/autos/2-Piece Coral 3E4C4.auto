@@ -42,32 +42,26 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stow"
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "ReefE to StationR"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Elevator to intake"
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Intake Game Piece"
-          }
-        },
-        {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
