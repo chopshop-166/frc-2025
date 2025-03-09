@@ -49,7 +49,7 @@ public class CommandSequences {
     }
 
     public Command intakeAuto() {
-        return armRotate.moveTo(ArmRotatePresets.INTAKE).andThen(coralManip.betterintake());
+        return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.betterintake());
     }
 
     public Command intakeBottom() {

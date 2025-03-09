@@ -101,8 +101,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
-        translationPID_X.setTolerance(0.01);
+        translationPID_X.setTolerance(0.1);
         translationPID_Y.setTolerance(0.01);
+        rotationPID.setTolerance(4);
     }
 
     public void setPose(Pose2d pose) {
@@ -155,6 +156,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
         Logger.recordOutput("Target Branch", targetBranch);
+        Logger.recordOutput("Translation_X_PID Error", translationPID_X.getPositionError());
+        Logger.recordOutput("Translation_Y_PID Error", translationPID_Y.getPositionError());
 
     }
 
@@ -216,7 +219,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
             translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
             translateXSpeedMPS += Math.copySign(DRIVE_KS,
-                    translateXSpeedMPS);
+            translateXSpeedMPS);
             // Direction is swapped on Red side so 2need to negate PID output
             if (!isBlueAlliance) {
                 translateXSpeedMPS *= -1;
@@ -251,7 +254,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             this.targetBranch = targetBranch;
         }).andThen(run(() -> {
         })).until(() -> {
-            return translationPID_X.atSetpoint() && translationPID_Y.atSetpoint() && rotationPID.atSetpoint();
+            return translationPID_X.atGoal() && translationPID_Y.atGoal() && rotationPID.atGoal();
         }).finallyDo(() -> {
             this.targetBranch = Branch.NONE;
         });

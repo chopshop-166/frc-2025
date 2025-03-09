@@ -13,7 +13,7 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     private final double RELEASE_SPEED = -0.3;
     private final double RELEASE_SPEED_L1 = -0.1;
     private final double INTAKE_SPEED = -0.2;
-    private final double RELEASE_DELAY = 1;
+    private final double RELEASE_DELAY = 0;
     private final double ALIGNMENT_SPEED = 0.09;
     private final double ALGAE_INTAKE = 0.4;
 

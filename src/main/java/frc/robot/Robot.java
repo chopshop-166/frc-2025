@@ -85,7 +85,9 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
-        NamedCommands.registerCommand("Elevator to intake", elevator.moveTo(ElevatorPresets.INTAKE));
+        NamedCommands.registerCommand("Elevator to intake", elevator.moveTo(ElevatorPresets.STOW));
+        NamedCommands.registerCommand("Align to Left Branch", drive.moveToBranchWait(Branch.LEFT_BRANCH));
+        NamedCommands.registerCommand("Align to Right Branch", drive.moveToBranchWait(Branch.RIGHT_BRANCH));
     }
 
     @Autonomous(name = "No Auto", defaultAuto = true)

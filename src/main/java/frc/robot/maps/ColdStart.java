@@ -187,7 +187,7 @@ public class ColdStart extends RobotMap {
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
             case SCOREL3 -> 36;
-            case SCOREL4, HIGHESTPOINT -> 57.5;
+            case SCOREL4, HIGHESTPOINT -> 58;
             default -> Double.NaN;
         };
 
