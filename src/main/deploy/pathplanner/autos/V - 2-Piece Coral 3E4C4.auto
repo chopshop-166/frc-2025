@@ -15,15 +15,41 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "race",
                 "data": {
-                  "pathName": "V -  Start3 to ReefE&F"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.25
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "V -  Start3 to ReefE&F"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "Position Coral L4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Position Coral L4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -36,7 +62,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 2.0
+                  "waitTime": 2.2
                 }
               },
               {
@@ -84,15 +110,41 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "Position Coral L4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.25
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "V - StationR to ReefC&D"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "path",
+                "type": "race",
                 "data": {
-                  "pathName": "V - StationR to ReefC&D"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Position Coral L4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -105,7 +157,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 2.0
+                  "waitTime": 2.2
                 }
               },
               {
