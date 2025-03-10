@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Zero Da Elevatah"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -21,7 +15,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 1.5
                       }
                     },
                     {
@@ -62,7 +56,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 2.2
+                  "waitTime": 1.9
                 }
               },
               {
@@ -91,15 +85,41 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "race",
                 "data": {
-                  "pathName": "ReefE to StationR"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ReefE to StationR"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 5.0
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "race",
                 "data": {
-                  "name": "Intake Game Piece"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake Game Piece"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 5.0
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -116,7 +136,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 1.5
                       }
                     },
                     {

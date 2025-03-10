@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.404963235294117,
-        "y": 2.4
+        "x": 5.22474358974359,
+        "y": 2.2808333333333324
       },
       "prevControl": {
-        "x": 5.677941176470589,
-        "y": 2.3945772058823525
+        "x": 5.4977215355859474,
+        "y": 2.275410774096722
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 122.0
   },
   "reversed": false,
   "folder": "Vision - Start1,3 to Reef",
