@@ -21,7 +21,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -45,7 +44,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     private final double maxRotationRadiansPerSecond;
     private final double SPEED_COEFFICIENT = 1;
     private final double ROTATION_COEFFICIENT = 1;
-    private final double ROTATION_KS = 0.19;
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));

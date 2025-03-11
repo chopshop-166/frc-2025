@@ -3,7 +3,6 @@ package frc.robot.maps;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
-import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.maps.CameraSource;
@@ -29,8 +28,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import frc.robot.maps.subsystems.AlgaeDestageMap;
-import frc.robot.maps.subsystems.OuttakeMap;
 
 @RobotMapFor("00:80:2F:17:F7:AF")
 
@@ -126,26 +123,6 @@ public class Alpha extends RobotMap {
                 new Rotation3d(0, Units.degreesToRadians(-16.875), Units.degreesToRadians(-6.5 + 180)));
         return new VisionMap(new CameraSource("Camera", kRobotToCam));
 
-    }
-
-    @Override
-    public AlgaeDestageMap getAlgaeDestageMap() {
-        // CSSparkMax motor = new CSSparkMax(9);
-        // SparkMaxConfig config = new SparkMaxConfig();
-        // config.smartCurrentLimit(30);
-        // motor.getMotorController().configure(config,
-        // ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        return new AlgaeDestageMap();
-    }
-
-    @Override
-    public OuttakeMap getOuttakeMap() {
-        CSSparkMax leftWheels = new CSSparkMax(10);
-        CSSparkMax rightWheels = new CSSparkMax(11);
-        rightWheels.setInverted(false);
-        CSDigitalInput sensor = new CSDigitalInput(9); // same channel as last year
-        // dont know if its right
-        return new OuttakeMap(leftWheels, rightWheels, sensor::get);
     }
 
     @Override

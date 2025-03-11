@@ -10,12 +10,10 @@ import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 
-import frc.robot.maps.subsystems.AlgaeDestageMap;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
-import frc.robot.maps.subsystems.OuttakeMap;
 import frc.robot.maps.subsystems.FunnelMap;
 
 public class RobotMap {
@@ -34,14 +32,6 @@ public class RobotMap {
 
     public LedMapBase getLedMap() {
         return new MockLedMap();
-    }
-
-    public OuttakeMap getOuttakeMap() {
-        return new OuttakeMap();
-    }
-
-    public AlgaeDestageMap getAlgaeDestageMap() {
-        return new AlgaeDestageMap();
     }
 
     public CoralManipMap getCoralManipMap() {
