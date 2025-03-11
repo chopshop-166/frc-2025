@@ -1,6 +1,5 @@
 package frc.robot.maps.subsystems;
 
-import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
