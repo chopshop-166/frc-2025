@@ -9,7 +9,6 @@ import frc.robot.maps.subsystems.FunnelMap;
 import frc.robot.maps.subsystems.FunnelMap.Data;
 
 public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
-    private final double RAISE_SPEED = 0.5;
     private final double MANUAL_LOWER_SPEED_COEF = 0.3;
     private final double FUNNEL_ROTATE_SPEED = 0.2;
     private final double FUNNEL_ROTATION_FORWARD_LIMIT = 60;
@@ -23,7 +22,7 @@ public class Funnel extends LoggedSubsystem<Data, FunnelMap> {
 
         return run(() -> {
             double speed = rotateSpeed.getAsDouble();
-            double speedCoef = RAISE_SPEED;
+            double speedCoef = getMap().driveSpeed;
             if (speed < 0) {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }

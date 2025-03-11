@@ -122,6 +122,7 @@ public class Riptide extends RobotMap {
                 maxRotationRadianPerSecond, pigeonGyro2, config, holonomicDrive);
     }
 
+    @Override
     public VisionMap getVisionMap() {
 
         return new VisionMap(
@@ -146,7 +147,7 @@ public class Riptide extends RobotMap {
         config.idleMode(IdleMode.kBrake);
         config.inverted(false);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        return (new FunnelMap(motor, motor.getEncoder()));
+        return (new FunnelMap(motor, motor.getEncoder(), 0.5));
     }
 
     @Override

@@ -122,6 +122,7 @@ public class Stingray extends RobotMap {
                 maxRotationRadianPerSecond, pigeonGyro2, config, holonomicDrive);
     }
 
+    @Override
     public VisionMap getVisionMap() {
 
         return new VisionMap(
@@ -146,7 +147,7 @@ public class Stingray extends RobotMap {
         config.idleMode(IdleMode.kBrake);
         config.inverted(false);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        return (new FunnelMap(motor, motor.getEncoder()));
+        return (new FunnelMap(motor, motor.getEncoder(), 0.7));
     }
 
     @Override
@@ -165,9 +166,9 @@ public class Stingray extends RobotMap {
         configLeft.voltageCompensation(11.5);
         configLeft.smartCurrentLimit(50);
         configLeft.idleMode(IdleMode.kBrake);
-        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2);
+        configLeft.encoder.velocityConversionFactor((((1 / 9.99) * Math.PI * 1.75) / 60) * 2);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        configLeft.encoder.positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2);
+        configLeft.encoder.positionConversionFactor(((1 / 9.99) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
