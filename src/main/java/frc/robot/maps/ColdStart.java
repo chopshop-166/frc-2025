@@ -199,7 +199,7 @@ public class ColdStart extends RobotMap {
     @Override
     public ArmRotateMap getArmRotateMap() {
         CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 0);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, -1.4);
         SparkFlexConfig config = new SparkFlexConfig();
         absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
