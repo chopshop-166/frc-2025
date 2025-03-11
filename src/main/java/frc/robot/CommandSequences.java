@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
-import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.ArmRotate;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.DeepClimb;
@@ -21,18 +20,16 @@ public class CommandSequences {
 
     Drive drive;
     Led led;
-    AlgaeDestage algaeDestage;
     CoralManip coralManip;
     Elevator elevator;
     ArmRotate armRotate;
     Funnel funnel;
     DeepClimb deepClimb;
 
-    public CommandSequences(Drive drive, Led led, AlgaeDestage algaeDestage, CoralManip coralManip, Elevator elevator,
+    public CommandSequences(Drive drive, Led led, CoralManip coralManip, Elevator elevator,
             ArmRotate armRotate, Funnel funnel, DeepClimb deepClimb) {
         this.drive = drive;
         this.led = led;
-        this.algaeDestage = algaeDestage;
         this.coralManip = coralManip;
         this.elevator = elevator;
         this.armRotate = armRotate;

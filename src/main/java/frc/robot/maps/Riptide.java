@@ -46,7 +46,7 @@ import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 
 @RobotMapFor("00:80:2F:40:A7:9D")
-public class ColdStart extends RobotMap {
+public class Riptide extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 

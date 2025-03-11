@@ -21,7 +21,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -45,7 +44,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     private final double maxRotationRadiansPerSecond;
     private final double SPEED_COEFFICIENT = 1;
     private final double ROTATION_COEFFICIENT = 1;
-    private final double ROTATION_KS = 0.19;
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
@@ -155,22 +153,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
         Logger.recordOutput("Target Branch", targetBranch);
 
-    }
-
-    private double calculateRotationSpeed(double targetAngleDegrees) {
-        double estimatorAngle = estimator.getEstimatedPosition().getRotation().getDegrees();
-        double rotationSpeed = rotationPID.calculate(estimatorAngle, targetAngleDegrees);
-        rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
-        // need to ensure we move at a fast enough speed for gyro to keep up
-        if (Math.abs(rotationSpeed) < 0.02 || Math.abs(rotationPID.getPositionError()) < 0.75) {
-            rotationSpeed = 0;
-        }
-        Logger.recordOutput("Target Angle", targetAngleDegrees);
-        Logger.recordOutput("Estimator Angle", estimatorAngle);
-        Logger.recordOutput("Rotation Speed", rotationSpeed);
-        Logger.recordOutput("Target Velocity", rotationPID.getSetpoint().velocity);
-        Logger.recordOutput("Position Error", rotationPID.getPositionError());
-        return rotationSpeed;
     }
 
     private void visionCalcs() {
