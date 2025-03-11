@@ -19,7 +19,6 @@ import frc.robot.maps.subsystems.ArmRotateMap.Data;
 public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     final ProfiledPIDController pid;
     private final double RAISE_SPEED_COEF = 0.5;
-    private final double LOWER_SPEED_COEF = 0.3;
     private final double MANUAL_LOWER_SPEED_COEF = 0.3;
     private final double SLOW_DOWN_COEF = 0.3;
     private final double ZEROING_SPEED = 0.5;

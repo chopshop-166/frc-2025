@@ -46,7 +46,7 @@ import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 
 @RobotMapFor("00:80:2F:40:A7:9D")
-public class ColdStart extends RobotMap {
+public class Riptide extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
@@ -199,7 +199,7 @@ public class ColdStart extends RobotMap {
     @Override
     public ArmRotateMap getArmRotateMap() {
         CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 0);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, -1.4);
         SparkFlexConfig config = new SparkFlexConfig();
         absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
