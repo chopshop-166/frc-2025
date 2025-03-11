@@ -157,22 +157,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     }
 
-    private double calculateRotationSpeed(double targetAngleDegrees) {
-        double estimatorAngle = estimator.getEstimatedPosition().getRotation().getDegrees();
-        double rotationSpeed = rotationPID.calculate(estimatorAngle, targetAngleDegrees);
-        rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
-        // need to ensure we move at a fast enough speed for gyro to keep up
-        if (Math.abs(rotationSpeed) < 0.02 || Math.abs(rotationPID.getPositionError()) < 0.75) {
-            rotationSpeed = 0;
-        }
-        Logger.recordOutput("Target Angle", targetAngleDegrees);
-        Logger.recordOutput("Estimator Angle", estimatorAngle);
-        Logger.recordOutput("Rotation Speed", rotationSpeed);
-        Logger.recordOutput("Target Velocity", rotationPID.getSetpoint().velocity);
-        Logger.recordOutput("Position Error", rotationPID.getPositionError());
-        return rotationSpeed;
-    }
-
     private void visionCalcs() {
         Optional<Integer> closestReefTag = Optional.empty();
         if (visionData.targets.size() > 0) {

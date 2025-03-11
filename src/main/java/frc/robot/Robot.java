@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
-import frc.robot.subsystems.AlgaeDestage;
 import frc.robot.subsystems.ArmRotate;
 import frc.robot.subsystems.CoralManip;
 import frc.robot.subsystems.DeepClimb;
@@ -35,7 +34,6 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.Led;
-import frc.robot.subsystems.Outtake;
 
 public final class Robot extends CommandRobot {
 
@@ -55,8 +53,6 @@ public final class Robot extends CommandRobot {
         return driveScaler.applyAsDouble(-driveController.getRightX());
     }, map.getVisionMap());
     private Led led = new Led(map.getLedMap());
-    private AlgaeDestage algaeDestage = new AlgaeDestage(map.getAlgaeDestageMap());
-    private Outtake outtake = new Outtake(map.getOuttakeMap());
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
     private Elevator elevator = new Elevator(map.getElevatorMap(),
             RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY()));
@@ -64,7 +60,7 @@ public final class Robot extends CommandRobot {
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap());
     private Funnel funnel = new Funnel(map.getFunnelMap());
 
-    private CommandSequences commandSequences = new CommandSequences(drive, led, algaeDestage, coralManip, elevator,
+    private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,
             armRotate, funnel, deepClimb);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
