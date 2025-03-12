@@ -11,7 +11,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
@@ -77,13 +76,7 @@ public class VisionMap {
                             target.bestCameraToTarget.getRotation().rotateBy(new Rotation3d(0, 0, Math.PI)));
                     target.bestCameraToTarget = reefToRobot;
 
-                    if (data.targets.containsKey(target.getFiducialId())) {
-                        data.targets.get(targetID).add(target);
-                    } else {
-                        ArrayList<PhotonTrackedTarget> targetList = new ArrayList<>();
-                        targetList.add(target);
-                        data.targets.put(targetID, targetList);
-                    }
+                    data.targets.putIfAbsent(targetID, new ArrayList<>()).add(target);
                 }
             }
         }
