@@ -17,13 +17,32 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Start1 to ReefI"
+                  "pathName": "V - Start2 to ReefG&H "
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Position Coral L2"
+                  "name": "Position Coral L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align to Left Branch"
                 }
               }
             ]
@@ -32,7 +51,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Score Coral L2"
+            "name": "Score Coral"
           }
         }
       ]

@@ -108,8 +108,8 @@ public class Riptide extends RobotMap {
 
         final double maxRotationRadianPerSecond = 2 * Math.PI;
 
-        RobotConfig config = new RobotConfig(68, 58, new ModuleConfig(
-                0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
+        RobotConfig config = new RobotConfig(58, 4.889, new ModuleConfig(
+                0.0508, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
@@ -187,7 +187,7 @@ public class Riptide extends RobotMap {
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
             case SCOREL3 -> 36;
-            case SCOREL4, HIGHESTPOINT -> 57.5;
+            case SCOREL4, HIGHESTPOINT -> 58;
             default -> Double.NaN;
         };
 

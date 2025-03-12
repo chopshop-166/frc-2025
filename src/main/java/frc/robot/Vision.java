@@ -51,14 +51,14 @@ public class Vision {
     };
 
     public Vision() {
-        for (int i = 6; i < 11; i++) {
+        for (int i = 6; i <= 11; i++) {
             final int tmpI = i;
             kTagLayout.getTagPose(i).ifPresent(pose -> {
                 RED_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
             });
         }
 
-        for (int i = 17; i < 22; i++) {
+        for (int i = 17; i <= 22; i++) {
             final int tmpI = i;
             kTagLayout.getTagPose(i).ifPresent(pose -> {
                 BLUE_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
