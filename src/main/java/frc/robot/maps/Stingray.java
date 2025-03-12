@@ -85,7 +85,7 @@ public class Stingray extends RobotMap {
 
         // All Distances are in Meters
         // Front Left Module
-        final AnalogEncoder encoderFL = new AnalogEncoder(1, 360, FLOFFSET);
+        final AnalogEncoder encoderFL = new AnalogEncoder(2, 360, FLOFFSET);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 encoderFL::get, frontLeftSteer, new CSSparkFlex(3), MK4i_L2);
 
@@ -95,12 +95,12 @@ public class Stingray extends RobotMap {
                 encoderFR::get, frontRightSteer, new CSSparkFlex(7), MK4i_L2);
 
         // Rear Left Module
-        final AnalogEncoder encoderRL = new AnalogEncoder(2, 360, RLOFFSET);
+        final AnalogEncoder encoderRL = new AnalogEncoder(0, 360, RLOFFSET);
         final SDSSwerveModule rearLeft = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 encoderRL::get, rearLeftSteer, new CSSparkFlex(1), MK4i_L2);
 
         // Rear Right Module
-        final AnalogEncoder encoderRR = new AnalogEncoder(0, 360, RROFFSET);
+        final AnalogEncoder encoderRR = new AnalogEncoder(1, 360, RROFFSET);
         final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 encoderRR::get, rearRightSteer, new CSSparkFlex(5), MK4i_L2);
 
