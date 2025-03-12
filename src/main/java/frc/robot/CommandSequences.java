@@ -6,6 +6,7 @@ import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.ArmRotate;
@@ -41,8 +42,12 @@ public class CommandSequences {
     // Intakes until sensor is tripped, LEDs indicate that game piece is acquired
 
     public Command intake() {
-        return armRotate.moveOut().andThen(led.elevatorToPreset(),
-                elevator.moveTo(ElevatorPresets.INTAKE), led.elevatorAtPreset());
+        return Commands.either(Commands.none(), armRotate.moveOut().andThen(led.elevatorToPreset()),
+                () -> elevator.atPreset(ElevatorPresets.INTAKE) || elevator.atPreset(ElevatorPresets.STOW))
+                .andThen(elevator.clearPreset(),
+                        elevator.moveTo(ElevatorPresets.INTAKE),
+                        led.elevatorAtPreset(),
+                        elevator.clearPreset());
     }
 
     public Command intakeAuto() {

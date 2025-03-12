@@ -93,6 +93,16 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         });
     }
 
+    public boolean atPreset(ElevatorPresets preset) {
+        return preset == getData().preset && pid.atSetpoint();
+    }
+
+    public Command clearPreset() {
+        return runOnce(() -> {
+            getData().preset = ElevatorPresets.OFF;
+        });
+    }
+
     private double limits(double speed) {
         double height = getElevatorHeight();
 
