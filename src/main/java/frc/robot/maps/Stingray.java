@@ -126,11 +126,11 @@ public class Stingray extends RobotMap {
     public VisionMap getVisionMap() {
 
         return new VisionMap(
-                new CameraSource("FL_RIPTIDE1_CAM",
+                new CameraSource("FL_STINGRAY_CAM",
                         new Transform3d(Units.inchesToMeters(9.43), Units.inchesToMeters(10.72),
                                 Units.inchesToMeters(8.24),
                                 new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(-16.76)))),
-                new CameraSource("FR_RIPTIDE1_CAM",
+                new CameraSource("FR_STINGRAY_CAM",
                         new Transform3d(Units.inchesToMeters(
                                 9.43),
                                 Units.inchesToMeters(
@@ -147,7 +147,7 @@ public class Stingray extends RobotMap {
         config.idleMode(IdleMode.kBrake);
         config.inverted(false);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        return (new FunnelMap(motor, motor.getEncoder(), 0.7));
+        return (new FunnelMap(motor, motor.getEncoder(), 0.5));
     }
 
     @Override
@@ -172,13 +172,10 @@ public class Stingray extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        // we want to add this back
-        // CSEncoder encoder = new CSEncoder(2, 3, false);
-
         ProfiledPIDController pid = new ProfiledPIDController(0.0, 0, 0,
                 new Constraints(45, 150));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.0, 0.0);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.024, 0.0);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
