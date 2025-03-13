@@ -45,7 +45,7 @@ import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 
-@RobotMapFor("Stingray")
+@RobotMapFor("00:80:2F:40:A6:13")
 public class Stingray extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
@@ -185,16 +185,16 @@ public class Stingray extends RobotMap {
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
             case INTAKE -> 1;
-            case SCOREL1 -> 1;
-            case SCOREL2 -> 1;
-            case SCOREL3 -> 1;
-            case SCOREL4, HIGHESTPOINT -> 1;
+            case SCOREL1 -> 15;
+            case SCOREL2 -> 19.5;
+            case SCOREL3 -> 36;
+            case SCOREL4, HIGHESTPOINT -> 59;
             default -> Double.NaN;
         };
 
         elevatorMotors.validateEncoderRate(.2, 10);
         return new ElevatorMap(elevatorMotors, leftMotor.getEncoder(), presets,
-                new ValueRange(0, 5), new ValueRange(1, 5), pid, feedForward);
+                new ValueRange(0, 60), new ValueRange(5, 55), pid, feedForward);
     }
 
     @Override
@@ -208,9 +208,9 @@ public class Stingray extends RobotMap {
         config.inverted(true);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.0, 0, 0, new Constraints(90, 300));
+        ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
         pid.setTolerance(3);
-        ArmFeedforward feedForward = new ArmFeedforward(0.0, 0.0, 0.0);
+        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;
@@ -237,22 +237,25 @@ public class Stingray extends RobotMap {
         return new CoralManipMap(motor, sensor::get);
     }
 
-    @Override
-    public DeepClimbMap getDeepClimbMap() {
-        CSSparkMax leftMotor = new CSSparkMax(13);
-        CSSparkMax rightMotor = new CSSparkMax(14);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
-        leftMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        config.follow(leftMotor.getMotorController(), true);
-        rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), () -> false);
+    // @Override
+    // public DeepClimbMap getDeepClimbMap() {
+    // CSSparkMax leftMotor = new CSSparkMax(13);
+    // CSSparkMax rightMotor = new CSSparkMax(14);
+    // SparkMaxConfig config = new SparkMaxConfig();
+    // config.smartCurrentLimit(30);
+    // config.idleMode(IdleMode.kBrake);
+    // config.inverted(true);
+    // leftMotor.getMotorController().configure(config,
+    // ResetMode.kResetSafeParameters,
+    // PersistMode.kPersistParameters);
+    // config.follow(leftMotor.getMotorController(), true);
+    // rightMotor.getMotorController().configure(config,
+    // ResetMode.kResetSafeParameters,
+    // PersistMode.kPersistParameters);
+    // return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
+    // () -> false);
 
-    }
+    // }
 
     @Override
     public void setupLogging() {
