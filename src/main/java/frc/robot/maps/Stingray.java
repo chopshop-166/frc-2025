@@ -50,10 +50,10 @@ public class Stingray extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
-        final double FLOFFSET = 0;
-        final double FROFFSET = 0;
-        final double RLOFFSET = 0;
-        final double RROFFSET = 0;
+        final double FLOFFSET = 45;
+        final double FROFFSET = 18;
+        final double RLOFFSET = 188;
+        final double RROFFSET = 19;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
@@ -172,10 +172,10 @@ public class Stingray extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.0, 0, 0,
-                new Constraints(45, 150));
+        ProfiledPIDController pid = new ProfiledPIDController(0.04, 0, 0,
+                new Constraints(80, 245));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.024, 0.0);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.01);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -210,15 +210,15 @@ public class Stingray extends RobotMap {
         ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
-            case INTAKE -> 302;
-            case SCOREL3 -> 285;
-            case SCOREL1, SCOREL2, SCOREL4, OUT -> 272;
-            case STOW -> 302;
+            case INTAKE -> 181;
+            case SCOREL3 -> 164;
+            case SCOREL1, SCOREL2, SCOREL4, OUT -> 151;
+            case STOW -> 181;
             default -> Double.NaN;
         };
 
         return new ArmRotateMap(motor, absEncoder, presets, pid,
-                new ValueRange(203, 302), new ValueRange(210, 295), feedForward);
+                new ValueRange(82, 181), new ValueRange(89, 181), feedForward);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class Stingray extends RobotMap {
         config.inverted(true);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        CSDigitalInput sensor = new CSDigitalInput(9);
+        CSDigitalInput sensor = new CSDigitalInput(1);
         return new CoralManipMap(motor, sensor::get);
     }
 
