@@ -45,15 +45,15 @@ import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 
-@RobotMapFor("00:80:2F:40:A7:9D")
-public class Riptide extends RobotMap {
+@RobotMapFor("00:80:2F:40:A6:13")
+public class Stingray extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
-        final double FLOFFSET = 46;
-        final double FROFFSET = 270;
-        final double RLOFFSET = 257.5;
-        final double RROFFSET = 132.2 + 180;
+        final double FLOFFSET = 45;
+        final double FROFFSET = 18;
+        final double RLOFFSET = 188;
+        final double RROFFSET = 19;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
@@ -85,7 +85,7 @@ public class Riptide extends RobotMap {
 
         // All Distances are in Meters
         // Front Left Module
-        final AnalogEncoder encoderFL = new AnalogEncoder(1, 360, FLOFFSET);
+        final AnalogEncoder encoderFL = new AnalogEncoder(2, 360, FLOFFSET);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 encoderFL::get, frontLeftSteer, new CSSparkFlex(3), MK4i_L2);
 
@@ -95,12 +95,12 @@ public class Riptide extends RobotMap {
                 encoderFR::get, frontRightSteer, new CSSparkFlex(7), MK4i_L2);
 
         // Rear Left Module
-        final AnalogEncoder encoderRL = new AnalogEncoder(2, 360, RLOFFSET);
+        final AnalogEncoder encoderRL = new AnalogEncoder(0, 360, RLOFFSET);
         final SDSSwerveModule rearLeft = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 encoderRL::get, rearLeftSteer, new CSSparkFlex(1), MK4i_L2);
 
         // Rear Right Module
-        final AnalogEncoder encoderRR = new AnalogEncoder(0, 360, RROFFSET);
+        final AnalogEncoder encoderRR = new AnalogEncoder(1, 360, RROFFSET);
         final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 encoderRR::get, rearRightSteer, new CSSparkFlex(5), MK4i_L2);
 
@@ -108,8 +108,8 @@ public class Riptide extends RobotMap {
 
         final double maxRotationRadianPerSecond = 2 * Math.PI;
 
-        RobotConfig config = new RobotConfig(58, 4.889, new ModuleConfig(
-                0.0508, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
+        RobotConfig config = new RobotConfig(68, 58, new ModuleConfig(
+                0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
@@ -126,11 +126,11 @@ public class Riptide extends RobotMap {
     public VisionMap getVisionMap() {
 
         return new VisionMap(
-                new CameraSource("FL_RIPTIDE1_CAM",
+                new CameraSource("FL_STINGRAY_CAM",
                         new Transform3d(Units.inchesToMeters(9.43), Units.inchesToMeters(10.72),
                                 Units.inchesToMeters(8.24),
                                 new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(-16.76)))),
-                new CameraSource("FR_RIPTIDE1_CAM",
+                new CameraSource("FR_STINGRAY_CAM",
                         new Transform3d(Units.inchesToMeters(
                                 9.43),
                                 Units.inchesToMeters(
@@ -166,19 +166,16 @@ public class Riptide extends RobotMap {
         configLeft.voltageCompensation(11.5);
         configLeft.smartCurrentLimit(50);
         configLeft.idleMode(IdleMode.kBrake);
-        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2);
+        configLeft.encoder.velocityConversionFactor((((1 / 9.99) * Math.PI * 1.75) / 60) * 2);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        configLeft.encoder.positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2);
+        configLeft.encoder.positionConversionFactor(((1 / 9.99) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        // we want to add this back
-        // CSEncoder encoder = new CSEncoder(2, 3, false);
-
-        ProfiledPIDController pid = new ProfiledPIDController(0.1, 0, 0,
-                new Constraints(45, 150));
+        ProfiledPIDController pid = new ProfiledPIDController(0.04, 0, 0,
+                new Constraints(80, 245));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.012, 0.02);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.01);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -188,19 +185,19 @@ public class Riptide extends RobotMap {
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
             case SCOREL3 -> 36;
-            case SCOREL4, HIGHESTPOINT -> 58;
+            case SCOREL4, HIGHESTPOINT -> 59;
             default -> Double.NaN;
         };
 
         elevatorMotors.validateEncoderRate(.2, 10);
         return new ElevatorMap(elevatorMotors, leftMotor.getEncoder(), presets,
-                new ValueRange(0, 58.25), new ValueRange(6, 53), pid, feedForward);
+                new ValueRange(0, 60), new ValueRange(5, 55), pid, feedForward);
     }
 
     @Override
     public ArmRotateMap getArmRotateMap() {
         CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, -1.4);
+        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 0);
         SparkFlexConfig config = new SparkFlexConfig();
         absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
@@ -213,15 +210,15 @@ public class Riptide extends RobotMap {
         ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
-            case INTAKE -> 302;
-            case SCOREL3 -> 285;
-            case SCOREL1, SCOREL2, SCOREL4, OUT -> 272;
-            case STOW -> 302;
+            case INTAKE -> 181;
+            case SCOREL3 -> 164;
+            case SCOREL1, SCOREL2, SCOREL4, OUT -> 151;
+            case STOW -> 181;
             default -> Double.NaN;
         };
 
         return new ArmRotateMap(motor, absEncoder, presets, pid,
-                new ValueRange(203, 302), new ValueRange(210, 295), feedForward);
+                new ValueRange(82, 181), new ValueRange(89, 181), feedForward);
     }
 
     @Override
@@ -233,26 +230,29 @@ public class Riptide extends RobotMap {
         config.inverted(true);
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        CSDigitalInput sensor = new CSDigitalInput(9);
+        CSDigitalInput sensor = new CSDigitalInput(1);
         return new CoralManipMap(motor, sensor::get);
     }
 
-    @Override
-    public DeepClimbMap getDeepClimbMap() {
-        CSSparkMax leftMotor = new CSSparkMax(13);
-        CSSparkMax rightMotor = new CSSparkMax(14);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
-        leftMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        config.follow(leftMotor.getMotorController(), true);
-        rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), () -> false);
+    // @Override
+    // public DeepClimbMap getDeepClimbMap() {
+    // CSSparkMax leftMotor = new CSSparkMax(13);
+    // CSSparkMax rightMotor = new CSSparkMax(14);
+    // SparkMaxConfig config = new SparkMaxConfig();
+    // config.smartCurrentLimit(30);
+    // config.idleMode(IdleMode.kBrake);
+    // config.inverted(true);
+    // leftMotor.getMotorController().configure(config,
+    // ResetMode.kResetSafeParameters,
+    // PersistMode.kPersistParameters);
+    // config.follow(leftMotor.getMotorController(), true);
+    // rightMotor.getMotorController().configure(config,
+    // ResetMode.kResetSafeParameters,
+    // PersistMode.kPersistParameters);
+    // return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
+    // () -> false);
 
-    }
+    // }
 
     @Override
     public void setupLogging() {
