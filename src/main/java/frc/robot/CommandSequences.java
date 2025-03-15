@@ -46,8 +46,7 @@ public class CommandSequences {
                 () -> elevator.atPreset(ElevatorPresets.INTAKE) || elevator.atPreset(ElevatorPresets.STOW))
                 .andThen(elevator.clearPreset(),
                         elevator.moveTo(ElevatorPresets.INTAKE),
-                        led.elevatorAtPreset(),
-                        elevator.clearPreset());
+                        led.elevatorAtPreset());
     }
 
     public Command intakeAuto() {

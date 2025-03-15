@@ -108,8 +108,8 @@ public class Stingray extends RobotMap {
 
         final double maxRotationRadianPerSecond = 2 * Math.PI;
 
-        RobotConfig config = new RobotConfig(68, 58, new ModuleConfig(
-                0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
+        RobotConfig config = new RobotConfig(50, 4.889, new ModuleConfig(
+                0.0508, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
@@ -183,9 +183,9 @@ public class Stingray extends RobotMap {
             case STOW -> 1;
             case INTAKE -> 1;
             case SCOREL1 -> 15;
-            case SCOREL2 -> 19.5;
-            case SCOREL3 -> 36;
-            case SCOREL4, HIGHESTPOINT -> 59;
+            case SCOREL2 -> 21;
+            case SCOREL3 -> 38;
+            case SCOREL4, HIGHESTPOINT -> 60;
             default -> Double.NaN;
         };
 
@@ -212,7 +212,7 @@ public class Stingray extends RobotMap {
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
             case SCOREL3 -> 164;
-            case SCOREL1, SCOREL2, SCOREL4, OUT -> 151;
+            case SCOREL1, SCOREL2, SCOREL4, OUT -> 164;
             case STOW -> 181;
             default -> Double.NaN;
         };
@@ -231,28 +231,28 @@ public class Stingray extends RobotMap {
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(1);
+        sensor.setInverted(true);
         return new CoralManipMap(motor, sensor::get);
     }
 
-    // @Override
-    // public DeepClimbMap getDeepClimbMap() {
-    // CSSparkMax leftMotor = new CSSparkMax(13);
-    // CSSparkMax rightMotor = new CSSparkMax(14);
-    // SparkMaxConfig config = new SparkMaxConfig();
-    // config.smartCurrentLimit(30);
-    // config.idleMode(IdleMode.kBrake);
-    // config.inverted(true);
-    // leftMotor.getMotorController().configure(config,
-    // ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
-    // config.follow(leftMotor.getMotorController(), true);
-    // rightMotor.getMotorController().configure(config,
-    // ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
-    // return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
-    // () -> false);
-
-    // }
+    @Override
+    public DeepClimbMap getDeepClimbMap() {
+        CSSparkMax leftMotor = new CSSparkMax(14);
+        CSSparkMax rightMotor = new CSSparkMax(13);
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
+        leftMotor.getMotorController().configure(config,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+        config.follow(leftMotor.getMotorController(), true);
+        rightMotor.getMotorController().configure(config,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
+                () -> false);
+    }
 
     @Override
     public void setupLogging() {
