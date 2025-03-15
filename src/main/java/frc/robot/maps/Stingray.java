@@ -2,6 +2,7 @@ package frc.robot.maps;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
@@ -126,11 +127,11 @@ public class Stingray extends RobotMap {
     public VisionMap getVisionMap() {
 
         return new VisionMap(
-                new CameraSource("FL_STINGRAY_CAM",
+                new CameraSource("FL_Stingray_Cam",
                         new Transform3d(Units.inchesToMeters(9.43), Units.inchesToMeters(10.72),
                                 Units.inchesToMeters(8.24),
                                 new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(-16.76)))),
-                new CameraSource("FR_STINGRAY_CAM",
+                new CameraSource("FR_Stingray_Cam",
                         new Transform3d(Units.inchesToMeters(
                                 9.43),
                                 Units.inchesToMeters(
@@ -173,9 +174,9 @@ public class Stingray extends RobotMap {
                 PersistMode.kPersistParameters);
 
         ProfiledPIDController pid = new ProfiledPIDController(0.04, 0, 0,
-                new Constraints(80, 245));
+                new Constraints(60, 200));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.01);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.005);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -211,8 +212,8 @@ public class Stingray extends RobotMap {
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
-            case SCOREL3 -> 164;
-            case SCOREL1, SCOREL2, SCOREL4, OUT -> 164;
+            case SCOREL1, SCOREL2, SCOREL3, OUT -> 164;
+            case SCOREL4 -> 157.5;
             case STOW -> 181;
             default -> Double.NaN;
         };
@@ -256,7 +257,7 @@ public class Stingray extends RobotMap {
 
     @Override
     public void setupLogging() {
-        // Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB
         // stick
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());

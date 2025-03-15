@@ -175,7 +175,7 @@ public final class Robot extends CommandRobot {
         // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
         copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
-                .onFalse(coralManip.score());
+                .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
     }
 

@@ -52,6 +52,7 @@ public class VisionMap {
         data.targets.clear();
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
+            Logger.recordOutput("Sees Tags", !results.isEmpty());
             if (!results.isEmpty()) {
                 for (PhotonPipelineResult result : results) {
                     if ((result.multitagResult.isPresent()
@@ -76,7 +77,14 @@ public class VisionMap {
                             target.bestCameraToTarget.getRotation().rotateBy(new Rotation3d(0, 0, Math.PI)));
                     target.bestCameraToTarget = reefToRobot;
 
-                    data.targets.putIfAbsent(targetID, new ArrayList<>()).add(target);
+                    if (data.targets.containsKey(target.getFiducialId())) {
+                        data.targets.get(targetID).add(target);
+                    } else {
+                        ArrayList<PhotonTrackedTarget> targetList = new ArrayList<>();
+                        targetList.add(target);
+                        data.targets.put(targetID, targetList);
+                    }
+
                 }
             }
         }
