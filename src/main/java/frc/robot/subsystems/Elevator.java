@@ -94,7 +94,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     }
 
     public boolean atPreset(ElevatorPresets preset) {
-        return preset == getData().preset && pid.atSetpoint();
+        return preset == getData().preset && pid.atGoal();
     }
 
     public Command clearPreset() {
@@ -140,9 +140,9 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             getData().preset = ElevatorPresets.OFF;
 
             if (armSafeSub.getAsBoolean()
-            || (getElevatorHeight() < BAD_HEIGHT_LOWER && speed < 0)
-            || (getElevatorHeight() > BAD_HEIGHT_UPPER && speed > 0)) {
-            getData().motor.setpoint = limits(speed);
+                    || (getElevatorHeight() < BAD_HEIGHT_LOWER && speed < 0)
+                    || (getElevatorHeight() > BAD_HEIGHT_UPPER && speed > 0)) {
+                getData().motor.setpoint = limits(speed);
             }
         } else if (getData().preset == ElevatorPresets.ZEROING) {
             // Do nothing

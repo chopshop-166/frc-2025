@@ -25,6 +25,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
         SCOREL1,
 
+        SCOREL1_TAKETWO,
+
         SCOREL2,
 
         SCOREL3,

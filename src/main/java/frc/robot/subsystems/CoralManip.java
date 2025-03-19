@@ -11,9 +11,11 @@ import frc.robot.maps.subsystems.CoralManipMap.Data;
 public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
     private final double RELEASE_SPEED = -0.3;
-    private final double RELEASE_SPEED_L1 = -0.1;
+    private final double RELEASE_SPEED_L1 = -0.2;
     private final double INTAKE_SPEED = -0.2;
     private final double RELEASE_DELAY = 0;
+
+    private final double RELEASE_DELAY_L1 = 0.5;
     private final double ALIGNMENT_SPEED = 0.09;
     private final double ALGAE_INTAKE = 0.4;
 
@@ -31,6 +33,12 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
         return run(() -> {
             getData().motor.setpoint = RELEASE_SPEED;
         }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
+    }
+
+    public Command betterScoreL1() {
+        return run(() -> {
+            getData().motor.setpoint = -RELEASE_SPEED_L1;
+        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY_L1), safeStateCmd());
     }
 
     public Command feed() {

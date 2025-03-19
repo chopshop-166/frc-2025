@@ -1,7 +1,9 @@
 package frc.robot.maps;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
@@ -108,8 +110,8 @@ public class Stingray extends RobotMap {
 
         final double maxRotationRadianPerSecond = 2 * Math.PI;
 
-        RobotConfig config = new RobotConfig(68, 58, new ModuleConfig(
-                0.1016, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
+        RobotConfig config = new RobotConfig(50, 4.889, new ModuleConfig(
+                0.0508, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
@@ -126,11 +128,11 @@ public class Stingray extends RobotMap {
     public VisionMap getVisionMap() {
 
         return new VisionMap(
-                new CameraSource("FL_STINGRAY_CAM",
+                new CameraSource("FL_Stingray_Cam",
                         new Transform3d(Units.inchesToMeters(9.43), Units.inchesToMeters(10.72),
                                 Units.inchesToMeters(8.24),
                                 new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(-16.76)))),
-                new CameraSource("FR_STINGRAY_CAM",
+                new CameraSource("FR_Stingray_Cam",
                         new Transform3d(Units.inchesToMeters(
                                 9.43),
                                 Units.inchesToMeters(
@@ -173,19 +175,20 @@ public class Stingray extends RobotMap {
                 PersistMode.kPersistParameters);
 
         ProfiledPIDController pid = new ProfiledPIDController(0.04, 0, 0,
-                new Constraints(80, 245));
+                new Constraints(60, 200));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.01);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.005);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
             case INTAKE -> 1;
-            case SCOREL1 -> 15;
-            case SCOREL2 -> 19.5;
-            case SCOREL3 -> 36;
-            case SCOREL4, HIGHESTPOINT -> 59;
+            case SCOREL1 -> 13;
+            case SCOREL1_TAKETWO -> 16;
+            case SCOREL2 -> 21;
+            case SCOREL3 -> 38;
+            case SCOREL4, HIGHESTPOINT -> 60;
             default -> Double.NaN;
         };
 
@@ -211,8 +214,9 @@ public class Stingray extends RobotMap {
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
-            case SCOREL3 -> 164;
-            case SCOREL1, SCOREL2, SCOREL4, OUT -> 151;
+            case SCOREL1, SCOREL2, SCOREL3, OUT -> 164;
+            case SCOREL1_TAKETWO -> 121;
+            case SCOREL4 -> 155;
             case STOW -> 181;
             default -> Double.NaN;
         };
@@ -231,36 +235,36 @@ public class Stingray extends RobotMap {
         motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         CSDigitalInput sensor = new CSDigitalInput(1);
+        sensor.setInverted(true);
         return new CoralManipMap(motor, sensor::get);
     }
 
-    // @Override
-    // public DeepClimbMap getDeepClimbMap() {
-    // CSSparkMax leftMotor = new CSSparkMax(13);
-    // CSSparkMax rightMotor = new CSSparkMax(14);
-    // SparkMaxConfig config = new SparkMaxConfig();
-    // config.smartCurrentLimit(30);
-    // config.idleMode(IdleMode.kBrake);
-    // config.inverted(true);
-    // leftMotor.getMotorController().configure(config,
-    // ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
-    // config.follow(leftMotor.getMotorController(), true);
-    // rightMotor.getMotorController().configure(config,
-    // ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
-    // return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
-    // () -> false);
-
-    // }
+    @Override
+    public DeepClimbMap getDeepClimbMap() {
+        CSSparkMax leftMotor = new CSSparkMax(14);
+        CSSparkMax rightMotor = new CSSparkMax(13);
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.smartCurrentLimit(30);
+        config.idleMode(IdleMode.kBrake);
+        config.inverted(true);
+        leftMotor.getMotorController().configure(config,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+        config.follow(leftMotor.getMotorController(), true);
+        rightMotor.getMotorController().configure(config,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
+                () -> false);
+    }
 
     @Override
     public void setupLogging() {
-        // Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB
+        Logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB
         // stick
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());
-        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        LoggedPowerDistribution.getInstance(0, ModuleType.kRev);
     }
 
 }

@@ -171,11 +171,13 @@ public final class Robot extends CommandRobot {
 
         copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
         copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
+        copilotController.getPovButton(POVDirection.LEFT).whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1_TAKETWO, ArmRotatePresets.SCOREL1_TAKETWO))
+                .onFalse(coralManip.betterScoreL1());
 
         // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
         copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
-                .onFalse(coralManip.score());
+                .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
     }
 
