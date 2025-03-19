@@ -23,6 +23,8 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
         SCOREL1,
 
+        SCOREL1_TAKETWO,
+
         SCOREL2,
 
         SCOREL3,

@@ -49,8 +49,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(2, 0, 0.0, new Constraints(4.0, 5.0));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(3.0, 5.0));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.8, 0, 0.0, new Constraints(2.5, 10.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(0.9, 5.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -152,14 +152,14 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
-        Logger.recordOutput("Estimator Pose", estimator.getEstimatedPosition());
-        Logger.recordOutput("Robot Rotation Gyro", getMap().gyro.getRotation2d());
-        Logger.recordOutput("Target Branch", targetBranch);
-        Logger.recordOutput("Translation_X_PID Error", translationPID_X.getPositionError());
-        Logger.recordOutput("Translation_Y_PID Error", translationPID_Y.getPositionError());
-        Logger.recordOutput("Translation_X_PID Velocity", translationPID_X.getSetpoint().velocity);
-        Logger.recordOutput("Translation_Y_PID Velocity", translationPID_Y.getSetpoint().velocity);
-
+        Logger.recordOutput("Drive/Estimator Pose", estimator.getEstimatedPosition());
+        Logger.recordOutput("Drive/Robot Rotation Gyro", getMap().gyro.getRotation2d());
+        Logger.recordOutput("Drive/Target Branch", targetBranch);
+        Logger.recordOutput("Drive/Translation_X_PID Error", translationPID_X.getPositionError());
+        Logger.recordOutput("Drive/Translation_Y_PID Error", translationPID_Y.getPositionError());
+        Logger.recordOutput("Drive/Translation_X_PID Velocity", translationPID_X.getSetpoint().velocity);
+        Logger.recordOutput("Drive/Translation_Y_PID Velocity", translationPID_Y.getSetpoint().velocity);
+        Logger.recordOutput("Drive/ActualChassisSpeeds", kinematics.toChassisSpeeds(getData().getModuleStates()));
     }
 
     private void visionCalcs() {

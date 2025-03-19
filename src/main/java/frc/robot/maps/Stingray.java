@@ -1,6 +1,7 @@
 package frc.robot.maps;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
@@ -183,7 +184,8 @@ public class Stingray extends RobotMap {
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
             case INTAKE -> 1;
-            case SCOREL1 -> 15;
+            case SCOREL1 -> 13;
+            case SCOREL1_TAKETWO -> 16;
             case SCOREL2 -> 21;
             case SCOREL3 -> 38;
             case SCOREL4, HIGHESTPOINT -> 60;
@@ -213,7 +215,8 @@ public class Stingray extends RobotMap {
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
             case SCOREL1, SCOREL2, SCOREL3, OUT -> 164;
-            case SCOREL4 -> 157.5;
+            case SCOREL1_TAKETWO -> 121;
+            case SCOREL4 -> 155;
             case STOW -> 181;
             default -> Double.NaN;
         };
@@ -261,7 +264,7 @@ public class Stingray extends RobotMap {
         // stick
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());
-        new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+        LoggedPowerDistribution.getInstance(0, ModuleType.kRev);
     }
 
 }
