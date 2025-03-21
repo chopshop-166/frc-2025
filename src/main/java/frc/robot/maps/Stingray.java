@@ -168,16 +168,18 @@ public class Stingray extends RobotMap {
         configLeft.voltageCompensation(11.5);
         configLeft.smartCurrentLimit(80);
         configLeft.idleMode(IdleMode.kBrake);
-        configLeft.encoder.velocityConversionFactor((((1 / 9.99) * Math.PI * 1.75) / 60) * 2);
+        configLeft.encoder.velocityConversionFactor((((1 / 9.99) * Math.PI * 1.75) / 60) * 2)
+                .positionConversionFactor(((1 / 9.99) * Math.PI * 1.75) * 2)
+                .quadratureAverageDepth(2)
+                .quadratureMeasurementPeriod(10);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        configLeft.encoder.positionConversionFactor(((1 / 9.99) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.009, 0, 0,
-                new Constraints(80, 120));
+        ProfiledPIDController pid = new ProfiledPIDController(0.019, 0, 0,
+                new Constraints(100, 250));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.0095, 0.024, 0.0085);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.0095, 0.024, 0.0072);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -214,7 +216,7 @@ public class Stingray extends RobotMap {
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
-            case SCOREL1, SCOREL2, SCOREL3, OUT -> 164;
+            case SCOREL1, SCOREL2, SCOREL3, OUT -> 162;
             case SCOREL1_TAKETWO -> 121;
             case SCOREL4 -> 155;
             case STOW -> 181;
