@@ -159,26 +159,27 @@ public class Riptide extends RobotMap {
 
         configRight.follow(leftMotor.getMotorController());
         configRight.voltageCompensation(11.5);
-        configRight.smartCurrentLimit(50);
+        configRight.smartCurrentLimit(80);
         configRight.idleMode(IdleMode.kBrake);
         rightMotor.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         configLeft.voltageCompensation(11.5);
-        configLeft.smartCurrentLimit(50);
+        configLeft.smartCurrentLimit(80);
         configLeft.idleMode(IdleMode.kBrake);
-        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2);
+        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2)
+                .positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2).quadratureMeasurementPeriod(10)
+                .quadratureAverageDepth(2);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        configLeft.encoder.positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2);
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
         // we want to add this back
         // CSEncoder encoder = new CSEncoder(2, 3, false);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.1, 0, 0,
-                new Constraints(45, 150));
+        ProfiledPIDController pid = new ProfiledPIDController(0.021, 0, 0,
+                new Constraints(48, 185));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0, 0.012, 0.02);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.008, 0.015, 0.0175);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -205,6 +206,8 @@ public class Riptide extends RobotMap {
         absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
+        config.encoder.quadratureMeasurementPeriod(10)
+                .quadratureAverageDepth(2);
         config.inverted(true);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);

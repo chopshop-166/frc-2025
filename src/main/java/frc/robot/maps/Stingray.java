@@ -161,12 +161,12 @@ public class Stingray extends RobotMap {
 
         configRight.follow(leftMotor.getMotorController());
         configRight.voltageCompensation(11.5);
-        configRight.smartCurrentLimit(50);
+        configRight.smartCurrentLimit(80);
         configRight.idleMode(IdleMode.kBrake);
         rightMotor.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         configLeft.voltageCompensation(11.5);
-        configLeft.smartCurrentLimit(50);
+        configLeft.smartCurrentLimit(80);
         configLeft.idleMode(IdleMode.kBrake);
         configLeft.encoder.velocityConversionFactor((((1 / 9.99) * Math.PI * 1.75) / 60) * 2);
         // Gear reduction is 22.2 sprocket diameter is 1.75 inches
@@ -174,10 +174,10 @@ public class Stingray extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.04, 0, 0,
-                new Constraints(60, 200));
+        ProfiledPIDController pid = new ProfiledPIDController(0.009, 0, 0,
+                new Constraints(80, 120));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.055, 0.024, 0.005);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.0095, 0.024, 0.0085);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -264,7 +264,7 @@ public class Stingray extends RobotMap {
         // stick
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.recordMetadata("RobotMap", this.getClass().getSimpleName());
-        LoggedPowerDistribution.getInstance(0, ModuleType.kRev);
+        LoggedPowerDistribution.getInstance(1, ModuleType.kRev);
     }
 
 }
