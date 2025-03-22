@@ -55,7 +55,7 @@ public final class Robot extends CommandRobot {
     private Led led = new Led(map.getLedMap());
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
     private Elevator elevator = new Elevator(map.getElevatorMap(),
-            RobotUtils.deadbandAxis(.1, () -> -copilotController.getLeftY()));
+            RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY()));
     private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap());
     private Funnel funnel = new Funnel(map.getFunnelMap());
@@ -148,20 +148,18 @@ public final class Robot extends CommandRobot {
         driveController.rightBumper().whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
         driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
 
-        copilotController.a().onTrue(commandSequences.intake());
         elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
 
         driveController.x().onTrue(funnel.rotateForward());
         driveController.y().onTrue(funnel.rotateBackward());
 
-        copilotController.x()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
-                .onFalse(coralManip.scoreL1());
-
+        copilotController.a().onTrue(commandSequences.intake());
         copilotController.b()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2))
                 .onFalse(coralManip.score());
-
+        copilotController.x()
+                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
+                .onFalse(coralManip.scoreL1());
         copilotController.y()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3))
                 .onFalse(coralManip.score());
@@ -171,9 +169,14 @@ public final class Robot extends CommandRobot {
 
         copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
         copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
-        copilotController.getPovButton(POVDirection.LEFT).whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1_TAKETWO, ArmRotatePresets.SCOREL1_TAKETWO))
-                .onFalse(coralManip.betterScoreL1());
 
+        copilotController.getPovButton(POVDirection.LEFT)
+                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL2, ArmRotatePresets.ALGAE)
+                        .alongWith(coralManip.feedAlgae()));
+
+        copilotController.getPovButton(POVDirection.UP)
+                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
+                        .alongWith(coralManip.feedAlgae()));
         // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
         copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
