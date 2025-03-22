@@ -21,13 +21,26 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 3.5
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "sequential",
                       "data": {
-                        "pathName": "V -  Start3 to ReefE&F"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "V -  Start3 to ReefE&F"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Align to Left Branch"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -50,25 +63,6 @@
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
                 }
               }
             ]
@@ -110,13 +104,26 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 3.5
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "sequential",
                       "data": {
-                        "pathName": "V - StationR to ReefC&D"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "V - StationR to ReefC&D"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Align to Left Branch"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -139,25 +146,6 @@
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
                 }
               }
             ]
@@ -199,13 +187,26 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 3.5
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "sequential",
                       "data": {
-                        "pathName": "V - StationR to ReefC&D"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "V - StationR to ReefC&D"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Align to Right Branch"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -228,25 +229,6 @@
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Right Branch"
                 }
               }
             ]
