@@ -35,6 +35,8 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
         STOW,
 
+        ALGAE,
+
         HOLD
 
     }

@@ -29,7 +29,11 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
         SCOREL2,
 
+        ALGAEL2,
+
         SCOREL3,
+
+        ALGAEL3,
 
         SCOREL4,
 

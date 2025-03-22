@@ -188,7 +188,9 @@ public class Riptide extends RobotMap {
             case INTAKE -> 1;
             case SCOREL1 -> 15;
             case SCOREL2 -> 19.5;
+            case ALGAEL2 -> 22;
             case SCOREL3 -> 36;
+            case ALGAEL3 -> 39;
             case SCOREL4, HIGHESTPOINT -> 58;
             default -> Double.NaN;
         };
