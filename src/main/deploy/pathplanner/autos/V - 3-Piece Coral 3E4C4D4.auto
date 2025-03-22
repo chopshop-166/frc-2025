@@ -94,6 +94,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Wait Until Game Piece"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -174,6 +180,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait Until Game Piece"
           }
         },
         {

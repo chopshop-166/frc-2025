@@ -49,11 +49,6 @@ public class CommandSequences {
                         led.elevatorAtPreset());
     }
 
-    public Command intakeAuto() {
-        return elevator.moveTo(ElevatorPresets.STOW)
-                .andThen(armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.betterintake()));
-    }
-
     public Command intakeBottom() {
         return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.betterintake())
                 .andThen(led.gamePieceAcquired());
