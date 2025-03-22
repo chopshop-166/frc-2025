@@ -204,9 +204,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
             translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
             translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
-            translateXSpeedMPS += Math.copySign(DRIVE_KS,
-                    translateXSpeedMPS);
-            // Direction is swapped on Red side so 2need to negate PID output
+            translateXSpeedMPS += Math.copySign(DRIVE_KS, translateXSpeedMPS);
+            // Direction is swapped on Red side so need to negate PID output
             if (!isBlueAlliance) {
                 translateXSpeedMPS *= -1;
                 translateYSpeedMPS *= -1;

@@ -21,13 +21,26 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 3.5
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "sequential",
                       "data": {
-                        "pathName": "V - Start1 to ReefI&J"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "V - Start1 to ReefI&J"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Align to Left Branch"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -50,25 +63,6 @@
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
                 }
               }
             ]
@@ -116,13 +110,26 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 3.5
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "sequential",
                       "data": {
-                        "pathName": "V - StationL To ReefL&K"
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "V - StationL To ReefL&K"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Align to Left Branch"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -145,25 +152,6 @@
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
                 }
               }
             ]
