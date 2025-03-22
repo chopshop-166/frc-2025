@@ -67,7 +67,8 @@ public final class Robot extends CommandRobot {
 
     public void registerNamedCommands() {
 
-        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intakeAuto());
+        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
+        NamedCommands.registerCommand("Wait Until Game Piece", coralManip.waitUntilGamePiece());
         NamedCommands.registerCommand("Position Coral L1",
                 commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1));
         NamedCommands.registerCommand("Position Coral L2",
