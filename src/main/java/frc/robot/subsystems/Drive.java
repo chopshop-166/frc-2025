@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -49,8 +48,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.8, 0, 0.0, new Constraints(2.5, 10.0));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(0.9, 5.0));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(2, 0, 0.0, new Constraints(0.9, 5.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.8, 0, 0.0, new Constraints(2.5, 10.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -200,11 +199,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
             visionCalcs();
             Pose2d robotPose = estimator.getEstimatedPosition();
-            // soooooooooo x and y are backwards somehow. Values underneath are correct
-            translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
-            translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
-            translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+            translateXSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
             translateXSpeedMPS += Math.copySign(DRIVE_KS, translateXSpeedMPS);
+            translateYSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+            translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
             // Direction is swapped on Red side so need to negate PID output
             if (!isBlueAlliance) {
                 translateXSpeedMPS *= -1;
@@ -225,7 +223,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
             isRobotCentric = false;
-
         }, () -> {
             this.targetBranch = Branch.NONE;
         });
@@ -250,9 +247,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             final double rotation, boolean robotCentricDrive) {
         ChassisSpeeds speeds;
         if (robotCentricDrive) {
-            speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
+            speeds = new ChassisSpeeds(xSpeed, ySpeed, rotation);
         } else {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed,
                     rotation, isBlueAlliance ? estimator.getEstimatedPosition().getRotation()
                             : estimator.getEstimatedPosition().getRotation()
                                     .plus(new Rotation2d(Units.degreesToRadians(180))));
