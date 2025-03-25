@@ -158,8 +158,8 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             getData().motor.setpoint = 0;
         }
         Logger.recordOutput("Elevator/PID at goal", pid.atGoal());
-        Logger.recordOutput("Elevator/DesiredElevatorVelocity", pid.getSetpoint().velocity);
-        Logger.recordOutput("Elevator/DesiredElevatorPosition", pid.getSetpoint().position);
+        Logger.recordOutput("Elevator/Desired Velocity", pid.getSetpoint().velocity);
+        Logger.recordOutput("Elevator/Desired Position", pid.getSetpoint().position);
 
     }
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ArmRotateMap.Data;
@@ -34,7 +35,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     }
 
     public Command move(DoubleSupplier rotateSpeed) {
-
         return run(() -> {
             double speed = rotateSpeed.getAsDouble();
             double speedCoef = RAISE_SPEED_COEF;
@@ -43,13 +43,12 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             }
             if (Math.abs(speed) > 0) {
                 getData().preset = ArmRotatePresets.OFF;
-                getData().motor.setpoint = (limits(speed * speedCoef));
+                getData().motor.setpoint = limits(speed * speedCoef);
             } else if (getData().preset == ArmRotatePresets.OFF) {
                 getData().motor.setpoint = 0.0;
             } else {
                 getData().motor.setpoint = 0.0;
             }
-
         });
     }
 
@@ -58,19 +57,17 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         return runOnce(() -> {
             getData().preset = level;
             pid.reset(getArmAngle(), 0.0);
-        }).andThen(run(() -> {
-            Logger.recordOutput("Arm pid at goal", pid.atGoal());
-        }).until(setPointPersistenceCheck)).withName("Move To Set Angle");
+        }).andThen(Commands.waitUntil(setPointPersistenceCheck))
+                .withName("Move To Set Angle");
     }
 
     public Command moveOut() {
         return runOnce(() -> {
             getData().preset = ArmRotatePresets.OUT;
             pid.reset(getArmAngle(), 0.0);
-        }).andThen(run(() -> {
-            Logger.recordOutput("Arm pid at goal", pid.atGoal());
-        }).until(() -> (getData().rotationAbsAngleDegrees <= getMap().armRotatePreset
-                .applyAsDouble(ArmRotatePresets.OUT) + 2))).withName("Move To Set Angle");
+        }).andThen(Commands.waitUntil(
+                () -> getArmAngle() <= getMap().armRotatePreset.applyAsDouble(ArmRotatePresets.OUT) + 2))
+                .withName("Move Out");
     }
 
     public Command zero() {
@@ -119,9 +116,9 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
                     pid.getSetpoint().velocity);
             getData().motor.setpoint = setpoint;
         }
-
-        Logger.recordOutput("DesiredArmVelocity", pid.getSetpoint().velocity);
-        Logger.recordOutput("DesiredArmPosition", pid.getSetpoint().position);
+        Logger.recordOutput("Arm/PID at goal", pid.atGoal());
+        Logger.recordOutput("Arm/Desired Velocity", pid.getSetpoint().velocity);
+        Logger.recordOutput("Arm/Desired Position", pid.getSetpoint().position);
 
     }
 
