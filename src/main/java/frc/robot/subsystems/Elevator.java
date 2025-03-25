@@ -74,7 +74,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
             this.getData().preset = level;
             pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
         }).andThen(run(() -> {
-            Logger.recordOutput("Elevator/PID at goal", pid.atGoal());
+
         })).until(() -> {
             return setPointPersistenceCheck.getAsBoolean();
         }).withName("Move to set height");
@@ -157,7 +157,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         } else {
             getData().motor.setpoint = 0;
         }
-
+        Logger.recordOutput("Elevator/PID at goal", pid.atGoal());
         Logger.recordOutput("Elevator/DesiredElevatorVelocity", pid.getSetpoint().velocity);
         Logger.recordOutput("Elevator/DesiredElevatorPosition", pid.getSetpoint().position);
 

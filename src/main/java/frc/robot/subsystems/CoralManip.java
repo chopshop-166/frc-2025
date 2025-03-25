@@ -19,6 +19,7 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     private final double RELEASE_DELAY_L1 = 0.5;
     private final double ALIGNMENT_SPEED = 0.09;
     private final double ALGAE_INTAKE = 0.4;
+    private final double ALGAE_INTAKE_HAT = -0.4;
 
     public CoralManip(CoralManipMap coralManipMap) {
         super(new Data(), coralManipMap);
@@ -51,6 +52,12 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     public Command feedAlgae() {
         return runOnce(() -> {
             getData().motor.setpoint = ALGAE_INTAKE;
+        });
+    }
+
+    public Command feedAlgaeHat() {
+        return runOnce(() -> {
+            getData().motor.setpoint = ALGAE_INTAKE_HAT;
         });
     }
 
