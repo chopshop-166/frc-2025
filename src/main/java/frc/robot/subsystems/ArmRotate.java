@@ -61,6 +61,13 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
                 .withName("Move To Set Angle");
     }
 
+    public Command moveToNonOwning(ArmRotatePresets level) {
+        return Commands.runOnce(() -> {
+            getData().preset = level;
+            pid.reset(getArmAngle(), 0.0);
+        }).withName("Move To Set Angle (Non-Owning)");
+    }
+
     public Command moveOut() {
         return runOnce(() -> {
             getData().preset = ArmRotatePresets.OUT;

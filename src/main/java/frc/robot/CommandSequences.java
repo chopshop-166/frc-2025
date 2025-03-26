@@ -50,7 +50,7 @@ public class CommandSequences {
     }
 
     public Command intakeBottom() {
-        return armRotate.moveTo(ArmRotatePresets.INTAKE)
+        return armRotate.moveToNonOwning(ArmRotatePresets.INTAKE)
                 .alongWith(coralManip.betterintake())
                 .andThen(led.gamePieceAcquired());
     }
