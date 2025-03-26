@@ -77,7 +77,7 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
                 run(() -> {
                     getData().motor.setpoint = -ALIGNMENT_SPEED;
                 }).until(() -> getData().gamePieceDetected),
-                safeStateCmd());
+                safeStateCmd()).withName("Better Intake");
     }
 
     // WARNING: DOES NOT REQUIRE THIS SUBSYSTEM

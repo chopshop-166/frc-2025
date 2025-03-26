@@ -80,7 +80,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     public Command zero() {
         return runSafe(() -> {
             getData().motor.setpoint = ZEROING_SPEED;
-        }).until(() -> getMap().motor.validate()).andThen(resetCmd());
+        }).until(() -> getMap().motor.validate()).andThen(resetCmd()).withName("Zero");
     }
 
     public Command moveToZero() {
