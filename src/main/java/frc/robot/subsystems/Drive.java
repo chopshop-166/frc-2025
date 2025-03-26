@@ -155,10 +155,12 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Drive/Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Drive/Robot Rotation Gyro", getMap().gyro.getRotation2d());
         Logger.recordOutput("Drive/Target Branch", targetBranch);
-        Logger.recordOutput("Drive/Translation_X_PID Error", translationPID_X.getPositionError());
-        Logger.recordOutput("Drive/Translation_Y_PID Error", translationPID_Y.getPositionError());
-        Logger.recordOutput("Drive/Translation_X_PID Velocity", translationPID_X.getSetpoint().velocity);
-        Logger.recordOutput("Drive/Translation_Y_PID Velocity", translationPID_Y.getSetpoint().velocity);
+        Logger.recordOutput("Drive/Translation_X_PID/Error", translationPID_X.getPositionError());
+        Logger.recordOutput("Drive/Translation_X_PID/Velocity", translationPID_X.getSetpoint().velocity);
+        Logger.recordOutput("Drive/Translation_X_PID/At Goal", translationPID_X.atGoal());
+        Logger.recordOutput("Drive/Translation_Y_PID/Error", translationPID_Y.getPositionError());
+        Logger.recordOutput("Drive/Translation_Y_PID/Velocity", translationPID_Y.getSetpoint().velocity);
+        Logger.recordOutput("Drive/Translation_Y_PID/At Goal", translationPID_Y.atGoal());
         Logger.recordOutput("Drive/ActualChassisSpeeds", kinematics.toChassisSpeeds(getData().getModuleStates()));
     }
 
