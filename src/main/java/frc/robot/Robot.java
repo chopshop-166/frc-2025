@@ -132,7 +132,7 @@ public final class Robot extends CommandRobot {
         // be added.
         Logger.start();
 
-        led.colorAlliance().schedule();
+        led.starPower().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
 
         if (!DriverStation.isFMSAttached()) {
@@ -153,7 +153,7 @@ public final class Robot extends CommandRobot {
     @Override
     public void disabledInit() {
         super.disabledInit();
-        led.colorAlliance().schedule();
+        led.starPower().schedule();
     }
 
     @Override

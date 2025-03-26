@@ -6,10 +6,14 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
+import com.chopshop166.chopshoplib.leds.ColorFormat;
+import com.chopshop166.chopshoplib.leds.SegmentConfig;
 import com.chopshop166.chopshoplib.maps.CameraSource;
+import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
+import com.chopshop166.chopshoplib.maps.WPILedMap;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro;
 import com.chopshop166.chopshoplib.states.PIDValues;
@@ -105,6 +109,15 @@ public class Shrimp extends RobotMap {
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro,
                 config, holonomicDrive);
+    }
+
+    @Override
+    public WPILedMap getLedMap() {
+        var result = new WPILedMap(11, 0);
+        var leds = result.ledBuffer;
+
+        SegmentConfig spoiler = leds.segment(11, ColorFormat.GRB).tags("Intake", "Elevator", "Vision", "Fun");
+        return result;
     }
 
     @Override
