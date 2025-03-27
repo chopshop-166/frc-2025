@@ -134,16 +134,18 @@ public final class Robot extends CommandRobot {
         led.colorAlliance().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
 
-        CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {
-            String newSub = "<NONE>";
-            String newName = "<NONE>";
-            if (newCmd.isPresent()) {
-                newSub = newCmd.get().getSubsystem();
-                newName = newCmd.get().getName();
-            }
-            System.out.println("Command interrupt: `" + oldCmd.getSubsystem() + "/" + oldCmd.getName() +
-                    "` -> `" + newSub + "/" + newName + "`");
-        });
+        if (!DriverStation.isFMSAttached()) {
+            CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {
+                String newSub = "<NONE>";
+                String newName = "<NONE>";
+                if (newCmd.isPresent()) {
+                    newSub = newCmd.get().getSubsystem();
+                    newName = newCmd.get().getName();
+                }
+                System.out.println("Command interrupt: `" + oldCmd.getSubsystem() + "/" + oldCmd.getName() +
+                        "` -> `" + newSub + "/" + newName + "`");
+            });
+        }
 
     }
 
