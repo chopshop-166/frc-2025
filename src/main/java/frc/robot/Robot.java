@@ -57,7 +57,8 @@ public final class Robot extends CommandRobot {
     private Elevator elevator = new Elevator(map.getElevatorMap(),
             RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY()));
     private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
-    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap());
+    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
+            RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
     private Funnel funnel = new Funnel(map.getFunnelMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,
@@ -206,7 +207,6 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
-        armRotate.setDefaultCommand(armRotate.move(RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY())));
         // funnel.setDefaultCommand(
         // funnel.move(RobotUtils.deadbandAxis(.1, () ->
         // -copilotController.getLeftTriggerAxis())));
