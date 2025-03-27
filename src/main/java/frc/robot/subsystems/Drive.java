@@ -101,7 +101,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.rotationSupplier = rotation;
 
         translationPID_X.setTolerance(0.1);
-        translationPID_Y.setTolerance(0.01);
+        translationPID_Y.setTolerance(0.06);
         rotationPID.setTolerance(4);
     }
 
