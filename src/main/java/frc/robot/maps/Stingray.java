@@ -209,7 +209,7 @@ public class Stingray extends RobotMap {
         absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
+        config.inverted(false);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
