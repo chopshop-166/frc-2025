@@ -216,9 +216,9 @@ public class Stingray extends RobotMap {
                 .positionConversionFactor(360.0 / 75);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.015, 0, 0, new Constraints(90, 300));
+        ProfiledPIDController pid = new ProfiledPIDController(0.01, 0, 0, new Constraints(90, 650));
         pid.setTolerance(3);
-        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0016);
+        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0011);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
