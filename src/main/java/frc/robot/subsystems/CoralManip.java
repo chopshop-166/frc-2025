@@ -5,7 +5,6 @@ import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.CoralManipMap.Data;
 
@@ -80,11 +79,6 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
                     getData().motor.setpoint = -ALIGNMENT_SPEED;
                 }).until(() -> getData().gamePieceDetected),
                 safeStateCmd()).withName("Better Intake");
-    }
-
-    // WARNING: DOES NOT REQUIRE THIS SUBSYSTEM
-    public Command waitUntilGamePiece() {
-        return Commands.waitUntil(() -> getData().gamePieceDetected);
     }
 
     @Override

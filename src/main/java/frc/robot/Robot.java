@@ -69,7 +69,7 @@ public final class Robot extends CommandRobot {
     public void registerNamedCommands() {
 
         NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
-        NamedCommands.registerCommand("Wait Until Game Piece", coralManip.waitUntilGamePiece());
+        NamedCommands.registerCommand("Wait Until Game Piece", coralManip.betterintake());
         NamedCommands.registerCommand("Position Coral L1",
                 commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1));
         NamedCommands.registerCommand("Position Coral L2",
@@ -161,7 +161,8 @@ public final class Robot extends CommandRobot {
         driveController.rightBumper().whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
         driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
 
-        elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
+        elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
+        elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
 
         driveController.x().onTrue(funnel.rotateForward());
         driveController.y().onTrue(funnel.rotateBackward());
