@@ -167,16 +167,21 @@ public final class Robot extends CommandRobot {
         copilotController.back().onTrue(commandSequences.resetCopilot());
         copilotController.start().onTrue(elevator.zero());
 
-        copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
-        copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
+        copilotController.getPovButton(POVDirection.UP).onTrue(armRotate.moveTo(ArmRotatePresets.OUT));
+        copilotController.getPovButton(POVDirection.DOWN).onTrue(armRotate.moveTo(ArmRotatePresets.INTAKE));
 
-        copilotController.getPovButton(POVDirection.LEFT)
-                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL2, ArmRotatePresets.ALGAE)
-                        .alongWith(coralManip.feedAlgae()));
+        // copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
+        // copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
 
-        copilotController.getPovButton(POVDirection.UP)
-                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
-                        .alongWith(coralManip.feedAlgae()));
+        // copilotController.getPovButton(POVDirection.LEFT)
+        // .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL2,
+        // ArmRotatePresets.ALGAE)
+        // .alongWith(coralManip.feedAlgae()));
+
+        // copilotController.getPovButton(POVDirection.UP)
+        // .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3,
+        // ArmRotatePresets.ALGAE)
+        // .alongWith(coralManip.feedAlgae()));
         // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
         copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))

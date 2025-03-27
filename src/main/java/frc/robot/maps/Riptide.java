@@ -217,7 +217,7 @@ public class Riptide extends RobotMap {
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         ProfiledPIDController pid = new ProfiledPIDController(0.0023, 0, 0, new Constraints(60, 300));
         pid.setTolerance(1);
-        ArmFeedforward feedForward = new ArmFeedforward(0.025, 0.0, 0.0016);
+        ArmFeedforward feedForward = new ArmFeedforward(0.025, 0.0, 0.0014);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;

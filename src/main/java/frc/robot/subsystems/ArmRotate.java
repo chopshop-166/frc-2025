@@ -59,7 +59,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().preset = level;
             pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
-            Logger.recordOutput("Arm pid at goal", pid.atGoal());
         }).until(setPointPersistenceCheck)).withName("Move To Set Angle");
     }
 
@@ -68,7 +67,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().preset = ArmRotatePresets.OUT;
             pid.reset(getArmAngle(), 0.0);
         }).andThen(run(() -> {
-            Logger.recordOutput("Arm pid at goal", pid.atGoal());
         }).until(() -> (getData().rotationAbsAngleDegrees <= getMap().armRotatePreset
                 .applyAsDouble(ArmRotatePresets.OUT) + 2))).withName("Move To Set Angle");
     }
@@ -114,14 +112,18 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             double targetHeight = getData().preset == ArmRotatePresets.HOLD ? holdAngle
                     : getMap().armRotatePreset.applyAsDouble(getData().preset);
             double setpoint = pid.calculate(getArmAngle(), new State(targetHeight, 0));
+            Logger.recordOutput("ArmRotate/PID Setpoint", setpoint);
+
             setpoint += getMap().armFeedforward.calculate(
                     pid.getSetpoint().position,
                     pid.getSetpoint().velocity);
+            Logger.recordOutput("ArmRotate/PID +FF Setpoint", setpoint);
             getData().motor.setpoint = setpoint;
         }
 
-        Logger.recordOutput("DesiredArmVelocity", pid.getSetpoint().velocity);
-        Logger.recordOutput("DesiredArmPosition", pid.getSetpoint().position);
+        Logger.recordOutput("ArmRotate/pid at goal", pid.atGoal());
+        Logger.recordOutput("ArmRotate/DesiredArmVelocity", pid.getSetpoint().velocity);
+        Logger.recordOutput("ArmRotate/DesiredArmPosition", pid.getSetpoint().position);
 
     }
 
