@@ -89,14 +89,14 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
             getData().preset = ArmRotatePresets.OFF;
         }).until(() -> {
             return getArmAngle() > getMap().armRotatePreset.applyAsDouble(ArmRotatePresets.STOW);
-        });
+        }).withName("Move to Zero");
     }
 
     public Command hold() {
         return runOnce(() -> {
             holdAngle = getArmAngle();
             getData().preset = ArmRotatePresets.HOLD;
-        });
+        }).withName("Hold");
     }
 
     private double limits(double speed) {

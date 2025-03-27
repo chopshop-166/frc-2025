@@ -34,37 +34,39 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
     public Command score() {
         return run(() -> {
             getData().motor.setpoint = RELEASE_SPEED;
-        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd());
+        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY), safeStateCmd())
+                .withName("Score Coral");
     }
 
     public Command betterScoreL1() {
         return run(() -> {
             getData().motor.setpoint = -RELEASE_SPEED_L1;
-        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY_L1), safeStateCmd());
+        }).until(() -> !getData().gamePieceDetected).andThen(waitSeconds(RELEASE_DELAY_L1), safeStateCmd())
+                .withName("Better Score L1 Coral");
     }
 
     public Command feed() {
         return runSafe(() -> {
             getData().motor.setpoint = RELEASE_SPEED_L1;
-        });
+        }).withName("Feed Coral");
     }
 
     public Command feedAlgae() {
         return runOnce(() -> {
             getData().motor.setpoint = ALGAE_INTAKE;
-        });
+        }).withName("Feed Algae");
     }
 
     public Command feedAlgaeHat() {
         return runOnce(() -> {
             getData().motor.setpoint = ALGAE_INTAKE_HAT;
-        });
+        }).withName("Feed Algae Hat");
     }
 
     public Command intake() {
         return runSafe(() -> {
             getData().motor.setpoint = INTAKE_SPEED;
-        }).until(() -> getData().gamePieceDetected);
+        }).until(() -> getData().gamePieceDetected).withName("Intake Coral");
     }
 
     public Command betterintake() {
