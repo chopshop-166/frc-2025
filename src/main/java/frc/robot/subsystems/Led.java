@@ -14,9 +14,9 @@ import frc.robot.maps.subsystems.patterns.ElevatorFill;
 
 public class Led extends LEDSubsystem {
 
-    Color elevatorColor = new Color(112, 255, 248); // Make it purple!
-    Color visionColorAligned = new Color(255, 32, 82); // Make it green!
-    Color armColor = new Color(0, 0, 0); // Make it cyan!
+    Color elevatorColor = new Color(128, 0, 128); // Make it purple!
+    Color visionColorAligned = new Color(125, 218, 88); // Make it green!
+    Color armColor = new Color(93, 226, 231); // Make it cyan!
 
     public Led(LedMapBase map) {
         super(map);
