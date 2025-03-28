@@ -209,13 +209,15 @@ public class Riptide extends RobotMap {
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
         config.encoder.quadratureMeasurementPeriod(10)
-                .quadratureAverageDepth(2);
-        config.inverted(true);
+                .quadratureAverageDepth(2)
+                .velocityConversionFactor((360.0 / 81) / 60)
+                .positionConversionFactor((360.0 / 81));
+        config.inverted(false);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
-        pid.setTolerance(3);
-        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
+        ProfiledPIDController pid = new ProfiledPIDController(0.0023, 0, 0, new Constraints(60, 300));
+        pid.setTolerance(1);
+        ArmFeedforward feedForward = new ArmFeedforward(0.025, 0.0, 0.0014);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;

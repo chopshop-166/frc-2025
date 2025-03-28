@@ -73,14 +73,13 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.rotationVelocity = (data.rotationAbsAngleDegrees - encoder.get()) / .02;
         data.rotationAbsAngleDegrees = encoder.get();
     }
 
     public static class Data extends DataWrapper {
         public MotorControllerData motor = new MotorControllerData();
         public double rotationAbsAngleDegrees;
-        public double rotationVelocity;
+        // public double rotationVelocity;
         public ArmRotatePresets preset = ArmRotatePresets.OFF;
     }
 }

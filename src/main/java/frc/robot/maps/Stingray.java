@@ -209,12 +209,16 @@ public class Stingray extends RobotMap {
         absEncoder.setInverted(true);
         config.smartCurrentLimit(30);
         config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
+        config.inverted(false);
+        config.encoder.quadratureAverageDepth(2)
+                .quadratureMeasurementPeriod(10)
+                .velocityConversionFactor((360.0 / 75) / 60)
+                .positionConversionFactor(360.0 / 75);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.005, 0, 0, new Constraints(90, 300));
+        ProfiledPIDController pid = new ProfiledPIDController(0.01, 0, 0, new Constraints(90, 650));
         pid.setTolerance(3);
-        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0018);
+        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0011);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;

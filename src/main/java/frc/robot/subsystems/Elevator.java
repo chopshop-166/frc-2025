@@ -41,24 +41,6 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
         this.elevatorSpeed = elevatorSpeed;
     }
 
-    public Command move(DoubleSupplier liftSpeed) {
-        return run(() -> {
-            double speed = liftSpeed.getAsDouble();
-            if (armSafeSub.getAsBoolean()
-                    || (getElevatorHeight() < BAD_HEIGHT_LOWER && speed < 0)
-                    || (getElevatorHeight() > BAD_HEIGHT_UPPER && speed > 0)) {
-                if (Math.abs(speed) > 0) {
-                    getData().preset = ElevatorPresets.OFF;
-                    getData().motor.setpoint = limits(speed);
-                } else if (getData().preset == ElevatorPresets.OFF) {
-                    getData().motor.setpoint = 0.0;
-                }
-            } else if (getData().preset == ElevatorPresets.OFF) {
-                getData().motor.setpoint = 0.0;
-            }
-        });
-    }
-
     public Command zero() {
         return startSafe(() -> {
             getMap().motor.resetValidators();
