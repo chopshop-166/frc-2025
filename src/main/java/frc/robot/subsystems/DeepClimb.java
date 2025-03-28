@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
@@ -7,6 +8,7 @@ import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.DeepClimbMap.Data;
+import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 
 public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
 
@@ -42,10 +44,14 @@ public class DeepClimb extends LoggedSubsystem<Data, DeepClimbMap> {
                     speedCoef = 0;
                 }
             }
-
             getData().motor.setpoint = speed * speedCoef;
-
         });
+    }
+
+    public BooleanSupplier deepClimbLEDTrigger() {
+        return () -> {
+            return (getData().encoderReading >= MIN_ENCODER_READING);
+        };
     }
 
     @Override

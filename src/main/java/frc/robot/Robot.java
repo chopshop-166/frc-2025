@@ -42,6 +42,7 @@ public final class Robot extends CommandRobot {
     private ButtonXboxController driveController = new ButtonXboxController(0);
     private ButtonXboxController copilotController = new ButtonXboxController(1);
     private Trigger elevatorSafeTrigger;
+    private Trigger deepClimbLEDTrigger;
 
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
@@ -98,6 +99,7 @@ public final class Robot extends CommandRobot {
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
         elevatorSafeTrigger = new Trigger(elevator.elevatorSafeTrigger());
+        deepClimbLEDTrigger = new Trigger(deepClimb.deepClimbLEDTrigger());
     }
 
     @Override
@@ -132,7 +134,7 @@ public final class Robot extends CommandRobot {
         // be added.
         Logger.start();
 
-        led.starPower().schedule();
+        led.colorAlliance().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
 
         if (!DriverStation.isFMSAttached()) {
@@ -153,7 +155,7 @@ public final class Robot extends CommandRobot {
     @Override
     public void disabledInit() {
         super.disabledInit();
-        led.starPower().schedule();
+        led.colorAlliance().schedule();
     }
 
     @Override
@@ -204,6 +206,7 @@ public final class Robot extends CommandRobot {
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
                 .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
+        deepClimbLEDTrigger.onTrue(led.deepClimbed());
     }
 
     @Override
