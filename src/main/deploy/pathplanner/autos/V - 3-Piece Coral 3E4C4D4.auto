@@ -31,7 +31,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "V - Start1 to ReefI&J"
+                              "pathName": "V -  Start3 to ReefE&F"
                             }
                           },
                           {
@@ -75,19 +75,13 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Retreat from ReefJ"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReefJ to StationL"
+                  "pathName": "ReefE to StationR"
                 }
               },
               {
@@ -126,7 +120,7 @@
                           {
                             "type": "path",
                             "data": {
-                              "pathName": "V - StationL To ReefL&K"
+                              "pathName": "V - StationR to ReefC&D"
                             }
                           },
                           {
@@ -170,9 +164,98 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ReefC to StationR"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Game Piece"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait Until Game Piece"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 3.5
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "V - StationR to ReefC&D"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Align to Right Branch"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Position Coral L4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Retreat from ReefL"
+            "pathName": "Retreat from ReefD"
           }
         }
       ]

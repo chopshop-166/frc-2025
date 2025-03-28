@@ -46,24 +46,21 @@ public class CommandSequences {
                 () -> elevator.atPreset(ElevatorPresets.INTAKE) || elevator.atPreset(ElevatorPresets.STOW))
                 .andThen(elevator.clearPreset(),
                         elevator.moveTo(ElevatorPresets.INTAKE),
-                        led.elevatorAtPreset());
-    }
-
-    public Command intakeAuto() {
-        return elevator.moveTo(ElevatorPresets.STOW)
-                .andThen(armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.betterintake()));
+                        led.elevatorAtPreset())
+                .withName("Intake");
     }
 
     public Command intakeBottom() {
-        return armRotate.moveTo(ArmRotatePresets.INTAKE).alongWith(coralManip.betterintake())
-                .andThen(led.gamePieceAcquired());
+        return armRotate.moveToNonOwning(ArmRotatePresets.INTAKE)
+                .alongWith(coralManip.betterintake())
+                .andThen(led.gamePieceAcquired()).withName("Intake Bottom");
     }
 
     // Moves elevator to set coral preset
 
     public Command moveElevator(ElevatorPresets level, ArmRotatePresets preset) {
         return led.elevatorToPreset().andThen(armRotate.moveOut(), elevator.moveTo(level),
-                led.elevatorAtPreset(), armRotate.moveTo(preset));
+                led.elevatorAtPreset(), armRotate.moveTo(preset)).withName("Move Elevator");
     }
 
     // Sets the rumble amount on controllers

@@ -176,10 +176,10 @@ public class Stingray extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.019, 0, 0,
+        ProfiledPIDController pid = new ProfiledPIDController(0.032, 0, 0,
                 new Constraints(100, 250));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.0095, 0.024, 0.0072);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.001, 0.024, 0.0072);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -192,13 +192,13 @@ public class Stingray extends RobotMap {
             case ALGAEL2 -> 24;
             case SCOREL3 -> 38;
             case ALGAEL3 -> 40;
-            case SCOREL4, HIGHESTPOINT -> 60;
+            case SCOREL4, HIGHESTPOINT -> 59;
             default -> Double.NaN;
         };
 
         elevatorMotors.validateEncoderRate(.2, 10);
         return new ElevatorMap(elevatorMotors, leftMotor.getEncoder(), presets,
-                new ValueRange(0, 60), new ValueRange(5, 55), pid, feedForward);
+                new ValueRange(0, 59), new ValueRange(5, 55), pid, feedForward);
     }
 
     @Override
@@ -222,7 +222,7 @@ public class Stingray extends RobotMap {
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
-            case SCOREL1, SCOREL2, SCOREL3, OUT -> 162;
+            case SCOREL1, SCOREL2, SCOREL3, OUT -> 161;
             case SCOREL1_TAKETWO -> 121;
             case SCOREL4 -> 155;
             case STOW -> 181;

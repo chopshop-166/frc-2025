@@ -101,6 +101,12 @@
                 "data": {
                   "name": "Intake Game Piece"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Wait Until Game Piece"
+                }
               }
             ]
           }
@@ -151,22 +157,9 @@
           }
         },
         {
-          "type": "race",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
-                }
-              }
-            ]
+            "name": "Align to Left Branch"
           }
         },
         {

@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ArmRotateMap.Data;
@@ -46,6 +47,13 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         }).until(setPointPersistenceCheck)).withName("Move To Set Angle");
     }
 
+    public Command moveToNonOwning(ArmRotatePresets level) {
+        return Commands.runOnce(() -> {
+            getData().preset = level;
+            pid.reset(getArmAngle(), 0.0);
+        }).withName("Move To Set Angle (Non-Owning)");
+    }
+
     public Command moveOut() {
         return runOnce(() -> {
             getData().preset = ArmRotatePresets.OUT;
@@ -59,7 +67,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         return runOnce(() -> {
             holdAngle = getArmAngle();
             getData().preset = ArmRotatePresets.HOLD;
-        });
+        }).withName("Hold");
     }
 
     private double limits(double speed) {
@@ -104,6 +112,9 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         } else {
             getData().motor.setpoint = 0;
         }
+        Logger.recordOutput("Arm/PID at goal", pid.atGoal());
+        Logger.recordOutput("Arm/Desired Velocity", pid.getSetpoint().velocity);
+        Logger.recordOutput("Arm/Desired Position", pid.getSetpoint().position);
 
         Logger.recordOutput("ArmRotate/pid at goal", pid.atGoal());
         Logger.recordOutput("ArmRotate/DesiredArmVelocity", pid.getSetpoint().velocity);

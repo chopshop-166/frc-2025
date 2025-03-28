@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Vision.Branch;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -68,7 +69,8 @@ public final class Robot extends CommandRobot {
 
     public void registerNamedCommands() {
 
-        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intakeAuto());
+        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
+        NamedCommands.registerCommand("Wait Until Game Piece", coralManip.betterintake());
         NamedCommands.registerCommand("Position Coral L1",
                 commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1));
         NamedCommands.registerCommand("Position Coral L2",
@@ -133,6 +135,19 @@ public final class Robot extends CommandRobot {
         led.colorAlliance().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
 
+        if (!DriverStation.isFMSAttached()) {
+            CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {
+                String newSub = "<NONE>";
+                String newName = "<NONE>";
+                if (newCmd.isPresent()) {
+                    newSub = newCmd.get().getSubsystem();
+                    newName = newCmd.get().getName();
+                }
+                System.out.println("Command interrupt: `" + oldCmd.getSubsystem() + "/" + oldCmd.getName() +
+                        "` -> `" + newSub + "/" + newName + "`");
+            });
+        }
+
     }
 
     @Override
@@ -149,7 +164,8 @@ public final class Robot extends CommandRobot {
         driveController.rightBumper().whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
         driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
 
-        elevatorSafeTrigger.onTrue(commandSequences.intakeBottom());
+        elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
+        elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
 
         driveController.x().onTrue(funnel.rotateForward());
         driveController.y().onTrue(funnel.rotateBackward());
