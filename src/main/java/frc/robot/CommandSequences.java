@@ -51,7 +51,7 @@ public class CommandSequences {
 
     public Command intakeBottom() {
         return armRotate.moveToNonOwning(ArmRotatePresets.INTAKE)
-                .alongWith(coralManip.betterintake())
+                .alongWith(coralManip.betterintake(), led.intakingStingray()).andThen(led.colorAlliance())
                 .withName("Intake Bottom");
     }
 

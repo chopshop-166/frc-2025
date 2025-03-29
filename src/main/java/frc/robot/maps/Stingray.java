@@ -132,9 +132,9 @@ public class Stingray extends RobotMap {
         var result = new WPILedMap(24, 0);
         var leds = result.ledBuffer;
 
-        SegmentConfig Left = leds.segment(6).tags("Intake", "Elevator", "Arm", "Climber");
+        SegmentConfig Left = leds.segment(6, ColorFormat.GRB).tags("Elevator", "Arm", "Climber");
         SegmentConfig Center = leds.segment(12, ColorFormat.GRB).tags("Intake", "Vision", "Climber");
-        SegmentConfig Right = leds.segment(6).tags("Intake", "Elevator", "Arm", "Climber");
+        SegmentConfig Right = leds.segment(6, ColorFormat.GRB).tags("Elevator", "Arm", "Climber");
         return result;
     }
 
