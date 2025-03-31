@@ -70,6 +70,11 @@ public class CommandSequences {
         });
     }
 
+    // public Command intakeAuto() {
+    // return moveElevator(ElevatorPresets.STOW,
+    // ArmRotatePresets.INTAKE).andThen(coralManip.betterintake());
+    // }
+
     // Resets all commands
 
     public Command resetCopilot() {

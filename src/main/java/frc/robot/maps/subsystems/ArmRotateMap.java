@@ -31,6 +31,8 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
         SCOREL4,
 
+        SCOREL4_AUTO,
+
         OUT,
 
         STOW,

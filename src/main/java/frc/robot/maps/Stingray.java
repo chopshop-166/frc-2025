@@ -239,6 +239,7 @@ public class Stingray extends RobotMap {
             case SCOREL1, SCOREL2, SCOREL3, OUT -> 161;
             case SCOREL1_TAKETWO -> 121;
             case SCOREL4 -> 155;
+            case SCOREL4_AUTO -> 152;
             case STOW -> 181;
             case ALGAE -> 160;
             default -> Double.NaN;
