@@ -19,12 +19,6 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.4
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
                         "pathName": "V -  Start3 to ReefE&F"
@@ -34,19 +28,13 @@
                 }
               },
               {
-                "type": "race",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
                       "type": "named",
                       "data": {
                         "name": "Position Coral L4"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.7
                       }
                     }
                   ]
@@ -56,19 +44,19 @@
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 2.3
+                  "name": "Align to Left Branch"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Align to Left Branch"
+                  "name": "Rotate Arm L4"
                 }
               }
             ]
@@ -78,12 +66,6 @@
           "type": "named",
           "data": {
             "name": "Score Coral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Retreat From ReefE"
           }
         },
         {
@@ -120,12 +102,6 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.4
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
                         "pathName": "V - StationR to ReefC&D"
@@ -135,19 +111,13 @@
                 }
               },
               {
-                "type": "race",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
                       "type": "named",
                       "data": {
                         "name": "Position Coral L4"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.7
                       }
                     }
                   ]
@@ -157,9 +127,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "Align to Left Branch"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align to Left Branch"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rotate Arm L4"
+                }
+              }
+            ]
           }
         },
         {
@@ -169,9 +152,48 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Retreat from ReefC"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ReefC to StationR"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    },
+                    {
+                      "type": "parallel",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Intake Game Piece"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Wait Until Game Piece"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
