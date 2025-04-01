@@ -101,6 +101,12 @@
                 "data": {
                   "name": "Intake Game Piece"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Wait Until Game Piece"
+                }
               }
             ]
           }

@@ -54,16 +54,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Elevator to intake"
+                  "name": "Intake Game Piece"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Wait Until Game Piece"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake Game Piece"
           }
         },
         {
