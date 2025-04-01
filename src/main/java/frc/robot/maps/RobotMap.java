@@ -15,6 +15,7 @@ import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
+import frc.robot.maps.subsystems.MitocandriaMap;
 
 public class RobotMap {
 
@@ -48,6 +49,10 @@ public class RobotMap {
 
     public ArmRotateMap getArmRotateMap() {
         return new ArmRotateMap();
+    }
+
+    public MitocandriaMap getMitocandriaMap() {
+        return new MitocandriaMap();
     }
 
     public void setupLogging() {

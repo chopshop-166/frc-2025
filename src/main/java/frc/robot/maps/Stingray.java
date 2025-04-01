@@ -28,6 +28,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import au.grapplerobotics.MitoCANdria;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -39,16 +40,17 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
+import frc.robot.maps.subsystems.MitocandriaMap;
 
 @RobotMapFor("00:80:2F:40:A6:13")
 public class Stingray extends RobotMap {
+
     @Override
     public SwerveDriveMap getDriveMap() {
 
@@ -265,6 +267,11 @@ public class Stingray extends RobotMap {
                 PersistMode.kPersistParameters);
         return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
                 () -> false);
+    }
+
+    @Override
+    public MitocandriaMap getMitocandriaMap() {
+        return new MitocandriaMap(new MitoCANdria(1));
     }
 
     @Override
