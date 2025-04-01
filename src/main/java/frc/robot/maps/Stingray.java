@@ -55,10 +55,10 @@ public class Stingray extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
-        final double FLOFFSET = 45;
-        final double FROFFSET = 18;
-        final double RLOFFSET = 188;
-        final double RROFFSET = 19;
+        final double FLOFFSET = 109.6 + 180;
+        final double FROFFSET = 313.5 + 180;
+        final double RLOFFSET = 10.2 + 180;
+        final double RROFFSET = 199.2 + 180;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
@@ -92,12 +92,12 @@ public class Stingray extends RobotMap {
         // Front Left Module
         final AnalogEncoder encoderFL = new AnalogEncoder(2, 360, FLOFFSET);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                encoderFL::get, frontLeftSteer, new CSSparkFlex(3), MK4i_L2);
+                encoderFL::get, frontLeftSteer, new CSSparkFlex(7), MK4i_L2);
 
         // Front Right Module
         final AnalogEncoder encoderFR = new AnalogEncoder(3, 360, FROFFSET);
         final SDSSwerveModule frontRight = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                encoderFR::get, frontRightSteer, new CSSparkFlex(7), MK4i_L2);
+                encoderFR::get, frontRightSteer, new CSSparkFlex(3), MK4i_L2);
 
         // Rear Left Module
         final AnalogEncoder encoderRL = new AnalogEncoder(0, 360, RLOFFSET);
