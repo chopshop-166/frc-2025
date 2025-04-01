@@ -121,6 +121,7 @@ public final class Robot extends CommandRobot {
                 Logger.recordMetadata("GitDirty", "Unknown");
                 break;
         }
+        Logger.recordMetadata("RobotMap", map.getClass().getName());
 
         map.setupLogging();
 
