@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -38,7 +37,6 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
     private final VisionMap.Data visionData = new VisionMap.Data();
-    private final Vision vision = new Vision();
 
     private final double maxDriveSpeedMetersPerSecond;
     private final double maxRotationRadiansPerSecond;
@@ -174,7 +172,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         // } else {
         // Fall back to picking tag based on global pose
-        closestReefTag = Optional.of(vision.findNearestTagId(isBlueAlliance, estimator));
+        closestReefTag = Optional.of(Vision.findNearestTagId(isBlueAlliance, estimator));
         // }
 
         if (closestReefTag.isPresent()) {
@@ -198,23 +196,27 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         double translateYSpeedMPS = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
         double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
 
+        // Always do vision PID calculations
+        visionCalcs();
+
+        // Seed the X and Y PID controllers
+        Pose2d robotPose = estimator.getEstimatedPosition();
+        // soooooooooo x and y are backwards somehow. Values underneath are correct.
+        double pidY = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
+        double pidX = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
+        double pidZ = rotationPID.calculate(robotPose.getRotation().getDegrees(),
+                targetPose.getRotation().getDegrees());
+
         if (targetBranch != Branch.NONE) {
 
-            visionCalcs();
-            Pose2d robotPose = estimator.getEstimatedPosition();
-            // soooooooooo x and y are backwards somehow. Values underneath are correct
-            translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
-            translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
-            translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
-            translateXSpeedMPS += Math.copySign(DRIVE_KS, translateXSpeedMPS);
+            translateYSpeedMPS = pidY + Math.copySign(DRIVE_KS, pidY);
+            translateXSpeedMPS = pidX + Math.copySign(DRIVE_KS, pidX);
             // Direction is swapped on Red side so need to negate PID output
             if (!isBlueAlliance) {
                 translateXSpeedMPS *= -1;
                 translateYSpeedMPS *= -1;
             }
-            rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
-                    targetPose.getRotation().getDegrees());
-            rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
+            rotationSpeed = pidZ + Math.copySign(ROTATION_KS, pidZ);
         }
 
         move(translateXSpeedMPS, translateYSpeedMPS, rotationSpeed, isRobotCentric);

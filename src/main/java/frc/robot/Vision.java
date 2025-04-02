@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.chopshop166.chopshoplib.maps.CameraSource;
@@ -17,7 +16,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public class Vision {
@@ -25,8 +23,26 @@ public class Vision {
     // The layout of the AprilTags on the field
     public static final AprilTagFieldLayout kTagLayout = CameraSource.DEFAULT_FIELD;
 
-    Map<Integer, Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new HashMap<>();
-    Map<Integer, Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new HashMap<>();
+    public static final Map<Integer, Pose2d> RED_APRIL_TAGS_REEF_POSITIONS = new HashMap<>() {
+        {
+            for (int i = 6; i <= 11; i++) {
+                final int tmpI = i;
+                kTagLayout.getTagPose(i).ifPresent(pose -> {
+                    RED_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
+                });
+            }
+        }
+    };
+    public static final Map<Integer, Pose2d> BLUE_APRIL_TAGS_REEF_POSITIONS = new HashMap<>() {
+        {
+            for (int i = 17; i <= 22; i++) {
+                final int tmpI = i;
+                kTagLayout.getTagPose(i).ifPresent(pose -> {
+                    BLUE_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
+                });
+            }
+        }
+    };
 
     public enum Branch {
         LEFT_BRANCH(new Transform2d(
@@ -50,23 +66,7 @@ public class Vision {
         }
     };
 
-    public Vision() {
-        for (int i = 6; i <= 11; i++) {
-            final int tmpI = i;
-            kTagLayout.getTagPose(i).ifPresent(pose -> {
-                RED_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
-            });
-        }
-
-        for (int i = 17; i <= 22; i++) {
-            final int tmpI = i;
-            kTagLayout.getTagPose(i).ifPresent(pose -> {
-                BLUE_APRIL_TAGS_REEF_POSITIONS.put(tmpI, pose.toPose2d());
-            });
-        }
-    }
-
-    private Map<Integer, Pose2d> getOurReef(boolean isBlueAlliance) {
+    private static Map<Integer, Pose2d> getOurReef(boolean isBlueAlliance) {
         if (isBlueAlliance) {
             return BLUE_APRIL_TAGS_REEF_POSITIONS;
         }
@@ -114,7 +114,7 @@ public class Vision {
 
     //
 
-    public void filterReefTags(boolean isBlueAlliance, Map<Integer, List<PhotonTrackedTarget>> targets) {
+    public static void filterReefTags(boolean isBlueAlliance, Map<Integer, List<PhotonTrackedTarget>> targets) {
         var reef = getOurReef(isBlueAlliance);
         for (var key : targets.keySet()) {
             // Pull in keySet from targets HashMap
@@ -125,7 +125,7 @@ public class Vision {
         }
     }
 
-    public PhotonTrackedTarget pickBestReefLocation(Map<Integer, List<PhotonTrackedTarget>> targets) {
+    public static PhotonTrackedTarget pickBestReefLocation(Map<Integer, List<PhotonTrackedTarget>> targets) {
         // Find the closest april tag target
         // For now we only look at a single camera's data
         // In the future we may want to combine the pose data for the april tags?
@@ -141,29 +141,13 @@ public class Vision {
         return closestTarget.getValue().get(0);
     }
 
-    public Transform2d adjustTranslationForBranch(Transform2d tagToCamera, Branch branch) {
+    public static Transform2d adjustTranslationForBranch(Transform2d tagToCamera, Branch branch) {
         // Maybe just works?? This should take into account the rotation of the tag I
         // believe
         return tagToCamera.plus(branch.getOffset());
     }
 
-    public int findNearestTagId(boolean isBlueAlliance, SwerveDrivePoseEstimator estimator) {
+    public static int findNearestTagId(boolean isBlueAlliance, SwerveDrivePoseEstimator estimator) {
         return getNearestTagIdImpl(getOurReef(isBlueAlliance), estimator);
-    }
-
-    public static Translation2d getReefCenter(boolean isBlueAlliance) {
-        Translation3d translation;
-        if (isBlueAlliance) {
-            Translation3d poseLeft = kTagLayout.getTagPose(18).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(21).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Blue");
-            translation = poseLeft.plus(poseRight).div(2);
-        } else {
-            Translation3d poseLeft = kTagLayout.getTagPose(10).get().getTranslation();
-            Translation3d poseRight = kTagLayout.getTagPose(7).get().getTranslation();
-            Logger.recordOutput("Reef Center", "Red");
-            translation = poseLeft.plus(poseRight).div(2);
-        }
-        return translation.toTranslation2d();
     }
 }
