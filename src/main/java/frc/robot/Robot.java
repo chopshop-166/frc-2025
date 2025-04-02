@@ -162,6 +162,7 @@ public final class Robot extends CommandRobot {
     public void disabledInit() {
         super.disabledInit();
         led.colorAlliance().schedule();
+        safeStateSubsystems(armRotate, elevator, coralManip, deepClimb, drive, funnel).schedule();
     }
 
     @Override
