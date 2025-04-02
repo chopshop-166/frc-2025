@@ -21,13 +21,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 1.4
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "V -  Start3 to ReefE&F"
+                        "pathName": "V - Start1 to ReefI&J"
                       }
                     }
                   ]
@@ -46,7 +46,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 2.0
+                        "waitTime": 2.7
                       }
                     }
                   ]
@@ -83,7 +83,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Retreat From ReefE"
+            "pathName": "Retreat from ReefJ"
           }
         },
         {
@@ -93,7 +93,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReefE to StationR"
+                  "pathName": "ReefJ to StationL"
                 }
               },
               {
@@ -122,13 +122,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 2.0
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "V - StationR to ReefC&D"
+                        "pathName": "V - StationL To ReefL&K"
                       }
                     }
                   ]
@@ -147,7 +147,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 2.0
+                        "waitTime": 2.7
                       }
                     }
                   ]
@@ -157,9 +157,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "Align to Left Branch"
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.2
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align to Left Branch"
+                }
+              }
+            ]
           }
         },
         {
@@ -171,7 +184,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Retreat from ReefC"
+            "pathName": "Retreat from ReefL"
           }
         }
       ]

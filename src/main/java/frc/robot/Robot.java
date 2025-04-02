@@ -42,6 +42,7 @@ public final class Robot extends CommandRobot {
     private ButtonXboxController driveController = new ButtonXboxController(0);
     private ButtonXboxController copilotController = new ButtonXboxController(1);
     private Trigger elevatorSafeTrigger;
+    private Trigger deepClimbLEDTrigger;
 
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
@@ -78,7 +79,14 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("Position Coral L3",
                 commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3));
         NamedCommands.registerCommand("Position Coral L4",
-                commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4));
+                commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.OUT));
+        NamedCommands.registerCommand("Rotate Arm L4", armRotate.moveTo(ArmRotatePresets.SCOREL4_AUTO));
+        NamedCommands.registerCommand("De-Stage Algae 2/3",
+                commandSequences.moveElevator(ElevatorPresets.ALGAEL2, ArmRotatePresets.ALGAE)
+                        .alongWith(coralManip.feedAlgae()));
+        NamedCommands.registerCommand("De-Stage Algae 3/4",
+                commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
+                        .alongWith(coralManip.feedAlgae()));
         NamedCommands.registerCommand("Score Coral", coralManip.score());
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
@@ -98,6 +106,7 @@ public final class Robot extends CommandRobot {
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
         elevatorSafeTrigger = new Trigger(elevator.elevatorSafeTrigger());
+        deepClimbLEDTrigger = new Trigger(deepClimb.deepClimbLEDTrigger());
     }
 
     @Override
@@ -162,8 +171,9 @@ public final class Robot extends CommandRobot {
         driveController.back().onTrue(drive.resetCmd());
         driveController.a()
                 .whileTrue(drive.robotCentricDrive());
-        driveController.rightBumper().whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
-        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
+        driveController.rightBumper()
+                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()));
+        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()));
 
         elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
         elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
@@ -185,26 +195,22 @@ public final class Robot extends CommandRobot {
         copilotController.back().onTrue(commandSequences.resetCopilot());
         copilotController.start().onTrue(elevator.zero());
 
-        copilotController.getPovButton(POVDirection.UP).onTrue(armRotate.moveTo(ArmRotatePresets.OUT));
-        copilotController.getPovButton(POVDirection.DOWN).onTrue(armRotate.moveTo(ArmRotatePresets.INTAKE));
+        copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
+        copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
 
-        // copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
-        // copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
+        copilotController.getPovButton(POVDirection.LEFT)
+                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL2, ArmRotatePresets.ALGAE)
+                        .alongWith(coralManip.feedAlgae()));
 
-        // copilotController.getPovButton(POVDirection.LEFT)
-        // .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL2,
-        // ArmRotatePresets.ALGAE)
-        // .alongWith(coralManip.feedAlgae()));
-
-        // copilotController.getPovButton(POVDirection.UP)
-        // .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3,
-        // ArmRotatePresets.ALGAE)
-        // .alongWith(coralManip.feedAlgae()));
+        copilotController.getPovButton(POVDirection.UP)
+                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
+                        .alongWith(coralManip.feedAlgae()));
         // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
         copilotController.rightBumper()
                 .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
                 .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
+        deepClimbLEDTrigger.onTrue(led.deepClimbed());
     }
 
     @Override

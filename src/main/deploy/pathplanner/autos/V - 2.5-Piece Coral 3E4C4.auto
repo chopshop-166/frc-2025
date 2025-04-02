@@ -19,12 +19,6 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.25
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
                         "pathName": "V -  Start3 to ReefE&F"
@@ -34,19 +28,13 @@
                 }
               },
               {
-                "type": "race",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
                       "type": "named",
                       "data": {
                         "name": "Position Coral L4"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.0
                       }
                     }
                   ]
@@ -56,19 +44,19 @@
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 2.2
+                  "name": "Align to Left Branch"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Align to Left Branch"
+                  "name": "Rotate Arm L4"
                 }
               }
             ]
@@ -114,12 +102,6 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.25
-                      }
-                    },
-                    {
                       "type": "path",
                       "data": {
                         "pathName": "V - StationR to ReefC&D"
@@ -129,19 +111,13 @@
                 }
               },
               {
-                "type": "race",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
                       "type": "named",
                       "data": {
                         "name": "Position Coral L4"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.0
                       }
                     }
                   ]
@@ -151,19 +127,19 @@
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 2.2
+                  "name": "Align to Left Branch"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Align to Left Branch"
+                  "name": "Rotate Arm L4"
                 }
               }
             ]
@@ -186,94 +162,38 @@
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "Intake Game Piece"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Wait Until Game Piece"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "race",
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.25
+                        "waitTime": 0.3
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "parallel",
                       "data": {
-                        "pathName": "V - StationR to ReefC&D"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "race",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Position Coral L4"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.0
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Intake Game Piece"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Wait Until Game Piece"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Right Branch"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score Coral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Retreat from ReefD"
           }
         }
       ]

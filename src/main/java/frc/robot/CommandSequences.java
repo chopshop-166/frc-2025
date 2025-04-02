@@ -45,22 +45,21 @@ public class CommandSequences {
         return Commands.either(Commands.none(), armRotate.moveOut().andThen(led.elevatorToPreset()),
                 () -> elevator.atPreset(ElevatorPresets.INTAKE) || elevator.atPreset(ElevatorPresets.STOW))
                 .andThen(elevator.clearPreset(),
-                        elevator.moveTo(ElevatorPresets.INTAKE),
-                        led.elevatorAtPreset())
+                        elevator.moveTo(ElevatorPresets.INTAKE))
                 .withName("Intake");
     }
 
     public Command intakeBottom() {
         return armRotate.moveToNonOwning(ArmRotatePresets.INTAKE)
-                .alongWith(coralManip.betterintake())
-                .andThen(led.gamePieceAcquired()).withName("Intake Bottom");
+                .alongWith(coralManip.betterintake(), led.intakingStingray()).andThen(led.colorAlliance())
+                .withName("Intake Bottom");
     }
 
     // Moves elevator to set coral preset
 
     public Command moveElevator(ElevatorPresets level, ArmRotatePresets preset) {
         return led.elevatorToPreset().andThen(armRotate.moveOut(), elevator.moveTo(level),
-                led.elevatorAtPreset(), armRotate.moveTo(preset)).withName("Move Elevator");
+                armRotate.moveTo(preset)).withName("Move Elevator");
     }
 
     // Sets the rumble amount on controllers
@@ -70,6 +69,11 @@ public class CommandSequences {
             controller.getHID().setRumble(RumbleType.kBothRumble, rumbleAmount);
         });
     }
+
+    // public Command intakeAuto() {
+    // return moveElevator(ElevatorPresets.STOW,
+    // ArmRotatePresets.INTAKE).andThen(coralManip.betterintake());
+    // }
 
     // Resets all commands
 

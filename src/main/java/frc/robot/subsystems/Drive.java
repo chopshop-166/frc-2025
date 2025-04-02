@@ -161,7 +161,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Drive/Translation_Y_PID/Error", translationPID_Y.getPositionError());
         Logger.recordOutput("Drive/Translation_Y_PID/Velocity", translationPID_Y.getSetpoint().velocity);
         Logger.recordOutput("Drive/Translation_Y_PID/At Goal", translationPID_Y.atGoal());
-        Logger.recordOutput("Drive/ActualChassisSpeeds", kinematics.toChassisSpeeds(getData().getModuleStates()));
+        Logger.recordOutput("Drive/ActualChassisSpeeds",
+                ChassisSpeeds.fromRobotRelativeSpeeds(kinematics.toChassisSpeeds(getData().getModuleStates()),
+                        estimator.getEstimatedPosition().getRotation()));
     }
 
     private void visionCalcs() {

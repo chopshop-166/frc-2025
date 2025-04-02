@@ -9,10 +9,13 @@ import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
+import com.chopshop166.chopshoplib.leds.ColorFormat;
+import com.chopshop166.chopshoplib.leds.SegmentConfig;
 import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
+import com.chopshop166.chopshoplib.maps.WPILedMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
@@ -54,10 +57,10 @@ public class Stingray extends RobotMap {
     @Override
     public SwerveDriveMap getDriveMap() {
 
-        final double FLOFFSET = 45;
-        final double FROFFSET = 18;
-        final double RLOFFSET = 188;
-        final double RROFFSET = 19;
+        final double FLOFFSET = 109.6 + 180;
+        final double FROFFSET = 313.5 + 180;
+        final double RLOFFSET = 10.2 + 180;
+        final double RROFFSET = 199.2 + 180;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
@@ -91,12 +94,12 @@ public class Stingray extends RobotMap {
         // Front Left Module
         final AnalogEncoder encoderFL = new AnalogEncoder(2, 360, FLOFFSET);
         final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                encoderFL::get, frontLeftSteer, new CSSparkFlex(3), MK4i_L2);
+                encoderFL::get, frontLeftSteer, new CSSparkFlex(7), MK4i_L2);
 
         // Front Right Module
         final AnalogEncoder encoderFR = new AnalogEncoder(3, 360, FROFFSET);
         final SDSSwerveModule frontRight = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                encoderFR::get, frontRightSteer, new CSSparkFlex(7), MK4i_L2);
+                encoderFR::get, frontRightSteer, new CSSparkFlex(3), MK4i_L2);
 
         // Rear Left Module
         final AnalogEncoder encoderRL = new AnalogEncoder(0, 360, RLOFFSET);
@@ -124,6 +127,17 @@ public class Stingray extends RobotMap {
         return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
                 maxDriveSpeedMetersPerSecond,
                 maxRotationRadianPerSecond, pigeonGyro2, config, holonomicDrive);
+    }
+
+    @Override
+    public WPILedMap getLedMap() {
+        var result = new WPILedMap(24, 0);
+        var leds = result.ledBuffer;
+
+        SegmentConfig Left = leds.segment(6, ColorFormat.GRB).tags("Elevator", "Arm", "Climber");
+        SegmentConfig Center = leds.segment(12, ColorFormat.GRB).tags("Intake", "Vision", "Climber");
+        SegmentConfig Right = leds.segment(6, ColorFormat.GRB).tags("Elevator", "Arm", "Climber");
+        return result;
     }
 
     @Override
@@ -227,6 +241,7 @@ public class Stingray extends RobotMap {
             case SCOREL1, SCOREL2, SCOREL3, OUT -> 161;
             case SCOREL1_TAKETWO -> 121;
             case SCOREL4 -> 155;
+            case SCOREL4_AUTO -> 152;
             case STOW -> 181;
             case ALGAE -> 160;
             default -> Double.NaN;
