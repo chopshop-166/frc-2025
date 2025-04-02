@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
@@ -42,7 +43,7 @@ public class CommandSequences {
     // Intakes until sensor is tripped, LEDs indicate that game piece is acquired
 
     public Command intake() {
-        return Commands.either(Commands.none(), armRotate.moveOut().andThen(led.elevatorToPreset()),
+        return Commands.either(Commands.none(), armOutLED().andThen(led.elevatorToPreset()),
                 () -> elevator.atPreset(ElevatorPresets.INTAKE) || elevator.atPreset(ElevatorPresets.STOW))
                 .andThen(elevator.clearPreset(),
                         elevator.moveTo(ElevatorPresets.INTAKE))
@@ -50,18 +51,30 @@ public class CommandSequences {
     }
 
     public Command intakeBottom() {
-        return armRotate.moveToNonOwning(ArmRotatePresets.INTAKE)
-                .alongWith(coralManip.betterintake(), led.intakingStingray()).andThen(led.colorAlliance())
+        return armRotate.moveTo(ArmRotatePresets.INTAKE)
+                .alongWith(
+                        intakeWithLEDs())
+                .andThen(led.colorAlliance())
                 .withName("Intake Bottom");
     }
 
+    public Command intakeWithLEDs() {
+        return parallel(coralManip.betterintake(), led.intakingStingray());
+    }
     // Moves elevator to set coral preset
 
     public Command moveElevator(ElevatorPresets level, ArmRotatePresets preset) {
-        return led.elevatorToPreset().andThen(armRotate.moveOut(), elevator.moveTo(level),
-                armRotate.moveTo(preset)).withName("Move Elevator");
+        return armOutLED().andThen(led.elevatorToPreset(), elevator.moveTo(level),
+                moveArm(preset), led.colorAlliance()).withName("Move Elevator");
     }
 
+    public Command armOutLED() {
+        return led.armToPreset().andThen(armRotate.moveOut());
+    }
+
+    public Command moveArm(ArmRotatePresets preset) {
+        return led.armToPreset().andThen(armRotate.moveTo(preset));
+    }
     // Sets the rumble amount on controllers
 
     public Command setRumble(ButtonXboxController controller, int rumbleAmount) {
