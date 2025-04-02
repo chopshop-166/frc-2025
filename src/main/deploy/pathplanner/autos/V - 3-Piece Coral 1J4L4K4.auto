@@ -15,29 +15,104 @@
           "data": {
             "commands": [
               {
-                "type": "race",
+                "type": "path",
+                "data": {
+                  "pathName": "V - Start1 to ReefI&J"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Position Coral L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align to Right Branch"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rotate Arm L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score Coral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "ReefJ to StationL"
+                }
+              },
+              {
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "wait",
                       "data": {
-                        "pathName": "V -  Start3 to ReefE&F"
+                        "waitTime": 0.3
+                      }
+                    },
+                    {
+                      "type": "parallel",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Intake Game Piece"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Wait Until Game Piece"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
                 }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "V - StationL To ReefL&K"
+                }
               },
               {
-                "type": "parallel",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Position Coral L4"
-                      }
-                    }
-                  ]
+                  "name": "Position Coral L4"
                 }
               }
             ]
@@ -75,49 +150,36 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReefE to StationR"
+                  "pathName": "ReefL to StationL"
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "Intake Game Piece"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Wait Until Game Piece"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "race",
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "wait",
                       "data": {
-                        "pathName": "V - StationR to ReefC&D"
+                        "waitTime": 0.3
                       }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "parallel",
-                "data": {
-                  "commands": [
+                    },
                     {
-                      "type": "named",
+                      "type": "parallel",
                       "data": {
-                        "name": "Position Coral L4"
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Intake Game Piece"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "Wait Until Game Piece"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -131,9 +193,28 @@
           "data": {
             "commands": [
               {
+                "type": "path",
+                "data": {
+                  "pathName": "V - StationL To ReefL&K"
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "Align to Left Branch"
+                  "name": "Position Coral L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Align to Right Branch"
                 }
               },
               {
@@ -158,7 +239,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReefC to StationR"
+                  "pathName": "ReefL to StationL"
                 }
               },
               {

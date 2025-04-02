@@ -13,10 +13,7 @@
     "Vision - Start1,3 to Reef",
     "Vision - StationL,R to Reef"
   ],
-  "autoFolders": [
-    "Vision Autos Start3",
-    "Vision Autos Start1"
-  ],
+  "autoFolders": [],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 10.0,
   "defaultMaxAngVel": 540.0,
