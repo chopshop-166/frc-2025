@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
@@ -51,7 +52,7 @@ public class CommandSequences {
     }
 
     public Command intakeBottom() {
-        return armRotate.moveTo(ArmRotatePresets.INTAKE)
+        return sequence(armRotate.moveTo(ArmRotatePresets.INTAKE), led.armAtPreset())
                 .alongWith(
                         intakeWithLEDs())
                 .andThen(led.colorAlliance())
