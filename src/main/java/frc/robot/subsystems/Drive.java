@@ -49,8 +49,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(0.1, 0, 0.0, new Constraints(2.5, 2));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(0.1, 0, 0.0, new Constraints(2.5, 2));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.8, 0, 0.0, new Constraints(2.5, 10.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(0.9, 5.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -100,7 +100,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
-        translationPID_X.setTolerance(0.06);
+        translationPID_X.setTolerance(0.1);
         translationPID_Y.setTolerance(0.06);
         rotationPID.setTolerance(4);
     }
@@ -206,10 +206,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             Pose2d robotPose = estimator.getEstimatedPosition();
             // soooooooooo x and y are backwards somehow. Values underneath are correct
             translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
-            translateYSpeedMPS += translationPID_X.getSetpoint().velocity;
             translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
             translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
-            translateXSpeedMPS += translationPID_Y.getSetpoint().velocity;
             translateXSpeedMPS += Math.copySign(DRIVE_KS, translateXSpeedMPS);
             // Direction is swapped on Red side so need to negate PID output
             if (!isBlueAlliance) {
