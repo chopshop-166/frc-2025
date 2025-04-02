@@ -192,10 +192,10 @@ public class Stingray extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.032, 0, 0,
+        ProfiledPIDController pid = new ProfiledPIDController(0.0365, 0, 0,
                 new Constraints(100, 250));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.001, 0.024, 0.0072);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.001, 0.024, 0.006);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
