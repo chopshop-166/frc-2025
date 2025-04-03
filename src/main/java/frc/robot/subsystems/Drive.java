@@ -261,7 +261,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                             : estimator.getEstimatedPosition().getRotation()
                                     .plus(new Rotation2d(Units.degreesToRadians(180))));
         }
-
+        Logger.recordOutput("Drive/TargetChassisSpeeds", speeds);
         move(speeds);
     }
 
