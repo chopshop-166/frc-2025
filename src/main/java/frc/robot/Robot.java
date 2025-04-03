@@ -15,6 +15,7 @@ import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController.POVDirection;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -144,6 +145,11 @@ public final class Robot extends CommandRobot {
 
         led.colorAlliance().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
+
+        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            // Do whatever you want with the pose here
+            Logger.recordOutput("Drive/PathPlannerTargetPose", pose);
+        });
 
         if (!DriverStation.isFMSAttached()) {
             CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {

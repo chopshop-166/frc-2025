@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.chopshop166.chopshoplib.leds.LEDSubsystem;
 import com.chopshop166.chopshoplib.leds.patterns.AlliancePattern;
 import com.chopshop166.chopshoplib.leds.patterns.FirePattern;
@@ -32,30 +34,37 @@ public class Led extends LEDSubsystem {
     }
 
     public Command intakingStingray() {
+        Logger.recordOutput("LEDS/Outer", "Intake Flashing");
         return setPattern("Intake", new FlashPattern(Color.kWhite, 0.15), "Flashing");
     }
 
     public Command elevatorToPreset() {
+        Logger.recordOutput("LEDS/Outer", "Elevator Moving");
         return setPattern("Elevator", new SpinPattern(elevatorColor), "Moving");
     }
 
     public Command visionAligning() {
+        Logger.recordOutput("LEDS/Inner", "Rainbow");
         return setPattern("Vision", new RainbowRoad(), "Aligning");
     }
 
     public Command visionAligned() {
+        Logger.recordOutput("LEDS/Inner", "Flashing");
         return setPattern("Vision", new FlashPattern(visionColorAligned, 0.125), "Aligned");
     }
 
     public Command deepClimbed() {
+        Logger.recordOutput("LEDS/Outer", "Flashing");
         return setPattern("Climber", new RainbowRoad(), "Climbed");
     }
 
     public Command armToPreset() {
+        Logger.recordOutput("LEDS/Outer", "Arm Moving");
         return setPattern("Arm", new SpinPattern(armColor), "Moving");
     }
 
     public Command armAtPreset() {
+        Logger.recordOutput("LEDS/Outer", "Arm Flashing");
         return setPattern("Arm", new FlashPattern(armColor, 0.15), "At Preset");
     }
 

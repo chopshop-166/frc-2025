@@ -51,7 +51,7 @@ public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
     }
 
     public Command moveTo(ElevatorPresets level) {
-        PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(15, pid::atGoal);
+        PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(5, pid::atGoal);
         return runOnce(() -> {
             this.getData().preset = level;
             pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
