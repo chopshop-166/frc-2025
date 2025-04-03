@@ -36,7 +36,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Align to Left Branch"
+                  "name": "Align to Right Branch"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReefE to StationR"
+                  "pathName": "ReefF to StationR"
                 }
               },
               {
@@ -125,7 +125,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Align to Left Branch"
+                  "name": "Align to Right Branch"
                 }
               },
               {
@@ -150,7 +150,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReefC to StationR"
+                  "pathName": "ReefD to StationR"
                 }
               },
               {

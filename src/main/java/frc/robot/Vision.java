@@ -36,7 +36,7 @@ public class Vision {
         RIGHT_BRANCH(new Transform2d(
                 Units.inchesToMeters(18.9),
                 Units.inchesToMeters(12.94 / 2),
-                Rotation2d.fromDegrees(180))),
+                Rotation2d.fromDegrees(185))),
         NONE(null);
 
         private Transform2d offset;

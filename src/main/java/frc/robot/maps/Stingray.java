@@ -154,7 +154,7 @@ public class Stingray extends RobotMap {
                                 Units.inchesToMeters(
                                         -10.72),
                                 Units.inchesToMeters(8.24),
-                                new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(16.76)))));
+                                new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(13)))));
     }
 
     @Override
