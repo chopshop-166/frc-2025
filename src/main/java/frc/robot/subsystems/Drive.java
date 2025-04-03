@@ -161,6 +161,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Drive/Translation_Y_PID/Error", translationPID_Y.getPositionError());
         Logger.recordOutput("Drive/Translation_Y_PID/Velocity", translationPID_Y.getSetpoint().velocity);
         Logger.recordOutput("Drive/Translation_Y_PID/At Goal", translationPID_Y.atGoal());
+        Logger.recordOutput("Drive/Rotation_PID/Error", rotationPID.getPositionError());
+        Logger.recordOutput("Drive/Rotation_PID/Velocity", rotationPID.getSetpoint().velocity);
+        Logger.recordOutput("Drive/Rotation_PID/At Goal", rotationPID.atGoal());
         Logger.recordOutput("Drive/ActualChassisSpeeds",
                 ChassisSpeeds.fromRobotRelativeSpeeds(kinematics.toChassisSpeeds(getData().getModuleStates()),
                         estimator.getEstimatedPosition().getRotation()));
@@ -183,9 +186,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             var chosenTagPoseOption = kTagLayout.getTagPose(closestReefTag.get());
             if (chosenTagPoseOption.isPresent()) {
                 Pose2d chosenTagPose = chosenTagPoseOption.get().toPose2d();
-                Logger.recordOutput("Chosen Tag", chosenTagPose);
+                Logger.recordOutput("Drive/Chosen Tag", chosenTagPose);
                 chosenTagPose = chosenTagPose.transformBy(targetBranch.getOffset());
-                Logger.recordOutput("Chosen Tag Branch Offset", chosenTagPose);
+                Logger.recordOutput("Drive/Chosen Tag Branch Offset", chosenTagPose);
                 targetPose = chosenTagPose;
             }
         }
