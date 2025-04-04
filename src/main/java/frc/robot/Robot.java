@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+
 import java.util.function.DoubleUnaryOperator;
 
 import org.littletonrobotics.junction.Logger;
@@ -36,6 +38,7 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.Led;
+import frc.robot.subsystems.Mitocandria;
 
 public final class Robot extends CommandRobot {
 
@@ -63,6 +66,7 @@ public final class Robot extends CommandRobot {
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
             RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
     private Funnel funnel = new Funnel(map.getFunnelMap());
+    private Mitocandria mito = new Mitocandria(map.getMitocandriaMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,
             armRotate, funnel, deepClimb);
@@ -88,9 +92,9 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("De-Stage Algae 3/4",
                 commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
                         .alongWith(coralManip.feedAlgae()));
-        NamedCommands.registerCommand("Score Coral", coralManip.score());
+        NamedCommands.registerCommand("Score Coral", coralManip.score().withTimeout(0.5));
         NamedCommands.registerCommand("Clear Coral",
-                coralManip.feed().alongWith(commandSequences.armOutLED()).andThen(coralManip.safeStateCmd()));
+                coralManip.feed().raceWith(commandSequences.armOutLED()).andThen(coralManip.safeStateCmd()));
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());

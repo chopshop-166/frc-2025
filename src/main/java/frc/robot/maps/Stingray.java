@@ -286,7 +286,7 @@ public class Stingray extends RobotMap {
 
     @Override
     public MitocandriaMap getMitocandriaMap() {
-        return new MitocandriaMap(new MitoCANdria(1));
+        return new MitocandriaMap(new MitoCANdria(0));
     }
 
     @Override
