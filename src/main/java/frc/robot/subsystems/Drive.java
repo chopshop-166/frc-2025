@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -107,9 +107,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
-        translationPID_X.setTolerance(0.1);
-        translationPID_Y.setTolerance(0.06);
-        rotationPID.setTolerance(4);
+        translationPID_X.setTolerance(0.035);
+        translationPID_Y.setTolerance(0.035);
+        rotationPID.setTolerance(2);
     }
 
     public void setPose(Pose2d pose) {
@@ -258,6 +258,12 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             this.targetBranch = Branch.NONE;
         });
 
+    }
+
+    public BooleanSupplier visionPIDTrue() {
+        return () -> {
+            return translationPID_X.atGoal() && translationPID_Y.atGoal() && rotationPID.atGoal();
+        };
     }
 
     private void move(final double xSpeed, final double ySpeed,

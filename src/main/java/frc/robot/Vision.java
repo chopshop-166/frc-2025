@@ -30,11 +30,11 @@ public class Vision {
 
     public enum Branch {
         LEFT_BRANCH(new Transform2d(
-                Units.inchesToMeters(18.9), // bot center to reef (w/ bumpers)
+                Units.inchesToMeters(19.5), // bot center to reef (w/ bumpers)
                 Units.inchesToMeters(-12.94 / 2), // distance between branches div by 2
                 Rotation2d.fromDegrees(180))),
         RIGHT_BRANCH(new Transform2d(
-                Units.inchesToMeters(18.9),
+                Units.inchesToMeters(19.5),
                 Units.inchesToMeters(12.94 / 2),
                 Rotation2d.fromDegrees(185))),
         NONE(null);

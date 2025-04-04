@@ -47,6 +47,7 @@ public final class Robot extends CommandRobot {
     private ButtonXboxController copilotController = new ButtonXboxController(1);
     private Trigger elevatorSafeTrigger;
     private Trigger deepClimbLEDTrigger;
+    private Trigger visionPIDTrigger;
 
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
@@ -114,6 +115,7 @@ public final class Robot extends CommandRobot {
         autoChooser = AutoBuilder.buildAutoChooser();
         elevatorSafeTrigger = new Trigger(elevator.elevatorSafeTrigger());
         deepClimbLEDTrigger = new Trigger(deepClimb.deepClimbLEDTrigger());
+        visionPIDTrigger = new Trigger(drive.visionPIDTrue());
     }
 
     @Override
@@ -184,8 +186,12 @@ public final class Robot extends CommandRobot {
         driveController.a()
                 .whileTrue(drive.robotCentricDrive());
         driveController.rightBumper()
-                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()));
-        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()));
+                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()))
+                .onFalse(led.colorAlliance().alongWith(
+                        commandSequences.setRumble(copilotController, 0)));
+        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()))
+                .onFalse(led.colorAlliance().alongWith(
+                        commandSequences.setRumble(copilotController, 0)));
 
         elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
         elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
@@ -223,6 +229,11 @@ public final class Robot extends CommandRobot {
                 .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
         deepClimbLEDTrigger.onTrue(led.deepClimbed());
+        visionPIDTrigger.and(DriverStation::isTeleopEnabled)
+                .onTrue(led.visionAligned().alongWith(
+                        commandSequences.setRumble(copilotController, 1)))
+                .onFalse(led.visionAligning().alongWith(
+                        commandSequences.setRumble(copilotController, 0)));
     }
 
     @Override
