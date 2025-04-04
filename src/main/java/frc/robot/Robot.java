@@ -89,6 +89,8 @@ public final class Robot extends CommandRobot {
                 commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
                         .alongWith(coralManip.feedAlgae()));
         NamedCommands.registerCommand("Score Coral", coralManip.score());
+        NamedCommands.registerCommand("Clear Coral",
+                coralManip.feed().alongWith(commandSequences.armOutLED()).andThen(coralManip.safeStateCmd()));
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
