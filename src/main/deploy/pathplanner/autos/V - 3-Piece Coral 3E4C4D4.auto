@@ -15,34 +15,41 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "V -  Start3 to ReefE&F"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "V -  Start3 to ReefE&F"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Align to Left Branch"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Position Coral L4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rotate Arm L4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Position Coral L4"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Rotate Arm L4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -110,34 +117,41 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "V - StationR to ReefC&D"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "V - StationR to ReefC&D"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Align to Left Branch"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Position Coral L4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Left Branch"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rotate Arm L4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Position Coral L4"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Rotate Arm L4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -205,34 +219,41 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "V - StationR to ReefC&D"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "V - StationR to ReefC&D"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Align to Right Branch"
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Position Coral L4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Align to Right Branch"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rotate Arm L4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Position Coral L4"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Rotate Arm L4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
