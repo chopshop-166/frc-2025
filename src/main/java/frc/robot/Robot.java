@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+
 import java.util.function.DoubleUnaryOperator;
 
 import org.littletonrobotics.junction.Logger;
@@ -15,6 +17,7 @@ import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController.POVDirection;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -35,6 +38,7 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Funnel;
 import frc.robot.subsystems.Led;
+import frc.robot.subsystems.Mitocandria;
 
 public final class Robot extends CommandRobot {
 
@@ -43,6 +47,7 @@ public final class Robot extends CommandRobot {
     private ButtonXboxController copilotController = new ButtonXboxController(1);
     private Trigger elevatorSafeTrigger;
     private Trigger deepClimbLEDTrigger;
+    private Trigger visionPIDTrigger;
 
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
@@ -62,6 +67,7 @@ public final class Robot extends CommandRobot {
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
             RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
     private Funnel funnel = new Funnel(map.getFunnelMap());
+    private Mitocandria mito = new Mitocandria(map.getMitocandriaMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,
             armRotate, funnel, deepClimb);
@@ -87,7 +93,9 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("De-Stage Algae 3/4",
                 commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
                         .alongWith(coralManip.feedAlgae()));
-        NamedCommands.registerCommand("Score Coral", coralManip.score());
+        NamedCommands.registerCommand("Score Coral", coralManip.score().withTimeout(0.5));
+        NamedCommands.registerCommand("Clear Coral",
+                coralManip.feed().raceWith(commandSequences.armOutLED()).andThen(coralManip.safeStateCmd()));
         NamedCommands.registerCommand("Stow",
                 commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
         NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
@@ -107,6 +115,7 @@ public final class Robot extends CommandRobot {
         autoChooser = AutoBuilder.buildAutoChooser();
         elevatorSafeTrigger = new Trigger(elevator.elevatorSafeTrigger());
         deepClimbLEDTrigger = new Trigger(deepClimb.deepClimbLEDTrigger());
+        visionPIDTrigger = new Trigger(drive.visionPIDTrue());
     }
 
     @Override
@@ -145,6 +154,11 @@ public final class Robot extends CommandRobot {
         led.colorAlliance().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
 
+        PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            // Do whatever you want with the pose here
+            Logger.recordOutput("Drive/PathPlannerTargetPose", pose);
+        });
+
         if (!DriverStation.isFMSAttached()) {
             CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {
                 String newSub = "<NONE>";
@@ -172,8 +186,12 @@ public final class Robot extends CommandRobot {
         driveController.a()
                 .whileTrue(drive.robotCentricDrive());
         driveController.rightBumper()
-                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()));
-        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()));
+                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()))
+                .onFalse(led.colorAlliance().alongWith(
+                        commandSequences.setRumble(copilotController, 0)));
+        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()))
+                .onFalse(led.colorAlliance().alongWith(
+                        commandSequences.setRumble(copilotController, 0)));
 
         elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
         elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
@@ -211,6 +229,11 @@ public final class Robot extends CommandRobot {
                 .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
         deepClimbLEDTrigger.onTrue(led.deepClimbed());
+        visionPIDTrigger.and(DriverStation::isTeleopEnabled)
+                .onTrue(led.visionAligned().alongWith(
+                        commandSequences.setRumble(copilotController, 1)))
+                .onFalse(led.visionAligning().alongWith(
+                        commandSequences.setRumble(copilotController, 0)));
     }
 
     @Override

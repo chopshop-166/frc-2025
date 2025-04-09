@@ -55,6 +55,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Clear Coral"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -144,6 +150,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Clear Coral"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -230,6 +242,12 @@
           "type": "named",
           "data": {
             "name": "Score Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Clear Coral"
           }
         },
         {

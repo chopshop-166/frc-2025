@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
 import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
@@ -48,9 +48,16 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     private final double DRIVE_KS = 0.1;
     final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
-    ProfiledPIDController rotationPID = new ProfiledPIDController(0.05, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.8, 0, 0.0, new Constraints(2.5, 10.0));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(2, 0, 0.0, new Constraints(0.9, 5.0));
+    // ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002,
+    // 0.000, new Constraints(240, 270));
+    // ProfiledPIDController translationPID_X = new ProfiledPIDController(2.0, 0,
+    // 0.0, new Constraints(2.5, 3.0));
+    // ProfiledPIDController translationPID_Y = new ProfiledPIDController(2.0, 0,
+    // 0.0, new Constraints(2.5, 3.0));
+
+    ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002, 0.000, new Constraints(240, 270));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -100,9 +107,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         this.ySpeedSupplier = ySpeed;
         this.rotationSupplier = rotation;
 
-        translationPID_X.setTolerance(0.1);
-        translationPID_Y.setTolerance(0.06);
-        rotationPID.setTolerance(4);
+        translationPID_X.setTolerance(0.035);
+        translationPID_Y.setTolerance(0.035);
+        rotationPID.setTolerance(2);
     }
 
     public void setPose(Pose2d pose) {
@@ -161,6 +168,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Drive/Translation_Y_PID/Error", translationPID_Y.getPositionError());
         Logger.recordOutput("Drive/Translation_Y_PID/Velocity", translationPID_Y.getSetpoint().velocity);
         Logger.recordOutput("Drive/Translation_Y_PID/At Goal", translationPID_Y.atGoal());
+        Logger.recordOutput("Drive/Rotation_PID/Error", rotationPID.getPositionError());
+        Logger.recordOutput("Drive/Rotation_PID/Velocity", rotationPID.getSetpoint().velocity);
+        Logger.recordOutput("Drive/Rotation_PID/At Goal", rotationPID.atGoal());
         Logger.recordOutput("Drive/ActualChassisSpeeds",
                 ChassisSpeeds.fromRobotRelativeSpeeds(kinematics.toChassisSpeeds(getData().getModuleStates()),
                         estimator.getEstimatedPosition().getRotation()));
@@ -183,9 +193,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             var chosenTagPoseOption = kTagLayout.getTagPose(closestReefTag.get());
             if (chosenTagPoseOption.isPresent()) {
                 Pose2d chosenTagPose = chosenTagPoseOption.get().toPose2d();
-                Logger.recordOutput("Chosen Tag", chosenTagPose);
+                Logger.recordOutput("Drive/Chosen Tag", chosenTagPose);
                 chosenTagPose = chosenTagPose.transformBy(targetBranch.getOffset());
-                Logger.recordOutput("Chosen Tag Branch Offset", chosenTagPose);
+                Logger.recordOutput("Drive/Chosen Tag Branch Offset", chosenTagPose);
                 targetPose = chosenTagPose;
             }
         }
@@ -250,6 +260,12 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     }
 
+    public BooleanSupplier visionPIDTrue() {
+        return () -> {
+            return translationPID_X.atGoal() && translationPID_Y.atGoal() && rotationPID.atGoal();
+        };
+    }
+
     private void move(final double xSpeed, final double ySpeed,
             final double rotation, boolean robotCentricDrive) {
         ChassisSpeeds speeds;
@@ -261,7 +277,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
                             : estimator.getEstimatedPosition().getRotation()
                                     .plus(new Rotation2d(Units.degreesToRadians(180))));
         }
-
+        Logger.recordOutput("Drive/TargetChassisSpeeds", speeds);
         move(speeds);
     }
 

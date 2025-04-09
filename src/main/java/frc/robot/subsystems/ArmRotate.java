@@ -39,7 +39,7 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     }
 
     public Command moveTo(ArmRotatePresets level) {
-        PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(15, pid::atGoal);
+        PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(10, pid::atGoal);
         return runOnce(() -> {
             getData().preset = level;
             pid.reset(getArmAngle(), 0.0);
@@ -112,9 +112,6 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
         } else {
             getData().motor.setpoint = 0;
         }
-        Logger.recordOutput("Arm/PID at goal", pid.atGoal());
-        Logger.recordOutput("Arm/Desired Velocity", pid.getSetpoint().velocity);
-        Logger.recordOutput("Arm/Desired Position", pid.getSetpoint().position);
 
         Logger.recordOutput("ArmRotate/pid at goal", pid.atGoal());
         Logger.recordOutput("ArmRotate/DesiredArmVelocity", pid.getSetpoint().velocity);

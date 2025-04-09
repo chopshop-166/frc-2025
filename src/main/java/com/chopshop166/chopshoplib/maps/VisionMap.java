@@ -62,7 +62,8 @@ public class VisionMap {
                     // Put the results measurement into the pose estimator
                     var estimate = source.estimator.update(result);
                     estimate.ifPresent(est -> {
-                        Logger.recordOutput("Camera Pose Estimate", est.estimatedPose.toPose2d());
+                        Logger.recordOutput("Camera Pose Estimate/" + source.camera.getName(),
+                                est.estimatedPose.toPose2d());
                         data.estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
                                 est.timestampSeconds);
                     });

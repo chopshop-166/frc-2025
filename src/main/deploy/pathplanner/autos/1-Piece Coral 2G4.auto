@@ -38,7 +38,19 @@
         {
           "type": "named",
           "data": {
+            "name": "Rotate Arm L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Score Coral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Clear Coral"
           }
         },
         {

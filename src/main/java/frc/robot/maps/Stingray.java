@@ -154,7 +154,7 @@ public class Stingray extends RobotMap {
                                 Units.inchesToMeters(
                                         -10.72),
                                 Units.inchesToMeters(8.24),
-                                new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(16.76)))));
+                                new Rotation3d(0, Units.degreesToRadians(-68), Units.degreesToRadians(13)))));
     }
 
     @Override
@@ -192,10 +192,10 @@ public class Stingray extends RobotMap {
         leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        ProfiledPIDController pid = new ProfiledPIDController(0.0365, 0, 0,
+        ProfiledPIDController pid = new ProfiledPIDController(0.0366, 0, 0,
                 new Constraints(100, 250));
         pid.setTolerance(0.25);
-        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.001, 0.024, 0.006);
+        ElevatorFeedforward feedForward = new ElevatorFeedforward(0.001, 0.024, 0.00635);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
 
@@ -232,9 +232,9 @@ public class Stingray extends RobotMap {
                 .positionConversionFactor(360.0 / 75);
         config.voltageCompensation(11.5);
         motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-        ProfiledPIDController pid = new ProfiledPIDController(0.01, 0, 0, new Constraints(90, 650));
-        pid.setTolerance(3);
-        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.0011);
+        ProfiledPIDController pid = new ProfiledPIDController(0.015, 0, 0, new Constraints(90, 650));
+        pid.setTolerance(1.5);
+        ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.001);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
@@ -286,7 +286,7 @@ public class Stingray extends RobotMap {
 
     @Override
     public MitocandriaMap getMitocandriaMap() {
-        return new MitocandriaMap(new MitoCANdria(1));
+        return new MitocandriaMap(new MitoCANdria(0));
     }
 
     @Override
