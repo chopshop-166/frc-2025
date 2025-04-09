@@ -115,8 +115,8 @@ public class Stingray extends RobotMap {
 
         final double maxRotationRadianPerSecond = 2 * Math.PI;
 
-        RobotConfig config = new RobotConfig(50, 4.889, new ModuleConfig(
-                0.0508, 6000, 1.0, DCMotor.getNeoVortex(1), 50, 1),
+        RobotConfig config = new RobotConfig(58, 4.889, new ModuleConfig(
+                0.0508, 4.16, 1.2, DCMotor.getNeoVortex(1).withReduction(6.75), 80, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
                 new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
                 new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
