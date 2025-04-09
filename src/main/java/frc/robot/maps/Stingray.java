@@ -194,7 +194,7 @@ public class Stingray extends RobotMap {
 
         ProfiledPIDController pid = new ProfiledPIDController(0.0366, 0, 0,
                 new Constraints(100, 250));
-        pid.setTolerance(0.25);
+        pid.setTolerance(0.375);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0.001, 0.024, 0.00635);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
