@@ -3,8 +3,8 @@
     {
       "x": -6,
       "y": -6,
-      "width": 1292,
-      "height": 812,
+      "width": 1280,
+      "height": 800,
       "state": {
         "sidebar": {
           "width": 312,
@@ -403,51 +403,6 @@
       }
     }
   ],
-  "satellites": [
-    {
-      "x": 1591,
-      "y": -1080,
-      "width": 974,
-      "height": 547,
-      "state": {
-        "type": 1,
-        "visualizer": null
-      },
-      "uuid": "glewgzy3g4s7tmt09vs12q2ceuaiscsf"
-    },
-    {
-      "x": 1591,
-      "y": -540,
-      "width": 974,
-      "height": 547,
-      "state": {
-        "type": 1,
-        "visualizer": null
-      },
-      "uuid": "5ct1jvxepsmfiz2cy1gctws2bjsrzepu"
-    },
-    {
-      "x": 631,
-      "y": -1080,
-      "width": 974,
-      "height": 547,
-      "state": {
-        "type": 1,
-        "visualizer": null
-      },
-      "uuid": "d0i07njotb52lc4z93bf5bpf3kkxdzhw"
-    },
-    {
-      "x": 631,
-      "y": -540,
-      "width": 974,
-      "height": 547,
-      "state": {
-        "type": 9,
-        "visualizer": null
-      },
-      "uuid": "7klzt8hkhmsgierdwpnav6d1sejryi2f"
-    }
-  ],
+  "satellites": [],
   "version": "4.1.2"
 }

@@ -4,6 +4,8 @@ import static edu.wpi.first.wpilibj2.command.Commands.parallel;
 import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.Commands.sequence;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -80,6 +82,7 @@ public class CommandSequences {
 
     public Command setRumble(ButtonXboxController controller, int rumbleAmount) {
         return runOnce(() -> {
+            Logger.recordOutput("Controllers/" + controller.getHID().getPort() + "/rumble", rumbleAmount);
             controller.getHID().setRumble(RumbleType.kBothRumble, rumbleAmount);
         });
     }
