@@ -19,6 +19,7 @@ public class Mitocandria extends LoggedSubsystem<Data, MitocandriaMap> {
 
     @Override
     public void periodic() {
+        super.periodic();
         orangePiAlert.set(getData().usb_port_1_current < 0.5);
     }
 
