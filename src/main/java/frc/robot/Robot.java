@@ -159,8 +159,8 @@ public final class Robot extends CommandRobot {
             Logger.recordOutput("Drive/PathPlannerTargetPose", pose);
         });
 
-        if (!DriverStation.isFMSAttached()) {
-            CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {
+        CommandScheduler.getInstance().onCommandInterrupt((oldCmd, newCmd) -> {
+            if (!DriverStation.isFMSAttached()) {
                 String newSub = "<NONE>";
                 String newName = "<NONE>";
                 if (newCmd.isPresent()) {
@@ -169,8 +169,8 @@ public final class Robot extends CommandRobot {
                 }
                 System.out.println("Command interrupt: `" + oldCmd.getSubsystem() + "/" + oldCmd.getName() +
                         "` -> `" + newSub + "/" + newName + "`");
-            });
-        }
+            }
+        });
 
     }
 
