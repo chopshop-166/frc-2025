@@ -67,6 +67,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     Branch targetBranch = Branch.NONE;
     Pose2d targetPose = new Pose2d();
 
+    ChassisSpeeds fielRelativeChassisSpeeds = new ChassisSpeeds();
+
     SwerveDrivePoseEstimator estimator;
 
     // The layout of the AprilTags on the field
@@ -159,6 +161,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
+        fielRelativeChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(
+                kinematics.toChassisSpeeds(getData().getModuleStates()),
+                estimator.getEstimatedPosition().getRotation());
+
         Logger.recordOutput("Drive/Estimator Pose", estimator.getEstimatedPosition());
         Logger.recordOutput("Drive/Robot Rotation Gyro", getMap().gyro.getRotation2d());
         Logger.recordOutput("Drive/Target Branch", targetBranch);
@@ -172,8 +178,7 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
         Logger.recordOutput("Drive/Rotation_PID/Velocity", rotationPID.getSetpoint().velocity);
         Logger.recordOutput("Drive/Rotation_PID/At Goal", rotationPID.atGoal());
         Logger.recordOutput("Drive/ActualChassisSpeeds",
-                ChassisSpeeds.fromRobotRelativeSpeeds(kinematics.toChassisSpeeds(getData().getModuleStates()),
-                        estimator.getEstimatedPosition().getRotation()));
+                fielRelativeChassisSpeeds);
     }
 
     private void visionCalcs() {
@@ -234,8 +239,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public Command moveToBranch(Branch targetBranch) {
         return startEnd(() -> {
-            translationPID_X.reset(estimator.getEstimatedPosition().getX());
-            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
+            translationPID_X.reset(estimator.getEstimatedPosition().getX(),
+                    fielRelativeChassisSpeeds.vxMetersPerSecond);
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY(),
+                    fielRelativeChassisSpeeds.vyMetersPerSecond);
             rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
             isRobotCentric = false;
@@ -247,8 +254,10 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public Command moveToBranchWait(Branch targetBranch) {
         return runOnce(() -> {
-            translationPID_X.reset(estimator.getEstimatedPosition().getX());
-            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
+            translationPID_X.reset(estimator.getEstimatedPosition().getX(),
+                    fielRelativeChassisSpeeds.vxMetersPerSecond);
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY(),
+                    fielRelativeChassisSpeeds.vyMetersPerSecond);
             rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
         }).andThen(run(() -> {
