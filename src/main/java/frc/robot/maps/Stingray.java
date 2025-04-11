@@ -209,6 +209,7 @@ public class Stingray extends RobotMap {
             case SCOREL3 -> 38;
             case ALGAEL3 -> 40;
             case SCOREL4, HIGHESTPOINT -> 59;
+            case BEFOREALGAE -> 55;
             default -> Double.NaN;
         };
 

@@ -46,7 +46,8 @@ public class CoralManip extends LoggedSubsystem<Data, CoralManipMap> {
 
     public Command feed() {
         return runSafe(() -> {
-            getData().motor.setpoint = RELEASE_SPEED_L1;
+            // getData().motor.setpoint = RELEASE_SPEED_L1;
+            getData().motor.setpoint = -ALGAE_INTAKE;
         }).withName("Feed Coral");
     }
 

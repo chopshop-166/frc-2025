@@ -71,6 +71,12 @@ public class CommandSequences {
                 moveArm(preset), led.colorAlliance()).withName("Move Elevator");
     }
 
+    public Command bargeAlgae() {
+        return armRotate.moveTo(ArmRotatePresets.ALGAEBARGE).andThen(
+                moveElevator(ElevatorPresets.BEFOREALGAE, ArmRotatePresets.ALGAEBARGE),
+                moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.ALGAEBARGE).alongWith(coralManip.feedAlgae()));
+    }
+
     public Command armOutLED() {
         return led.armToPreset().andThen(armRotate.moveOut());
     }

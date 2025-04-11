@@ -39,6 +39,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
         HIGHESTPOINT,
 
+        BEFOREALGAE,
+
         STOW,
 
         HOLD

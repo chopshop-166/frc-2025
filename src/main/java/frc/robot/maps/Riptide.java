@@ -179,7 +179,7 @@ public class Riptide extends RobotMap {
 
         ProfiledPIDController pid = new ProfiledPIDController(0.021, 0, 0,
                 new Constraints(48, 185));
-        pid.setTolerance(0.25);
+        pid.setTolerance(0.5);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0.008, 0.015, 0.0175);
 
         var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
@@ -193,6 +193,7 @@ public class Riptide extends RobotMap {
             case SCOREL3 -> 36;
             case ALGAEL3 -> 39;
             case SCOREL4, HIGHESTPOINT -> 58;
+            case BEFOREALGAE -> 54;
             default -> Double.NaN;
         };
 
@@ -223,8 +224,9 @@ public class Riptide extends RobotMap {
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;
             case SCOREL3 -> 285;
-            case SCOREL1, SCOREL2, SCOREL4, OUT -> 272;
+            case SCOREL1, SCOREL2, SCOREL4, OUT -> 270;
             case STOW -> 302;
+            case ALGAEBARGE -> 256;
             default -> Double.NaN;
         };
 
