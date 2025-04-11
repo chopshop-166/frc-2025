@@ -23,6 +23,8 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
         INTAKE,
 
+        ALGAE_PROCESS,
+
         SCOREL1,
 
         SCOREL1_TAKETWO,

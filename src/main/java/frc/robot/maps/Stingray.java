@@ -202,6 +202,7 @@ public class Stingray extends RobotMap {
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
             case INTAKE -> 1;
+            case ALGAE_PROCESS -> 6;
             case SCOREL1 -> 13;
             case SCOREL1_TAKETWO -> 16;
             case SCOREL2 -> 21;
@@ -244,6 +245,7 @@ public class Stingray extends RobotMap {
             case SCOREL4_AUTO -> 152;
             case STOW -> 181;
             case ALGAE -> 145;
+            case ALGAE_PROCESS -> 172;
             default -> Double.NaN;
         };
 

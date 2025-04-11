@@ -93,6 +93,9 @@ public final class Robot extends CommandRobot {
         NamedCommands.registerCommand("De-Stage Algae 3/4",
                 commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
                         .alongWith(coralManip.feedAlgae()));
+        NamedCommands.registerCommand("Process Algae",
+                commandSequences.moveElevator(ElevatorPresets.ALGAE_PROCESS, ArmRotatePresets.ALGAE_PROCESS)
+                        .alongWith(coralManip.feed()));
         NamedCommands.registerCommand("Score Coral", coralManip.score().withTimeout(0.75));
         NamedCommands.registerCommand("Clear Coral",
                 coralManip.feed().raceWith(commandSequences.armOutLED()).andThen(coralManip.safeStateCmd()));
