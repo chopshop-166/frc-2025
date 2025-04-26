@@ -185,14 +185,15 @@ public final class Robot extends CommandRobot {
         driveController.back().onTrue(drive.resetCmd());
         driveController.a()
                 .whileTrue(drive.robotCentricDrive());
-        driveController.rightBumper()
-                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()))
-                .onFalse(led.colorAlliance().alongWith(
-                        commandSequences.setRumble(copilotController, 0)));
-        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()))
-                .onFalse(led.colorAlliance().alongWith(
-                        commandSequences.setRumble(copilotController, 0)));
-
+        // driveController.rightBumper()
+        // .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()))
+        // .onFalse(led.colorAlliance().alongWith(
+        // commandSequences.setRumble(copilotController, 0)));
+        // driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()))
+        // .onFalse(led.colorAlliance().alongWith(
+        // commandSequences.setRumble(copilotController, 0)));
+        driveController.rightBumper().whileTrue(commandSequences.autoScore(Branch.RIGHT_BRANCH));
+        driveController.leftBumper().whileTrue(commandSequences.autoScore(Branch.LEFT_BRANCH));
         elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
         elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
 
@@ -200,15 +201,27 @@ public final class Robot extends CommandRobot {
         driveController.y().onTrue(funnel.rotateBackward());
 
         copilotController.a().onTrue(commandSequences.intake());
-        copilotController.b()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2))
-                .onFalse(coralManip.score());
-        copilotController.x()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
-                .onFalse(coralManip.scoreL1());
-        copilotController.y()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3))
-                .onFalse(coralManip.score());
+
+        copilotController.x().onTrue(commandSequences.setheight(1));
+        copilotController.b().onTrue(commandSequences.setheight(2));
+        copilotController.y().onTrue(commandSequences.setheight(3));
+        copilotController.rightBumper().onTrue(commandSequences.setheight(4));
+        // copilotController.b()
+        // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2,
+        // ArmRotatePresets.SCOREL2))
+        // .onFalse(coralManip.score());
+        // copilotController.x()
+        // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1,
+        // ArmRotatePresets.SCOREL1))
+        // .onFalse(coralManip.scoreL1());
+        // copilotController.y()
+        // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3,
+        // ArmRotatePresets.SCOREL3))
+        // .onFalse(coralManip.score());
+        // copilotController.rightBumper()
+        // .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4,
+        // ArmRotatePresets.SCOREL4))
+        // .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
 
         copilotController.back().onTrue(commandSequences.resetCopilot());
         copilotController.start().onTrue(elevator.zero());
@@ -224,9 +237,6 @@ public final class Robot extends CommandRobot {
                 .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
                         .alongWith(coralManip.feedAlgae()));
         // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
-        copilotController.rightBumper()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
-                .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
         copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
         deepClimbLEDTrigger.onTrue(led.deepClimbed());
         visionPIDTrigger.and(DriverStation::isTeleopEnabled)
