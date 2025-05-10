@@ -56,8 +56,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
     // 0.0, new Constraints(2.5, 3.0));
 
     ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.0, 0, 0.0, new Constraints(2.2, 2.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.0, 0, 0.0, new Constraints(2.2, 2.0));
     DoubleSupplier xSpeedSupplier;
     DoubleSupplier ySpeedSupplier;
     DoubleSupplier rotationSupplier;
@@ -221,9 +221,17 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             Pose2d robotPose = estimator.getEstimatedPosition();
             // soooooooooo x and y are backwards somehow. Values underneath are correct
             translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
-            translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
+            if (!translationPID_X.atGoal()) {
+                translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
+            }
+            translateYSpeedMPS += translationPID_X.getSetpoint().velocity;
+            Logger.recordOutput("Drive/Translation_X", translateYSpeedMPS);
             translateXSpeedMPS = translationPID_Y.calculate(robotPose.getY(), targetPose.getY());
-            translateXSpeedMPS += Math.copySign(DRIVE_KS, translateXSpeedMPS);
+            if (!translationPID_Y.atGoal()) {
+                translateXSpeedMPS += Math.copySign(DRIVE_KS, translateXSpeedMPS);
+            }
+            translateXSpeedMPS += translationPID_Y.getSetpoint().velocity;
+            Logger.recordOutput("Drive/Translation_Y", translateXSpeedMPS);
             // Direction is swapped on Red side so need to negate PID output
             if (!isBlueAlliance) {
                 translateXSpeedMPS *= -1;
@@ -231,7 +239,9 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
             }
             rotationSpeed = rotationPID.calculate(robotPose.getRotation().getDegrees(),
                     targetPose.getRotation().getDegrees());
-            rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
+            if (!rotationPID.atGoal()) {
+                rotationSpeed += Math.copySign(ROTATION_KS, rotationSpeed);
+            }
         }
 
         move(translateXSpeedMPS, translateYSpeedMPS, rotationSpeed, isRobotCentric);
@@ -239,10 +249,8 @@ public class Drive extends LoggedSubsystem<SwerveDriveData, SwerveDriveMap> {
 
     public Command moveToBranch(Branch targetBranch) {
         return startEnd(() -> {
-            translationPID_X.reset(estimator.getEstimatedPosition().getX(),
-                    fielRelativeChassisSpeeds.vxMetersPerSecond);
-            translationPID_Y.reset(estimator.getEstimatedPosition().getY(),
-                    fielRelativeChassisSpeeds.vyMetersPerSecond);
+            translationPID_X.reset(estimator.getEstimatedPosition().getX());
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
             rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
             isRobotCentric = false;
