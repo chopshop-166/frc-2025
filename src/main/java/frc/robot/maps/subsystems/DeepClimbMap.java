@@ -4,34 +4,35 @@ import java.util.function.BooleanSupplier;
 
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
-import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
+
+import edu.wpi.first.units.measure.Distance;
+import yams.mechanisms.config.ArmConfig;
+import yams.motorcontrollers.SmartMotorController;
 
 public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
 
     public final SmartMotorController motor;
     public final BooleanSupplier sensor;
+    public final ArmConfig config;
 
     public DeepClimbMap() {
-        this(new SmartMotorController(), () -> true);
+        this(null, () -> true, null);
     }
 
-    public DeepClimbMap(SmartMotorController motor, BooleanSupplier sensor) {
+    public DeepClimbMap(SmartMotorController motor, BooleanSupplier sensor, ArmConfig config) {
         this.motor = motor;
         this.sensor = sensor;
+        this.config = config;
     }
 
     @Override
     public void updateData(Data data) {
-        data.motor.updateData(motor);
-        data.encoderReading = motor.getEncoder().getDistance();
+        data.encoderReading = motor.getMeasurementPosition();
         data.atBottomLimit = sensor.getAsBoolean();
-
     }
 
     public static class Data extends DataWrapper {
-        public MotorControllerData motor = new MotorControllerData();
         public boolean atBottomLimit;
-        public double encoderReading;
+        public Distance encoderReading;
     }
 }

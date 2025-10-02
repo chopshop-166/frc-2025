@@ -1,5 +1,8 @@
 package frc.robot.maps;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
@@ -22,10 +25,13 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -39,11 +45,17 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
+import yams.mechanisms.config.ArmConfig;
+import yams.motorcontrollers.SmartMotorController;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.local.SparkWrapper;
 
 @RobotMapFor("00:80:2F:40:A7:9D")
 public class Riptide extends RobotMap {
@@ -246,20 +258,17 @@ public class Riptide extends RobotMap {
     }
 
     @Override
-    public DeepClimbMap getDeepClimbMap() {
-        CSSparkMax leftMotor = new CSSparkMax(13);
-        CSSparkMax rightMotor = new CSSparkMax(14);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
-        leftMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        config.follow(leftMotor.getMotorController(), true);
-        rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        return new DeepClimbMap(new SmartMotorControllerGroup(leftMotor, rightMotor), () -> false);
-
+    public DeepClimbMap getDeepClimbMap(Subsystem deepClimb) {
+        SparkMax leftMotor = new SparkMax(13, MotorType.kBrushless);
+        SparkMax rightMotor = new SparkMax(14, MotorType.kBrushless);
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(deepClimb)
+                .withStatorCurrentLimit(Amps.of(30))
+                .withIdleMode(MotorMode.BRAKE)
+                .withMotorInverted(true).withFollowers(Pair.of(rightMotor, true));
+        SmartMotorController smc = new SparkWrapper(leftMotor, DCMotor.getNEO(2), motorConfig);
+        ArmConfig armConfig = new ArmConfig(smc)
+                .withHardLimit(Degrees.of(0), Degrees.of(90));
+        return new DeepClimbMap(smc, () -> false, armConfig);
     }
 
     @Override

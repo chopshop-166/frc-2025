@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ArmRotateMap.Data;
-import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 
 public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     final ProfiledPIDController pid;

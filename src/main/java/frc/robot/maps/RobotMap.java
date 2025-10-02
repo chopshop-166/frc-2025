@@ -10,6 +10,7 @@ import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
@@ -43,7 +44,7 @@ public class RobotMap {
         return new ElevatorMap();
     }
 
-    public DeepClimbMap getDeepClimbMap() {
+    public DeepClimbMap getDeepClimbMap(Subsystem deepClimb) {
         return new DeepClimbMap();
     }
 

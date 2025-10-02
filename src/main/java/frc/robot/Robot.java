@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-
 import java.util.function.DoubleUnaryOperator;
 
 import org.littletonrobotics.junction.Logger;
@@ -26,8 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Vision.Branch;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Vision.Branch;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
@@ -63,7 +61,7 @@ public final class Robot extends CommandRobot {
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
     private Elevator elevator = new Elevator(map.getElevatorMap(),
             RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY()));
-    private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
+    private DeepClimb deepClimb = new DeepClimb(map);
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
             RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
     private Funnel funnel = new Funnel(map.getFunnelMap());
@@ -72,7 +70,7 @@ public final class Robot extends CommandRobot {
     private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,
             armRotate, funnel, deepClimb);
 
-    NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
+    final NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
 
