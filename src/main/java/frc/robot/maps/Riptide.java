@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Volts;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
-import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
@@ -30,7 +29,6 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.Pair;
@@ -50,7 +48,6 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
-import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 import yams.mechanisms.config.ArmConfig;
@@ -213,23 +210,21 @@ public class Riptide extends RobotMap {
     }
 
     @Override
-    public ArmRotateMap getArmRotateMap() {
-        CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, -1.4);
-        SparkFlexConfig config = new SparkFlexConfig();
-        absEncoder.setInverted(true);
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.encoder.quadratureMeasurementPeriod(10)
-                .quadratureAverageDepth(2)
-                .velocityConversionFactor((360.0 / 81) / 60)
-                .positionConversionFactor((360.0 / 81));
-        config.inverted(false);
-        config.voltageCompensation(11.5);
-        motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    public ArmRotateMap getArmRotateConfig(Subsystem armRotateSubsystem) {
+        SparkFlex motor = new SparkFlex(10, MotorType.kBrushless);
         ProfiledPIDController pid = new ProfiledPIDController(0.0023, 0, 0, new Constraints(60, 300));
         pid.setTolerance(1);
         ArmFeedforward feedForward = new ArmFeedforward(0.025, 0.0, 0.0014);
+
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(armRotateSubsystem)
+                .withExternalEncoder(new DutyCycleEncoder(0, 360, -1.4))
+                .withEncoderInverted(true)
+                .withIdleMode(MotorMode.BRAKE)
+                .withMotorInverted(false)
+                .withStatorCurrentLimit(Amps.of(30))
+                .withVoltageCompensation(Volts.of(11.5))
+                .withClosedLoopController(pid)
+                .withFeedforward(feedForward);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 302;
@@ -238,9 +233,13 @@ public class Riptide extends RobotMap {
             case STOW -> 302;
             default -> Double.NaN;
         };
-
-        return new ArmRotateMap(motor, absEncoder, presets, pid,
-                new ValueRange(203, 302), new ValueRange(210, 295), feedForward);
+        SmartMotorController smc = new SparkWrapper(motor, DCMotor.getNEO(2), motorConfig);
+        ArmConfig armConfig = new ArmConfig(smc)
+                .withSoftLimits(Degrees.of(210), Degrees.of(295))
+                .withHardLimit(Degrees.of(203), Degrees.of(302))
+                .withLength(Inches.of(81))
+                .withTelemetry("ArmRotate", TelemetryVerbosity.HIGH);
+        return new ArmRotateMap(armConfig, presets);
     }
 
     @Override

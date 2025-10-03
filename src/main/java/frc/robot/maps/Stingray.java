@@ -10,7 +10,6 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.digital.CSDigitalInput;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
 import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
@@ -35,7 +34,6 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import au.grapplerobotics.MitoCANdria;
@@ -55,7 +53,6 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
-import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 import frc.robot.maps.subsystems.MitocandriaMap;
@@ -231,23 +228,21 @@ public class Stingray extends RobotMap {
     }
 
     @Override
-    public ArmRotateMap getArmRotateMap() {
-        CSSparkFlex motor = new CSSparkFlex(10);
-        DutyCycleEncoder absEncoder = new DutyCycleEncoder(0, 360, 0);
-        SparkFlexConfig config = new SparkFlexConfig();
-        absEncoder.setInverted(true);
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.inverted(false);
-        config.encoder.quadratureAverageDepth(2)
-                .quadratureMeasurementPeriod(10)
-                .velocityConversionFactor((360.0 / 75) / 60)
-                .positionConversionFactor(360.0 / 75);
-        config.voltageCompensation(11.5);
-        motor.getMotorController().configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    public ArmRotateMap getArmRotateConfig(Subsystem armRotateSubsystem) {
+        SparkFlex motor = new SparkFlex(10, MotorType.kBrushless);
         ProfiledPIDController pid = new ProfiledPIDController(0.015, 0, 0, new Constraints(90, 650));
         pid.setTolerance(1.5);
         ArmFeedforward feedForward = new ArmFeedforward(0.02, 0.0, 0.001);
+
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(armRotateSubsystem)
+                .withExternalEncoder(new DutyCycleEncoder(0, 360, 0))
+                .withEncoderInverted(true)
+                .withIdleMode(MotorMode.BRAKE)
+                .withMotorInverted(false)
+                .withStatorCurrentLimit(Amps.of(30))
+                .withVoltageCompensation(Volts.of(11.5))
+                .withClosedLoopController(pid)
+                .withFeedforward(feedForward);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> 181;
@@ -259,9 +254,13 @@ public class Stingray extends RobotMap {
             case ALGAE -> 160;
             default -> Double.NaN;
         };
-
-        return new ArmRotateMap(motor, absEncoder, presets, pid,
-                new ValueRange(82, 181), new ValueRange(89, 181), feedForward);
+        SmartMotorController smc = new SparkWrapper(motor, DCMotor.getNEO(2), motorConfig);
+        ArmConfig armConfig = new ArmConfig(smc)
+                .withSoftLimits(Degrees.of(82), Degrees.of(181))
+                .withHardLimit(Degrees.of(89), Degrees.of(181))
+                .withLength(Inches.of(75))
+                .withTelemetry("ArmRotate", TelemetryVerbosity.HIGH);
+        return new ArmRotateMap(armConfig, presets);
     }
 
     @Override

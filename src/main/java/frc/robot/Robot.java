@@ -61,8 +61,7 @@ public final class Robot extends CommandRobot {
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
     private Elevator elevator = new Elevator(map);
     private DeepClimb deepClimb = new DeepClimb(map);
-    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
-            RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
+    private ArmRotate armRotate = new ArmRotate(map);
     private Funnel funnel = new Funnel(map.getFunnelMap());
     private Mitocandria mito = new Mitocandria(map.getMitocandriaMap());
 
@@ -144,8 +143,7 @@ public final class Robot extends CommandRobot {
             setUseTiming(false); // Run as fast as possible
         }
         // Start logging! No more data receivers, replay sources, or metadata values
-        // may
-        // be added.
+        // may be added.
         Logger.start();
 
         led.colorAlliance().schedule();
@@ -191,7 +189,7 @@ public final class Robot extends CommandRobot {
                         commandSequences.setRumble(copilotController, 0)));
 
         elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
-        elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
+        elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveTo(ArmRotatePresets.INTAKE));
 
         driveController.x().onTrue(funnel.rotateForward());
         driveController.y().onTrue(funnel.rotateBackward());
@@ -253,11 +251,12 @@ public final class Robot extends CommandRobot {
         // funnel.setDefaultCommand(
         // funnel.move(RobotUtils.deadbandAxis(.1, () ->
         // -copilotController.getLeftTriggerAxis())));
-        deepClimb
-                .setDefaultCommand(
-                        deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getTriggers())));
+        deepClimb.setDefaultCommand(deepClimb.rotate(
+                RobotUtils.deadbandAxis(0.1, () -> copilotController.getTriggers())));
         elevator.setDefaultCommand(elevator.move(
                 RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY())));
+        armRotate.setDefaultCommand(armRotate.move(
+                RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY())));
 
     }
 
