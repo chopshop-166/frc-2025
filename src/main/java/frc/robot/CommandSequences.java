@@ -48,8 +48,7 @@ public class CommandSequences {
     public Command intake() {
         return Commands.either(Commands.none(), armOutLED().andThen(led.elevatorToPreset()),
                 () -> elevator.atPreset(ElevatorPresets.INTAKE) || elevator.atPreset(ElevatorPresets.STOW))
-                .andThen(elevator.clearPreset(),
-                        elevator.moveTo(ElevatorPresets.INTAKE))
+                .andThen(elevator.moveTo(ElevatorPresets.INTAKE))
                 .withName("Intake");
     }
 

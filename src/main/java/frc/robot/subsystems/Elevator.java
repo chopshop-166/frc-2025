@@ -1,147 +1,85 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.InchesPerSecond;
+
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.Logger;
+import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
 
-import com.chopshop166.chopshoplib.PersistenceCheck;
-import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
-
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ElevatorMap;
-import frc.robot.maps.subsystems.ElevatorMap.Data;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 
-public class Elevator extends LoggedSubsystem<Data, ElevatorMap> {
+public class Elevator extends SmartSubsystemBase {
 
-    final ProfiledPIDController pid;
-    final double SLOW_DOWN_COEF = 0.5;
-    final double LOWER_SPEED = -0.15;
+    private final ElevatorMap map;
+    private final yams.mechanisms.positional.Elevator elevator;
+
     final double ZEROING_SPEED = -0.1;
-    double holdHeight = 0;
 
-    final static double BAD_HEIGHT_LOWER = 12;
-    final static double BAD_HEIGHT_UPPER = 15;
+    final static Distance BAD_HEIGHT_LOWER = Inches.of(12);
 
     NetworkTableInstance instance = NetworkTableInstance.getDefault();
     DoublePublisher heightPub = instance.getDoubleTopic("Elevator/Height").publish();
     BooleanSubscriber armSafeSub = instance.getBooleanTopic("Arm/Safe").subscribe(false);
 
-    DoubleSupplier elevatorSpeed;
-
-    public Elevator(ElevatorMap elevatorMap, DoubleSupplier elevatorSpeed) {
-        super(new Data(), elevatorMap);
-        pid = elevatorMap.pid;
-        this.elevatorSpeed = elevatorSpeed;
+    public Elevator(RobotMap robotMap) {
+        map = robotMap.getElevatorMap(this);
+        this.elevator = map.elevator;
     }
 
     public Command zero() {
-        return startSafe(() -> {
-            getMap().motor.resetValidators();
-            getData().preset = ElevatorPresets.ZEROING;
-            getData().motor.setpoint = ZEROING_SPEED;
-
-        }).until(() -> getMap().motor.validate()).andThen(resetCmd());
+        var debouncer = new Debouncer(0.2);
+        return elevator.set(ZEROING_SPEED).andThen(run(() -> {
+        }).until(() -> {
+            return debouncer.calculate(elevator.getVelocity().lt(InchesPerSecond.of(10)));
+        })).andThen(resetCmd());
     }
 
     public Command moveTo(ElevatorPresets level) {
-        PersistenceCheck setPointPersistenceCheck = new PersistenceCheck(5, pid::atGoal);
-        return runOnce(() -> {
-            this.getData().preset = level;
-            pid.reset(getElevatorHeight(), getData().liftingHeightVelocity);
-        }).andThen(run(() -> {
-
-        })).until(() -> {
-            return setPointPersistenceCheck.getAsBoolean();
-        }).withName("Move to set height");
+        return elevator.setHeight(Inches.of(map.presetValues.applyAsDouble(level)));
     }
 
-    public BooleanSupplier elevatorSafeTrigger() {
-        return () -> {
-            return (getData().heightAbsInches < BAD_HEIGHT_LOWER && getData().preset == ElevatorPresets.INTAKE);
-        };
+    public Trigger elevatorSafeTrigger() {
+        return elevator.lte(BAD_HEIGHT_LOWER);
     }
 
-    public Command hold() {
-        return runOnce(() -> {
-            holdHeight = getElevatorHeight();
-            getData().preset = ElevatorPresets.HOLD;
-        });
+    public Command move(DoubleSupplier elevatorSpeed) {
+        return elevator.set(elevatorSpeed::getAsDouble);
     }
 
     public boolean atPreset(ElevatorPresets preset) {
-        return preset == getData().preset && pid.atGoal();
-    }
-
-    public Command clearPreset() {
-        return runOnce(() -> {
-            getData().preset = ElevatorPresets.OFF;
-        });
-    }
-
-    private double limits(double speed) {
-        double height = getElevatorHeight();
-
-        speed = getMap().hardLimits.filterSpeed(height, speed);
-
-        speed = getMap().softLimits.scaleSpeed(height, speed, SLOW_DOWN_COEF);
-
-        return speed;
-
-    }
-
-    private double getElevatorHeight() {
-        return getData().heightAbsInches;
+        return elevator.isNear(Inches.of(map.presetValues.applyAsDouble(preset)), Inches.of(1)).getAsBoolean();
     }
 
     @Override
     public void reset() {
-        getData().preset = ElevatorPresets.OFF;
-        getMap().encoder.reset();
     }
 
     @Override
     public void safeState() {
-        getData().motor.setpoint = 0;
-        getData().preset = ElevatorPresets.OFF;
+        elevator.set(0.0).schedule();
     }
 
     @Override
     public void periodic() {
         super.periodic();
-        heightPub.set(getData().heightAbsInches / getMap().hardLimits.max());
-        double speed = elevatorSpeed.getAsDouble();
+        elevator.updateTelemetry();
+        heightPub.set(elevator.getHeight().in(Inches));
+    }
 
-        if (Math.abs(speed) > 0) {
-            getData().preset = ElevatorPresets.OFF;
-
-            if (armSafeSub.getAsBoolean()
-                    || (getElevatorHeight() < BAD_HEIGHT_LOWER && speed < 0)
-                    || (getElevatorHeight() > BAD_HEIGHT_UPPER && speed > 0)) {
-                getData().motor.setpoint = limits(speed);
-            }
-        } else if (getData().preset == ElevatorPresets.ZEROING) {
-            // Do nothing
-        } else if (getData().preset != ElevatorPresets.OFF) {
-            double targetHeight = getData().preset == ElevatorPresets.HOLD ? holdHeight
-                    : getMap().presetValues.applyAsDouble(getData().preset);
-            double setpoint = pid.calculate(getElevatorHeight(), new State(targetHeight, 0));
-            Logger.recordOutput("Elevator/PID Setpoint", setpoint);
-            setpoint += getMap().feedForward.calculate(pid.getSetpoint().velocity);
-            Logger.recordOutput("Elevator/PID +FF Setpoint", setpoint);
-            getData().motor.setpoint = setpoint;
-        } else {
-            getData().motor.setpoint = 0;
-        }
-        Logger.recordOutput("Elevator/PID at goal", pid.atGoal());
-        Logger.recordOutput("Elevator/Desired Velocity", pid.getSetpoint().velocity);
-        Logger.recordOutput("Elevator/Desired Position", pid.getSetpoint().position);
-
+    @Override
+    public void simulationPeriodic() {
+        // This method will be called once per scheduler run during simulation
+        super.simulationPeriodic();
+        elevator.simIterate();
     }
 }

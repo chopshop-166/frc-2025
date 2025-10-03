@@ -18,9 +18,9 @@ public class DeepClimb extends SmartSubsystemBase {
     private final double SPOOL_OUT_SPEED = -0.72;
     private final double MIN_ENCODER_READING = -12;
 
-    final DeepClimbMap map;
-    final Arm arm;
-    final DeepClimbMap.Data data = new DeepClimbMap.Data();
+    private final DeepClimbMap map;
+    private final Arm arm;
+    private final DeepClimbMap.Data data = new DeepClimbMap.Data();
 
     public DeepClimb(RobotMap robotMap) {
         map = robotMap.getDeepClimbMap(this);

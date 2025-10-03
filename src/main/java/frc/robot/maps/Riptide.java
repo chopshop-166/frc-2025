@@ -2,6 +2,8 @@ package frc.robot.maps;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -16,7 +18,6 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.CSSparkFlex;
 import com.chopshop166.chopshoplib.motors.CSSparkMax;
-import com.chopshop166.chopshoplib.motors.SmartMotorControllerGroup;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro2;
 import com.chopshop166.chopshoplib.states.PIDValues;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -25,6 +26,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -52,9 +54,12 @@ import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 import yams.mechanisms.config.ArmConfig;
+import yams.mechanisms.config.ElevatorConfig;
+import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 @RobotMapFor("00:80:2F:40:A7:9D")
@@ -164,37 +169,33 @@ public class Riptide extends RobotMap {
     }
 
     @Override
-    public ElevatorMap getElevatorMap() {
-        CSSparkFlex leftMotor = new CSSparkFlex(11);
-        CSSparkFlex rightMotor = new CSSparkFlex(12);
-        SparkFlexConfig configRight = new SparkFlexConfig();
-        SparkFlexConfig configLeft = new SparkFlexConfig();
-
-        configRight.follow(leftMotor.getMotorController());
-        configRight.voltageCompensation(11.5);
-        configRight.smartCurrentLimit(80);
-        configRight.idleMode(IdleMode.kBrake);
-        rightMotor.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-        configLeft.voltageCompensation(11.5);
-        configLeft.smartCurrentLimit(80);
-        configLeft.idleMode(IdleMode.kBrake);
-        configLeft.encoder.velocityConversionFactor((((1 / 22.2) * Math.PI * 1.75) / 60) * 2)
-                .positionConversionFactor(((1 / 22.2) * Math.PI * 1.75) * 2).quadratureMeasurementPeriod(10)
-                .quadratureAverageDepth(2);
-        // Gear reduction is 22.2 sprocket diameter is 1.75 inches
-        leftMotor.getMotorController().configure(configLeft, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-
-        // we want to add this back
-        // CSEncoder encoder = new CSEncoder(2, 3, false);
+    public ElevatorMap getElevatorMap(Subsystem elevatorSubsystem) {
+        SparkFlex leftMotor = new SparkFlex(11, MotorType.kBrushless);
+        SparkFlex rightMotor = new SparkFlex(12, MotorType.kBrushless);
 
         ProfiledPIDController pid = new ProfiledPIDController(0.021, 0, 0,
                 new Constraints(48, 185));
         pid.setTolerance(0.25);
         ElevatorFeedforward feedForward = new ElevatorFeedforward(0.008, 0.015, 0.0175);
 
-        var elevatorMotors = new SmartMotorControllerGroup(leftMotor, rightMotor);
+        // we want to add this back
+        // CSEncoder encoder = new CSEncoder(2, 3, false);
+
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(elevatorSubsystem)
+                .withFollowers(Pair.of(rightMotor, false))
+                .withVoltageCompensation(Volts.of(11.5))
+                .withStatorCurrentLimit(Amps.of(80))
+                .withIdleMode(MotorMode.BRAKE)
+                .withWheelDiameter(Inches.of(1.75))
+                .withClosedLoopController(pid)
+                .withFeedforward(feedForward);
+
+        SmartMotorController elevatorMotor = new SparkWrapper(leftMotor, DCMotor.getNEO(2), motorConfig);
+
+        ElevatorConfig elevatorConfig = new ElevatorConfig(elevatorMotor)
+                .withSoftLimits(Inches.of(6), Inches.of(53))
+                .withHardLimits(Inches.of(0), Inches.of(58.25))
+                .withTelemetry("Elevator", TelemetryVerbosity.HIGH);
 
         ElevatorMap.PresetValues presets = preset -> switch (preset) {
             case STOW -> 1;
@@ -208,9 +209,7 @@ public class Riptide extends RobotMap {
             default -> Double.NaN;
         };
 
-        elevatorMotors.validateEncoderRate(.2, 10);
-        return new ElevatorMap(elevatorMotors, leftMotor.getEncoder(), presets,
-                new ValueRange(0, 58.25), new ValueRange(6, 53), pid, feedForward);
+        return new ElevatorMap(new Elevator(elevatorConfig), presets);
     }
 
     @Override
@@ -267,7 +266,8 @@ public class Riptide extends RobotMap {
                 .withMotorInverted(true).withFollowers(Pair.of(rightMotor, true));
         SmartMotorController smc = new SparkWrapper(leftMotor, DCMotor.getNEO(2), motorConfig);
         ArmConfig armConfig = new ArmConfig(smc)
-                .withHardLimit(Degrees.of(0), Degrees.of(90));
+                .withHardLimit(Degrees.of(0), Degrees.of(90))
+                .withTelemetry("DeepClimb", TelemetryVerbosity.HIGH);
         return new DeepClimbMap(smc, () -> false, armConfig);
     }
 

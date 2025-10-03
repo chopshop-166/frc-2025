@@ -59,8 +59,7 @@ public final class Robot extends CommandRobot {
     }, map.getVisionMap());
     private Led led = new Led(map.getLedMap());
     private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
-    private Elevator elevator = new Elevator(map.getElevatorMap(),
-            RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY()));
+    private Elevator elevator = new Elevator(map);
     private DeepClimb deepClimb = new DeepClimb(map);
     private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
             RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
@@ -257,6 +256,8 @@ public final class Robot extends CommandRobot {
         deepClimb
                 .setDefaultCommand(
                         deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getTriggers())));
+        elevator.setDefaultCommand(elevator.move(
+                RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY())));
 
     }
 

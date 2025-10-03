@@ -40,7 +40,7 @@ public class RobotMap {
         return new CoralManipMap();
     }
 
-    public ElevatorMap getElevatorMap() {
+    public ElevatorMap getElevatorMap(Subsystem elevator) {
         return new ElevatorMap();
     }
 
