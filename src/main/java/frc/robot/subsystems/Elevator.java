@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ElevatorMap;
@@ -38,10 +39,10 @@ public class Elevator extends SmartSubsystemBase {
 
     public Command zero() {
         var debouncer = new Debouncer(0.2);
-        return elevator.set(ZEROING_SPEED).andThen(run(() -> {
-        }).until(() -> {
-            return debouncer.calculate(elevator.getVelocity().lt(InchesPerSecond.of(10)));
-        })).andThen(resetCmd());
+        return elevator.set(ZEROING_SPEED)
+                .andThen(Commands.waitUntil(() -> {
+                    return debouncer.calculate(elevator.getVelocity().lt(InchesPerSecond.of(10)));
+                })).andThen(resetCmd());
     }
 
     public Command moveTo(ElevatorPresets level) {

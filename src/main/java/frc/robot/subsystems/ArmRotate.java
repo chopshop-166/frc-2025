@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
@@ -39,8 +40,8 @@ public class ArmRotate extends SmartSubsystemBase {
 
     public Command moveOut() {
         return arm.set(() -> map.armRotatePreset.applyAsDouble(ArmRotatePresets.OUT))
-                .andThen(run(() -> {
-                }).until(arm.lte(Degrees.of(map.armRotatePreset.applyAsDouble(ArmRotatePresets.OUT) + 2))))
+                .andThen(Commands
+                        .waitUntil(arm.lte(Degrees.of(map.armRotatePreset.applyAsDouble(ArmRotatePresets.OUT) + 2))))
                 .withName("Move Out");
     }
 
