@@ -257,7 +257,7 @@ public class Riptide extends RobotMap {
     }
 
     @Override
-    public DeepClimbMap getDeepClimbMap(Subsystem deepClimb) {
+    public ArmConfig getDeepClimbConfig(Subsystem deepClimb) {
         SparkMax leftMotor = new SparkMax(13, MotorType.kBrushless);
         SparkMax rightMotor = new SparkMax(14, MotorType.kBrushless);
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(deepClimb)
@@ -268,7 +268,7 @@ public class Riptide extends RobotMap {
         ArmConfig armConfig = new ArmConfig(smc)
                 .withHardLimit(Degrees.of(0), Degrees.of(90))
                 .withTelemetry("DeepClimb", TelemetryVerbosity.HIGH);
-        return new DeepClimbMap(smc, () -> false, armConfig);
+        return armConfig;
     }
 
     @Override

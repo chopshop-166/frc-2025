@@ -17,6 +17,7 @@ import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 import frc.robot.maps.subsystems.MitocandriaMap;
+import yams.mechanisms.config.ArmConfig;
 
 public class RobotMap {
 
@@ -44,8 +45,8 @@ public class RobotMap {
         return new ElevatorMap();
     }
 
-    public DeepClimbMap getDeepClimbMap(Subsystem deepClimb) {
-        return new DeepClimbMap();
+    public ArmConfig getDeepClimbConfig(Subsystem deepClimb) {
+        return null;
     }
 
     public ArmRotateMap getArmRotateMap() {

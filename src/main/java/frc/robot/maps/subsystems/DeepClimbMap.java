@@ -5,7 +5,6 @@ import java.util.function.BooleanSupplier;
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 
-import edu.wpi.first.units.measure.Distance;
 import yams.mechanisms.config.ArmConfig;
 import yams.motorcontrollers.SmartMotorController;
 
@@ -27,12 +26,10 @@ public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
 
     @Override
     public void updateData(Data data) {
-        data.encoderReading = motor.getMeasurementPosition();
         data.atBottomLimit = sensor.getAsBoolean();
     }
 
     public static class Data extends DataWrapper {
         public boolean atBottomLimit;
-        public Distance encoderReading;
     }
 }
