@@ -31,22 +31,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
 import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
-import frc.robot.subsystems.ArmRotate;
-import frc.robot.subsystems.CoralManip;
-import frc.robot.subsystems.DeepClimb;
 import frc.robot.subsystems.Drive;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Funnel;
-import frc.robot.subsystems.Led;
-import frc.robot.subsystems.Mitocandria;
 
 public final class Robot extends CommandRobot {
 
     private RobotMap map = getRobotMap(RobotMap.class, new RobotMap());
     private ButtonXboxController driveController = new ButtonXboxController(0);
     private ButtonXboxController copilotController = new ButtonXboxController(1);
-    private Trigger elevatorSafeTrigger;
-    private Trigger deepClimbLEDTrigger;
     private Trigger visionPIDTrigger;
 
     // Helpers
@@ -59,47 +50,10 @@ public final class Robot extends CommandRobot {
     }, () -> {
         return driveScaler.applyAsDouble(-driveController.getRightX());
     }, map.getVisionMap());
-    private Led led = new Led(map.getLedMap());
-    private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
-    private Elevator elevator = new Elevator(map.getElevatorMap(),
-            RobotUtils.deadbandAxis(.15, () -> -copilotController.getLeftY()));
-    private DeepClimb deepClimb = new DeepClimb(map.getDeepClimbMap());
-    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
-            RobotUtils.deadbandAxis(.1, () -> -copilotController.getRightY()));
-    private Funnel funnel = new Funnel(map.getFunnelMap());
-    private Mitocandria mito = new Mitocandria(map.getMitocandriaMap());
-
-    private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,
-            armRotate, funnel, deepClimb);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
     public void registerNamedCommands() {
-
-        NamedCommands.registerCommand("Intake Game Piece", commandSequences.intake());
-        NamedCommands.registerCommand("Wait Until Game Piece", commandSequences.intakeWithLEDs());
-        NamedCommands.registerCommand("Position Coral L1",
-                commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1));
-        NamedCommands.registerCommand("Position Coral L2",
-                commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2));
-        NamedCommands.registerCommand("Position Coral L3",
-                commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3));
-        NamedCommands.registerCommand("Position Coral L4",
-                commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.OUT));
-        NamedCommands.registerCommand("Rotate Arm L4", armRotate.moveTo(ArmRotatePresets.SCOREL4_AUTO));
-        NamedCommands.registerCommand("De-Stage Algae 2/3",
-                commandSequences.moveElevator(ElevatorPresets.ALGAEL2, ArmRotatePresets.ALGAE)
-                        .alongWith(coralManip.feedAlgae()));
-        NamedCommands.registerCommand("De-Stage Algae 3/4",
-                commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
-                        .alongWith(coralManip.feedAlgae()));
-        NamedCommands.registerCommand("Score Coral", coralManip.score().withTimeout(0.5));
-        NamedCommands.registerCommand("Clear Coral",
-                coralManip.feed().raceWith(commandSequences.armOutLED()).andThen(coralManip.safeStateCmd()));
-        NamedCommands.registerCommand("Stow",
-                commandSequences.moveElevator(ElevatorPresets.STOW, ArmRotatePresets.STOW));
-        NamedCommands.registerCommand("Zero Da Elevatah", elevator.zero());
-        NamedCommands.registerCommand("Elevator to intake", elevator.moveTo(ElevatorPresets.STOW));
         NamedCommands.registerCommand("Align to Left Branch", drive.moveToBranchWait(Branch.LEFT_BRANCH));
         NamedCommands.registerCommand("Align to Right Branch", drive.moveToBranchWait(Branch.RIGHT_BRANCH));
     }
@@ -113,8 +67,6 @@ public final class Robot extends CommandRobot {
         super();
         registerNamedCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
-        elevatorSafeTrigger = new Trigger(elevator.elevatorSafeTrigger());
-        deepClimbLEDTrigger = new Trigger(deepClimb.deepClimbLEDTrigger());
         visionPIDTrigger = new Trigger(drive.visionPIDTrue());
     }
 
@@ -151,7 +103,6 @@ public final class Robot extends CommandRobot {
         // be added.
         Logger.start();
 
-        led.colorAlliance().schedule();
         DriverStation.silenceJoystickConnectionWarning(true);
 
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
@@ -177,7 +128,6 @@ public final class Robot extends CommandRobot {
     @Override
     public void disabledInit() {
         super.disabledInit();
-        led.colorAlliance().schedule();
     }
 
     @Override
@@ -186,54 +136,9 @@ public final class Robot extends CommandRobot {
         driveController.a()
                 .whileTrue(drive.robotCentricDrive());
         driveController.rightBumper()
-                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH).alongWith(led.visionAligning()))
-                .onFalse(led.colorAlliance().alongWith(
-                        commandSequences.setRumble(copilotController, 0)));
-        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH).alongWith(led.visionAligning()))
-                .onFalse(led.colorAlliance().alongWith(
-                        commandSequences.setRumble(copilotController, 0)));
+                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
+        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
 
-        elevatorSafeTrigger.and(DriverStation::isTeleopEnabled).onTrue(commandSequences.intakeBottom());
-        elevatorSafeTrigger.and(DriverStation::isAutonomous).onTrue(armRotate.moveToNonOwning(ArmRotatePresets.INTAKE));
-
-        driveController.x().onTrue(funnel.rotateForward());
-        driveController.y().onTrue(funnel.rotateBackward());
-
-        copilotController.a().onTrue(commandSequences.intake());
-        copilotController.b()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL2, ArmRotatePresets.SCOREL2))
-                .onFalse(coralManip.score());
-        copilotController.x()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL1, ArmRotatePresets.SCOREL1))
-                .onFalse(coralManip.scoreL1());
-        copilotController.y()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL3, ArmRotatePresets.SCOREL3))
-                .onFalse(coralManip.score());
-
-        copilotController.back().onTrue(commandSequences.resetCopilot());
-        copilotController.start().onTrue(elevator.zero());
-
-        copilotController.getPovButton(POVDirection.RIGHT).onTrue(coralManip.feedAlgae());
-        copilotController.getPovButton(POVDirection.DOWN).whileTrue(coralManip.feed());
-
-        copilotController.getPovButton(POVDirection.LEFT)
-                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL2, ArmRotatePresets.ALGAE)
-                        .alongWith(coralManip.feedAlgae()));
-
-        copilotController.getPovButton(POVDirection.UP)
-                .onTrue(commandSequences.moveElevator(ElevatorPresets.ALGAEL3, ArmRotatePresets.ALGAE)
-                        .alongWith(coralManip.feedAlgae()));
-        // copilotController.leftBumper().whileTrue(armRotate.moveTo(ArmRotatePresets.OUT));
-        copilotController.rightBumper()
-                .whileTrue(commandSequences.moveElevator(ElevatorPresets.SCOREL4, ArmRotatePresets.SCOREL4))
-                .onFalse(coralManip.score().andThen(armRotate.moveTo(ArmRotatePresets.OUT)));
-        copilotController.leftBumper().whileTrue(deepClimb.spoolIn());
-        deepClimbLEDTrigger.onTrue(led.deepClimbed());
-        visionPIDTrigger.and(DriverStation::isTeleopEnabled)
-                .onTrue(led.visionAligned().alongWith(
-                        commandSequences.setRumble(copilotController, 1)))
-                .onFalse(led.visionAligning().alongWith(
-                        commandSequences.setRumble(copilotController, 0)));
     }
 
     @Override
@@ -253,12 +158,6 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
-        // funnel.setDefaultCommand(
-        // funnel.move(RobotUtils.deadbandAxis(.1, () ->
-        // -copilotController.getLeftTriggerAxis())));
-        deepClimb
-                .setDefaultCommand(
-                        deepClimb.rotate(RobotUtils.deadbandAxis(0.1, () -> copilotController.getTriggers())));
 
     }
 
