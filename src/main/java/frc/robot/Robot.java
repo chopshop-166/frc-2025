@@ -4,17 +4,13 @@
 
 package frc.robot;
 
-import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
-
 import java.util.function.DoubleUnaryOperator;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.Autonomous;
-import com.chopshop166.chopshoplib.RobotUtils;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
-import com.chopshop166.chopshoplib.controls.ButtonXboxController.POVDirection;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -26,11 +22,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Vision.Branch;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Vision.Branch;
 import frc.robot.maps.RobotMap;
-import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
-import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
 import frc.robot.subsystems.Drive;
 
 public final class Robot extends CommandRobot {
@@ -80,17 +74,11 @@ public final class Robot extends CommandRobot {
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        switch (BuildConstants.DIRTY) {
-            case 0:
-                Logger.recordMetadata("GitDirty", "All changes committed");
-                break;
-            case 1:
-                Logger.recordMetadata("GitDirty", "Uncomitted changes");
-                break;
-            default:
-                Logger.recordMetadata("GitDirty", "Unknown");
-                break;
-        }
+        Logger.recordMetadata("GitDirty", switch (BuildConstants.DIRTY) {
+            case 0 -> "All changes committed";
+            case 1 -> "Uncomitted changes";
+            default -> "Unknown";
+        });
         Logger.recordMetadata("RobotMap", map.getClass().getName());
 
         map.setupLogging();
@@ -99,8 +87,7 @@ public final class Robot extends CommandRobot {
             setUseTiming(false); // Run as fast as possible
         }
         // Start logging! No more data receivers, replay sources, or metadata values
-        // may
-        // be added.
+        // may be added.
         Logger.start();
 
         DriverStation.silenceJoystickConnectionWarning(true);
