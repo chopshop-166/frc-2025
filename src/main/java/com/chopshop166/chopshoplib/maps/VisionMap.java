@@ -10,9 +10,9 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import yams.mechanisms.swerve.SwerveDrive;
 
 public class VisionMap {
 
@@ -48,7 +48,7 @@ public class VisionMap {
      * @param <T>       Estimator wheel type.
      * @param estimator The WPIlib estimator object.
      */
-    public <T> void updateData(Data data) {
+    public <T> void updateData(Data data, SwerveDrive swerveDriveMechanism) {
         data.targets.clear();
         for (var source : this.visionSources) {
             var results = source.camera.getAllUnreadResults();
@@ -64,7 +64,7 @@ public class VisionMap {
                     estimate.ifPresent(est -> {
                         Logger.recordOutput("Camera Pose Estimate/" + source.camera.getName(),
                                 est.estimatedPose.toPose2d());
-                        data.estimator.addVisionMeasurement(est.estimatedPose.toPose2d(),
+                        swerveDriveMechanism.addVisionMeasurement(est.estimatedPose.toPose2d(),
                                 est.timestampSeconds);
                     });
                 }
@@ -92,7 +92,6 @@ public class VisionMap {
     }
 
     public static class Data {
-        public SwerveDrivePoseEstimator estimator;
         public Map<Integer, List<PhotonTrackedTarget>> targets = new HashMap<>();
     }
 }

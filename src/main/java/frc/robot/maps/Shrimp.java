@@ -104,7 +104,7 @@ public class Shrimp extends RobotMap {
                 new SparkMax(8, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
         final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(backRightDrive, backRightSteer)
                 .withAbsoluteEncoder(new AnalogEncoder(2, 360, 256.88)::get)
-                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY);
+                .withLocation(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY.unaryMinus());
 
         final SwerveDriveConfig swerveDriveConfig = new SwerveDriveConfig(driveSubsystem,
                 new SwerveModule(frontLeftConfig),
@@ -117,10 +117,10 @@ public class Shrimp extends RobotMap {
 
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNEO(1), 50, 1),
-                new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY.unaryMinus()),
-                new Translation2d(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY),
-                new Translation2d(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY.unaryMinus()));
+                frontLeftConfig.getLocation().get(),
+                frontRightConfig.getLocation().get(),
+                backLeftConfig.getLocation().get(),
+                backRightConfig.getLocation().get());
         PPHolonomicDriveController holonomicDrive = new PPHolonomicDriveController(
                 new PIDConstants(2.0, 0.0, 0.05),
                 new PIDConstants(1.0, 0.0, 0.0));

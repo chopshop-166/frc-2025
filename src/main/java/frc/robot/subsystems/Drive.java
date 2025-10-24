@@ -39,22 +39,22 @@ public class Drive extends SmartSubsystemBase {
 
     private final double ROTATION_KS = 0.1;
     private final double DRIVE_KS = 0.1;
-    final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
+    private final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
-    ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002, 0.000, new Constraints(240, 270));
-    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
-    ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
-    DoubleSupplier xSpeedSupplier;
-    DoubleSupplier ySpeedSupplier;
-    DoubleSupplier rotationSupplier;
+    private final ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002, 0.000,
+            new Constraints(240, 270));
+    private final ProfiledPIDController translationPID_X = new ProfiledPIDController(1.6, 0, 0.0,
+            new Constraints(2.0, 3.0));
+    private final ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.6, 0, 0.0,
+            new Constraints(2.0, 3.0));
+    private final DoubleSupplier xSpeedSupplier;
+    private final DoubleSupplier ySpeedSupplier;
+    private final DoubleSupplier rotationSupplier;
 
     boolean isBlueAlliance = false;
     boolean isRobotCentric = false;
     Branch targetBranch = Branch.NONE;
     Pose2d targetPose = new Pose2d();
-
-    // The layout of the AprilTags on the field
-    public static final AprilTagFieldLayout kTagLayout = CameraSource.DEFAULT_FIELD;
 
     final SwerveDriveMap map;
     final SwerveDrive swerveDriveMechanism;
@@ -126,7 +126,7 @@ public class Drive extends SmartSubsystemBase {
         super.periodic();
         isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
 
-        visionMap.updateData(visionData);
+        visionMap.updateData(visionData, swerveDriveMechanism);
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
@@ -147,7 +147,7 @@ public class Drive extends SmartSubsystemBase {
     private void visionCalcs() {
         int closestReefTag = vision.findNearestTagId(isBlueAlliance, swerveDriveMechanism.getPose());
 
-        var chosenTagPoseOption = kTagLayout.getTagPose(closestReefTag);
+        var chosenTagPoseOption = CameraSource.DEFAULT_FIELD.getTagPose(closestReefTag);
         if (chosenTagPoseOption.isPresent()) {
             Pose2d chosenTagPose = chosenTagPoseOption.get().toPose2d();
             Logger.recordOutput("Drive/Chosen Tag", chosenTagPose);
