@@ -30,17 +30,17 @@ public class ArmRotate extends SmartSubsystemBase {
 
     public ArmRotate(RobotMap robotMap) {
         map = robotMap.getArmRotateConfig(this);
-        arm = new Arm(map.config);
+        arm = new Arm(map.config());
     }
 
     public Command moveTo(ArmRotatePresets level) {
-        return arm.set(() -> map.armRotatePreset.applyAsDouble(level));
+        return arm.set(() -> map.armRotatePreset().applyAsDouble(level));
     }
 
     public Command moveOut() {
-        return arm.set(() -> map.armRotatePreset.applyAsDouble(ArmRotatePresets.OUT))
+        return arm.set(() -> map.armRotatePreset().applyAsDouble(ArmRotatePresets.OUT))
                 .andThen(Commands
-                        .waitUntil(arm.lte(Degrees.of(map.armRotatePreset.applyAsDouble(ArmRotatePresets.OUT) + 2))))
+                        .waitUntil(arm.lte(Degrees.of(map.armRotatePreset().applyAsDouble(ArmRotatePresets.OUT) + 2))))
                 .withName("Move Out");
     }
 

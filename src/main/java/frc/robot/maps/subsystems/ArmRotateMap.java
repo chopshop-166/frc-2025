@@ -4,7 +4,7 @@ import java.util.function.ToDoubleFunction;
 
 import yams.mechanisms.config.ArmConfig;
 
-public class ArmRotateMap {
+public record ArmRotateMap(ArmConfig config, PresetValue armRotatePreset) {
 
     public enum ArmRotatePresets {
 
@@ -38,16 +38,7 @@ public class ArmRotateMap {
     public interface PresetValue extends ToDoubleFunction<ArmRotatePresets> {
     }
 
-    public final ArmConfig config;
-    public final PresetValue armRotatePreset;
-
     public ArmRotateMap() {
         this(null, p -> Double.NaN);
-
-    }
-
-    public ArmRotateMap(ArmConfig config, PresetValue armRotatePreset) {
-        this.config = config;
-        this.armRotatePreset = armRotatePreset;
     }
 }

@@ -34,7 +34,7 @@ public class Elevator extends SmartSubsystemBase {
 
     public Elevator(RobotMap robotMap) {
         map = robotMap.getElevatorMap(this);
-        this.elevator = map.elevator;
+        this.elevator = new yams.mechanisms.positional.Elevator(map.config());
     }
 
     public Command zero() {
@@ -46,7 +46,7 @@ public class Elevator extends SmartSubsystemBase {
     }
 
     public Command moveTo(ElevatorPresets level) {
-        return elevator.setHeight(Inches.of(map.presetValues.applyAsDouble(level)));
+        return elevator.setHeight(Inches.of(map.presetValues().applyAsDouble(level)));
     }
 
     public Trigger elevatorSafeTrigger() {
@@ -58,7 +58,7 @@ public class Elevator extends SmartSubsystemBase {
     }
 
     public boolean atPreset(ElevatorPresets preset) {
-        return elevator.isNear(Inches.of(map.presetValues.applyAsDouble(preset)), Inches.of(1)).getAsBoolean();
+        return elevator.isNear(Inches.of(map.presetValues().applyAsDouble(preset)), Inches.of(1)).getAsBoolean();
     }
 
     @Override

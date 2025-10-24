@@ -25,7 +25,7 @@ public class RobotMap {
     }
 
     public FunnelMap getFunnelMap(Subsystem funnelSubsystem) {
-        return new FunnelMap(null, 0.0);
+        return new FunnelMap();
     }
 
     public VisionMap getVisionMap() {
@@ -37,7 +37,7 @@ public class RobotMap {
     }
 
     public CoralManipMap getCoralManipMap(Subsystem coralManip) {
-        return new CoralManipMap(null, () -> false);
+        return new CoralManipMap();
     }
 
     public ElevatorMap getElevatorMap(Subsystem elevator) {

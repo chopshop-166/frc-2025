@@ -2,12 +2,9 @@ package frc.robot.maps.subsystems;
 
 import java.util.function.ToDoubleFunction;
 
-import com.chopshop166.chopshoplib.logging.DataWrapper;
-import com.chopshop166.chopshoplib.logging.LoggableMap;
+import yams.mechanisms.config.ElevatorConfig;
 
-import yams.mechanisms.positional.Elevator;
-
-public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
+public record ElevatorMap(ElevatorConfig config, PresetValues presetValues) {
 
     public enum ElevatorPresets {
         OFF,
@@ -40,22 +37,7 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public interface PresetValues extends ToDoubleFunction<ElevatorPresets> {
     }
 
-    public final Elevator elevator;
-    public final PresetValues presetValues;
-
     public ElevatorMap() {
         this(null, p -> Double.NaN);
-    }
-
-    public ElevatorMap(Elevator elevator, PresetValues presetValues) {
-        this.elevator = elevator;
-        this.presetValues = presetValues;
-    }
-
-    @Override
-    public void updateData(Data data) {
-    }
-
-    public static class Data extends DataWrapper {
     }
 }

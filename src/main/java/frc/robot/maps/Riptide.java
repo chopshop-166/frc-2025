@@ -209,7 +209,7 @@ public class Riptide extends RobotMap {
             default -> Double.NaN;
         };
 
-        return new ElevatorMap(new Elevator(elevatorConfig), presets);
+        return new ElevatorMap(elevatorConfig, presets);
     }
 
     @Override

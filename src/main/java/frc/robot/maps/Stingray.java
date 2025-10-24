@@ -58,7 +58,6 @@ import frc.robot.maps.subsystems.FunnelMap;
 import frc.robot.maps.subsystems.MitocandriaMap;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.ElevatorConfig;
-import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
@@ -227,7 +226,7 @@ public class Stingray extends RobotMap {
             default -> Double.NaN;
         };
 
-        return new ElevatorMap(new Elevator(elevatorConfig), presets);
+        return new ElevatorMap(elevatorConfig, presets);
     }
 
     @Override
