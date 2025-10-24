@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,13 +14,11 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import com.chopshop166.chopshoplib.maps.CameraSource;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 
 public class Vision {
 
@@ -30,12 +30,12 @@ public class Vision {
 
     public enum Branch {
         LEFT_BRANCH(new Transform2d(
-                Units.inchesToMeters(19.5), // bot center to reef (w/ bumpers)
-                Units.inchesToMeters(-12.94 / 2), // distance between branches div by 2
+                Inches.of(19.5), // bot center to reef (w/ bumpers)
+                Inches.of(-12.94 / 2), // distance between branches div by 2
                 Rotation2d.fromDegrees(180))),
         RIGHT_BRANCH(new Transform2d(
-                Units.inchesToMeters(19.5),
-                Units.inchesToMeters(12.94 / 2),
+                Inches.of(19.5),
+                Inches.of(12.94 / 2),
                 Rotation2d.fromDegrees(185))),
         NONE(null);
 
@@ -67,14 +67,10 @@ public class Vision {
     }
 
     private Map<Integer, Pose2d> getOurReef(boolean isBlueAlliance) {
-        if (isBlueAlliance) {
-            return BLUE_APRIL_TAGS_REEF_POSITIONS;
-        }
-        return RED_APRIL_TAGS_REEF_POSITIONS;
+        return isBlueAlliance ? BLUE_APRIL_TAGS_REEF_POSITIONS : RED_APRIL_TAGS_REEF_POSITIONS;
     }
 
-    public static int getNearestTagIdImpl(Map<Integer, Pose2d> poses, SwerveDrivePoseEstimator estimator) {
-        Pose2d robotPose = estimator.getEstimatedPosition();
+    private static int getNearestTagIdImpl(Map<Integer, Pose2d> poses, Pose2d robotPose) {
         Translation2d robotTranslation = robotPose.getTranslation();
         Rotation2d robotRotation = robotPose.getRotation();
         return Collections.min(
@@ -147,8 +143,8 @@ public class Vision {
         return tagToCamera.plus(branch.getOffset());
     }
 
-    public int findNearestTagId(boolean isBlueAlliance, SwerveDrivePoseEstimator estimator) {
-        return getNearestTagIdImpl(getOurReef(isBlueAlliance), estimator);
+    public int findNearestTagId(boolean isBlueAlliance, Pose2d robotPose) {
+        return getNearestTagIdImpl(getOurReef(isBlueAlliance), robotPose);
     }
 
     public static Translation2d getReefCenter(boolean isBlueAlliance) {

@@ -1,27 +1,27 @@
 package frc.robot.maps;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.FeetPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.chopshop166.chopshoplib.drive.SDSSwerveModule;
-import com.chopshop166.chopshoplib.drive.SDSSwerveModule.Configuration;
 import com.chopshop166.chopshoplib.leds.ColorFormat;
 import com.chopshop166.chopshoplib.leds.SegmentConfig;
 import com.chopshop166.chopshoplib.maps.CameraSource;
-import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.RobotMapFor;
-import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.maps.WPILedMap;
-import com.chopshop166.chopshoplib.motors.CSSparkMax;
 import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro;
-import com.chopshop166.chopshoplib.states.PIDValues;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -29,86 +29,103 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.maps.subsystems.SwerveDriveMap;
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
+import yams.mechanisms.config.SwerveDriveConfig;
+import yams.mechanisms.config.SwerveModuleConfig;
+import yams.mechanisms.swerve.SwerveModule;
+import yams.motorcontrollers.SmartMotorController;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 
 @RobotMapFor("00:80:2F:19:7B:A3")
 public class Shrimp extends RobotMap {
 
     @Override
-    public SwerveDriveMap getDriveMap() {
-
-        // Remember to divide by 360
-        // CAN ID
-        final double FLOFFSET = 271.12; // 181.05;
-        // CAN ID
-        final double FROFFSET = 5.5; // 77.12 - 71.62;
-        // CAN ID
-        final double RLOFFSET = 321.77; // 185.41 + 136.36;
-        // CAN ID
-        final double RROFFSET = 256.88; // 321.43 + 115.45 - 180;
+    public SwerveDriveMap getDriveMap(Subsystem driveSubsystem) {
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
-        final double MODULE_OFFSET_XY = Units.inchesToMeters(6);
+        final Distance MODULE_OFFSET_XY = Inches.of(6);
+
         final PigeonGyro pigeonGyro = new PigeonGyro(new PigeonIMU(5));
-
-        final CSSparkMax frontLeftSteer = new CSSparkMax(1);
-        final CSSparkMax frontRightSteer = new CSSparkMax(3);
-        final CSSparkMax rearLeftSteer = new CSSparkMax(5);
-        final CSSparkMax rearRightSteer = new CSSparkMax(7);
-
-        frontLeftSteer.setInverted(false);
-        frontRightSteer.setInverted(false);
-        rearLeftSteer.setInverted(false);
-        rearRightSteer.setInverted(false);
-
         pigeonGyro.setInverted(true);
 
-        // Configuration for MK4 with L2 speeds
-        Configuration MK4_L2 = new Configuration(SDSSwerveModule.MK4_V2.gearRatio,
-                SDSSwerveModule.MK4_V2.wheelDiameter, new PIDValues(0.004, 0.00,
-                        0.0002));
+        SmartMotorControllerConfig steerConfig = new SmartMotorControllerConfig(driveSubsystem)
+                .withMotorInverted(false)
+                .withIdleMode(MotorMode.BRAKE)
+                .withClosedLoopController(0.004, 0.0, 0.0002);
 
-        // All Distances are in Meters
-        // Front Left Module
-        final AnalogEncoder encoderFL = new AnalogEncoder(0, 360, FLOFFSET);
-        final SDSSwerveModule frontLeft = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                () -> encoderFL.get(), frontLeftSteer, new CSSparkMax(2), MK4_L2);
+        SmartMotorControllerConfig driveConfig = new SmartMotorControllerConfig(driveSubsystem)
+                .withMotorInverted(false)
+                .withIdleMode(MotorMode.BRAKE)
+                .withWheelDiameter(Inches.of(3.95))
+                // Configuration for MK4 with L2 speeds
+                .withGearing(new MechanismGearing(GearBox.fromStages("14:50.0", "27:17", "15:45")));
 
-        // Front Right Module
-        final AnalogEncoder encoderFR = new AnalogEncoder(3, 360, FROFFSET);
-        final SDSSwerveModule frontRight = new SDSSwerveModule(new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                () -> encoderFR.get(), frontRightSteer, new CSSparkMax(4), MK4_L2);
+        // Front Left
+        final SmartMotorController frontLeftSteer = SmartMotorController.create(
+                new SparkMax(1, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController frontLeftDrive = SmartMotorController.create(
+                new SparkMax(2, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(frontLeftDrive, frontLeftSteer)
+                .withAbsoluteEncoder(new AnalogEncoder(0, 360, 271.12)::get)
+                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY.unaryMinus());
 
-        // Rear Left Module
-        final AnalogEncoder encoderRL = new AnalogEncoder(1, 360, RLOFFSET);
-        final SDSSwerveModule rearLeft = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                () -> encoderRL.get(), rearLeftSteer, new CSSparkMax(6), MK4_L2);
+        // Front right
+        final SmartMotorController frontRightSteer = SmartMotorController.create(
+                new SparkMax(3, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController frontRightDrive = SmartMotorController.create(
+                new SparkMax(4, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SwerveModuleConfig frontRightConfig = new SwerveModuleConfig(frontRightDrive, frontRightSteer)
+                .withAbsoluteEncoder(new AnalogEncoder(3, 360, 5.5)::get)
+                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY);
 
-        // Rear Right Module
-        final AnalogEncoder encoderRR = new AnalogEncoder(2, 360, RROFFSET);
-        final SDSSwerveModule rearRight = new SDSSwerveModule(new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                () -> encoderRR.get(), rearRightSteer, new CSSparkMax(8), MK4_L2);
+        // Back left
+        final SmartMotorController backLeftSteer = SmartMotorController.create(
+                new SparkMax(5, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController backLeftDrive = SmartMotorController.create(
+                new SparkMax(6, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(backLeftDrive, backLeftSteer)
+                .withAbsoluteEncoder(new AnalogEncoder(1, 360, 321.77)::get)
+                .withLocation(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY);
 
-        final double maxDriveSpeedMetersPerSecond = Units.feetToMeters(3);
+        // Back right
+        final SmartMotorController backRightSteer = SmartMotorController.create(
+                new SparkMax(7, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController backRightDrive = SmartMotorController.create(
+                new SparkMax(8, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(backRightDrive, backRightSteer)
+                .withAbsoluteEncoder(new AnalogEncoder(2, 360, 256.88)::get)
+                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY);
 
-        final double maxRotationRadianPerSecond = 2 * Math.PI;
+        final SwerveDriveConfig swerveDriveConfig = new SwerveDriveConfig(driveSubsystem,
+                new SwerveModule(frontLeftConfig),
+                new SwerveModule(frontRightConfig),
+                new SwerveModule(backLeftConfig),
+                new SwerveModule(backRightConfig))
+                .withGyro(() -> pigeonGyro.getRotation2d().getMeasure())
+                .withMaximumChassisSpeed(FeetPerSecond.of(3), DegreesPerSecond.of(360))
+                .withTelemetry(TelemetryVerbosity.HIGH);
 
         RobotConfig config = new RobotConfig(68, 5000, new ModuleConfig(
                 0.1016, 6000, 1.0, DCMotor.getNEO(1), 50, 1),
                 new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                new Translation2d(MODULE_OFFSET_XY, -MODULE_OFFSET_XY),
-                new Translation2d(-MODULE_OFFSET_XY, MODULE_OFFSET_XY),
-                new Translation2d(-MODULE_OFFSET_XY, -MODULE_OFFSET_XY));
-        PPHolonomicDriveController holonomicDrive = new PPHolonomicDriveController(new PIDConstants(2.0, 0.0, 0.05),
+                new Translation2d(MODULE_OFFSET_XY, MODULE_OFFSET_XY.unaryMinus()),
+                new Translation2d(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY),
+                new Translation2d(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY.unaryMinus()));
+        PPHolonomicDriveController holonomicDrive = new PPHolonomicDriveController(
+                new PIDConstants(2.0, 0.0, 0.05),
                 new PIDConstants(1.0, 0.0, 0.0));
 
-        return new SwerveDriveMap(frontLeft, frontRight, rearLeft, rearRight,
-                maxDriveSpeedMetersPerSecond,
-                maxRotationRadianPerSecond, pigeonGyro,
-                config, holonomicDrive);
+        return new SwerveDriveMap(swerveDriveConfig, config, holonomicDrive);
     }
 
     @Override

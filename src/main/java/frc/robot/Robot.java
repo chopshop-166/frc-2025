@@ -37,7 +37,7 @@ public final class Robot extends CommandRobot {
     // Helpers
     final DoubleUnaryOperator driveScaler = getScaler(0.45, 0.25);
 
-    private Drive drive = new Drive(map.getDriveMap(), () -> {
+    private Drive drive = new Drive(map, () -> {
         return driveScaler.applyAsDouble(-driveController.getLeftX());
     }, () -> {
         return driveScaler.applyAsDouble(-driveController.getLeftY());

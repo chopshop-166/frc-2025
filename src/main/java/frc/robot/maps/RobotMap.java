@@ -7,20 +7,22 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.MockLedMap;
-import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.maps.subsystems.ArmRotateMap;
 import frc.robot.maps.subsystems.CoralManipMap;
 import frc.robot.maps.subsystems.DeepClimbMap;
 import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 import frc.robot.maps.subsystems.MitocandriaMap;
+import frc.robot.maps.subsystems.SwerveDriveMap;
+import yams.mechanisms.config.SwerveDriveConfig;
 
 public class RobotMap {
 
-    public SwerveDriveMap getDriveMap() {
-        return new SwerveDriveMap();
+    public SwerveDriveMap getDriveMap(Subsystem driveSubsystem) {
+        return new SwerveDriveMap(new SwerveDriveConfig(driveSubsystem), null, null);
     }
 
     public FunnelMap getFunnelMap() {
