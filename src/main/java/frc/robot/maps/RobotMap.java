@@ -36,8 +36,8 @@ public class RobotMap {
         return new MockLedMap();
     }
 
-    public CoralManipMap getCoralManipMap() {
-        return new CoralManipMap();
+    public CoralManipMap getCoralManipMap(Subsystem coralManip) {
+        return new CoralManipMap(null, () -> false);
     }
 
     public ElevatorMap getElevatorMap(Subsystem elevator) {

@@ -267,17 +267,16 @@ public class Stingray extends RobotMap {
     }
 
     @Override
-    public CoralManipMap getCoralManipMap() {
-        CSSparkMax motor = new CSSparkMax(9);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
-        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
+    public CoralManipMap getCoralManipMap(Subsystem coralManip) {
+        SparkMax motor = new SparkMax(9, MotorType.kBrushless);
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(coralManip)
+                .withStatorCurrentLimit(Amps.of(30))
+                .withIdleMode(MotorMode.BRAKE)
+                .withMotorInverted(true)
+                .withTelemetry("Coral Manip", TelemetryVerbosity.HIGH);
+        SmartMotorController smc = new SparkWrapper(motor, DCMotor.getNEO(1), motorConfig);
         CSDigitalInput sensor = new CSDigitalInput(1);
-        sensor.setInverted(true);
-        return new CoralManipMap(motor, sensor::get);
+        return new CoralManipMap(smc, sensor::get);
     }
 
     @Override

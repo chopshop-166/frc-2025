@@ -58,7 +58,7 @@ public final class Robot extends CommandRobot {
         return driveScaler.applyAsDouble(-driveController.getRightX());
     }, map.getVisionMap());
     private Led led = new Led(map.getLedMap());
-    private CoralManip coralManip = new CoralManip(map.getCoralManipMap());
+    private CoralManip coralManip = new CoralManip(map);
     private Elevator elevator = new Elevator(map);
     private DeepClimb deepClimb = new DeepClimb(map);
     private ArmRotate armRotate = new ArmRotate(map);
