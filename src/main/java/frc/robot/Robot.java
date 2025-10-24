@@ -124,17 +124,11 @@ public final class Robot extends CommandRobot {
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
         Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
         Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        switch (BuildConstants.DIRTY) {
-            case 0:
-                Logger.recordMetadata("GitDirty", "All changes committed");
-                break;
-            case 1:
-                Logger.recordMetadata("GitDirty", "Uncomitted changes");
-                break;
-            default:
-                Logger.recordMetadata("GitDirty", "Unknown");
-                break;
-        }
+        Logger.recordMetadata("GitDirty", switch (BuildConstants.DIRTY) {
+            case 0 -> "All changes committed";
+            case 1 -> "Uncomitted changes";
+            default -> "Unknown";
+        });
         Logger.recordMetadata("RobotMap", map.getClass().getName());
 
         map.setupLogging();
