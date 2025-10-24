@@ -62,7 +62,7 @@ public final class Robot extends CommandRobot {
     private Elevator elevator = new Elevator(map);
     private DeepClimb deepClimb = new DeepClimb(map);
     private ArmRotate armRotate = new ArmRotate(map);
-    private Funnel funnel = new Funnel(map.getFunnelMap());
+    private Funnel funnel = new Funnel(map);
     private Mitocandria mito = new Mitocandria(map.getMitocandriaMap());
 
     private CommandSequences commandSequences = new CommandSequences(drive, led, coralManip, elevator,

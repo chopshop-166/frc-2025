@@ -24,8 +24,8 @@ public class RobotMap {
         return new SwerveDriveMap();
     }
 
-    public FunnelMap getFunnelMap() {
-        return new FunnelMap();
+    public FunnelMap getFunnelMap(Subsystem funnelSubsystem) {
+        return new FunnelMap(null, 0.0);
     }
 
     public VisionMap getVisionMap() {

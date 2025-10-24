@@ -172,14 +172,17 @@ public class Stingray extends RobotMap {
     }
 
     @Override
-    public FunnelMap getFunnelMap() {
-        CSSparkMax motor = new CSSparkMax(15);
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(30);
-        config.idleMode(IdleMode.kBrake);
-        config.inverted(false);
-        motor.getMotorController().configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        return (new FunnelMap(motor, motor.getEncoder(), 0.5));
+    public FunnelMap getFunnelMap(Subsystem funnelSubsystem) {
+        SparkMax rawMotor = new SparkMax(15, MotorType.kBrushless);
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(funnelSubsystem)
+                .withStatorCurrentLimit(Amps.of(30))
+                .withIdleMode(MotorMode.BRAKE)
+                .withMotorInverted(false);
+        SmartMotorController smartMotor = new SparkWrapper(rawMotor, DCMotor.getNEO(1), motorConfig);
+        ArmConfig armConfig = new ArmConfig(smartMotor)
+                .withHardLimit(Degrees.of(2), Degrees.of(60))
+                .withTelemetry("Funnel", TelemetryVerbosity.HIGH);
+        return new FunnelMap(armConfig, 0.5);
     }
 
     @Override
