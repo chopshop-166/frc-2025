@@ -27,7 +27,6 @@ public class ArmRotate extends SmartSubsystemBase {
 
     ArmRotateMap map;
     Arm arm;
-    private final ArmRotateMap.Data data = new ArmRotateMap.Data();
 
     public ArmRotate(RobotMap robotMap) {
         map = robotMap.getArmRotateConfig(this);
@@ -70,7 +69,6 @@ public class ArmRotate extends SmartSubsystemBase {
         // This method will be called once per scheduler run during simulation
         super.simulationPeriodic();
         arm.simIterate();
-        map.updateData(data);
     }
 
     @Override

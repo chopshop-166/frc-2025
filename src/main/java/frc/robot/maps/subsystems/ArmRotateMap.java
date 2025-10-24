@@ -2,12 +2,9 @@ package frc.robot.maps.subsystems;
 
 import java.util.function.ToDoubleFunction;
 
-import com.chopshop166.chopshoplib.logging.DataWrapper;
-import com.chopshop166.chopshoplib.logging.LoggableMap;
-
 import yams.mechanisms.config.ArmConfig;
 
-public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
+public class ArmRotateMap {
 
     public enum ArmRotatePresets {
 
@@ -37,6 +34,7 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
     }
 
+    @FunctionalInterface
     public interface PresetValue extends ToDoubleFunction<ArmRotatePresets> {
     }
 
@@ -51,12 +49,5 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     public ArmRotateMap(ArmConfig config, PresetValue armRotatePreset) {
         this.config = config;
         this.armRotatePreset = armRotatePreset;
-    }
-
-    @Override
-    public void updateData(Data data) {
-    }
-
-    public static class Data extends DataWrapper {
     }
 }

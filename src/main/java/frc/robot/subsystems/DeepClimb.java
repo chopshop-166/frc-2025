@@ -9,7 +9,6 @@ import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
-import frc.robot.maps.subsystems.DeepClimbMap;
 import yams.mechanisms.positional.Arm;
 
 public class DeepClimb extends SmartSubsystemBase {
@@ -19,14 +18,13 @@ public class DeepClimb extends SmartSubsystemBase {
     private final double MIN_ENCODER_READING = -12;
 
     private final Arm arm;
-    private final DeepClimbMap.Data data = new DeepClimbMap.Data();
 
     public DeepClimb(RobotMap robotMap) {
         arm = new Arm(robotMap.getDeepClimbConfig(this));
     }
 
     public Command spoolIn() {
-        return arm.set(SPOOL_IN_SPEED).until(() -> data.atBottomLimit).finallyDo(this::safeState);
+        return arm.set(SPOOL_IN_SPEED).finallyDo(this::safeState);
     }
 
     public Command spoolOut() {
