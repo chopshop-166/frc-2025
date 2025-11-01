@@ -63,6 +63,7 @@ public class Elevator extends SmartSubsystemBase {
 
     @Override
     public void reset() {
+        elevator.getMotor().setEncoderPosition(Inches.of(0));
     }
 
     @Override
