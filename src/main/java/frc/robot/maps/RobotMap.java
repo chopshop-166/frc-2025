@@ -11,20 +11,15 @@ import com.chopshop166.chopshoplib.maps.SwerveDriveMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 
 import frc.robot.maps.subsystems.ArmRotateMap;
-import frc.robot.maps.subsystems.CoralManipMap;
-import frc.robot.maps.subsystems.DeepClimbMap;
-import frc.robot.maps.subsystems.ElevatorMap;
-import frc.robot.maps.subsystems.FunnelMap;
+import frc.robot.maps.subsystems.IntakeMap;
 import frc.robot.maps.subsystems.MitocandriaMap;
+import frc.robot.maps.subsystems.ShooterMap;
+import frc.robot.maps.subsystems.UndertakerMap;
 
 public class RobotMap {
 
     public SwerveDriveMap getDriveMap() {
         return new SwerveDriveMap();
-    }
-
-    public FunnelMap getFunnelMap() {
-        return new FunnelMap();
     }
 
     public VisionMap getVisionMap() {
@@ -35,20 +30,20 @@ public class RobotMap {
         return new MockLedMap();
     }
 
-    public CoralManipMap getCoralManipMap() {
-        return new CoralManipMap();
-    }
-
-    public ElevatorMap getElevatorMap() {
-        return new ElevatorMap();
-    }
-
-    public DeepClimbMap getDeepClimbMap() {
-        return new DeepClimbMap();
-    }
-
     public ArmRotateMap getArmRotateMap() {
         return new ArmRotateMap();
+    }
+
+    public ShooterMap getShooterMap() {
+        return new ShooterMap();
+    }
+
+    public UndertakerMap getUndertakerMap() {
+        return new UndertakerMap();
+    }
+
+    public IntakeMap getIntakeMap() {
+        return new IntakeMap();
     }
 
     public MitocandriaMap getMitocandriaMap() {

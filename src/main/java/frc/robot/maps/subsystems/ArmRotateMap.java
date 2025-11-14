@@ -7,11 +7,12 @@ import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
+import com.chopshop166.chopshoplib.sensors.IEncoder;
+import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
@@ -21,23 +22,9 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
 
         INTAKE,
 
-        SCOREL1,
+        SHOOT_HIGH,
 
-        SCOREL1_TAKETWO,
-
-        SCOREL2,
-
-        SCOREL3,
-
-        SCOREL4,
-
-        SCOREL4_AUTO,
-
-        OUT,
-
-        STOW,
-
-        ALGAE,
+        SHOOT_LOW,
 
         HOLD
 
@@ -47,7 +34,7 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     }
 
     public SmartMotorController motor;
-    public final DutyCycleEncoder encoder;
+    public final IEncoder encoder;
     public final PresetValue armRotatePreset;
     public final ProfiledPIDController pid;
     public final ValueRange hardLimits;
@@ -55,13 +42,13 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     public final ArmFeedforward armFeedforward;
 
     public ArmRotateMap() {
-        this(new SmartMotorController(), new DutyCycleEncoder(0), p -> Double.NaN,
+        this(new SmartMotorController(), new MockEncoder(), p -> Double.NaN,
                 new ProfiledPIDController(0, 0, 0, new Constraints(0, 0)), new ValueRange(0, 0), new ValueRange(0, 0),
                 new ArmFeedforward(0, 0, 0));
 
     }
 
-    public ArmRotateMap(SmartMotorController motor, DutyCycleEncoder encoder, PresetValue armRotatePreset,
+    public ArmRotateMap(SmartMotorController motor, IEncoder encoder, PresetValue armRotatePreset,
             ProfiledPIDController pid, ValueRange hardLimits, ValueRange softLimits, ArmFeedforward armFeedforward) {
         this.motor = motor;
         this.encoder = encoder;
@@ -75,7 +62,7 @@ public class ArmRotateMap implements LoggableMap<ArmRotateMap.Data> {
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.rotationAbsAngleDegrees = encoder.get();
+        data.rotationAbsAngleDegrees = encoder.getAbsolutePosition();
     }
 
     public static class Data extends DataWrapper {

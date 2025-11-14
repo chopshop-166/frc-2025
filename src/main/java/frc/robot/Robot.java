@@ -29,9 +29,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Vision.Branch;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.maps.RobotMap;
+import frc.robot.maps.subsystems.ShooterMap;
+import frc.robot.maps.subsystems.UndertakerMap;
 import frc.robot.maps.subsystems.ArmRotateMap.ArmRotatePresets;
-import frc.robot.maps.subsystems.ElevatorMap.ElevatorPresets;
+import frc.robot.subsystems.ArmRotate;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.Speeds;
+import frc.robot.subsystems.Undertaker;
 
 public final class Robot extends CommandRobot {
 
@@ -50,6 +56,12 @@ public final class Robot extends CommandRobot {
     }, () -> {
         return driveScaler.applyAsDouble(-driveController.getRightX());
     }, map.getVisionMap());
+    private ArmRotate armRotate = new ArmRotate(map.getArmRotateMap(),
+            RobotUtils.deadbandAxis(.1, () -> (copilotController.getLeftY())));
+    private Shooter shooter = new Shooter(map.getShooterMap());
+    private Undertaker undertaker = new Undertaker(map.getUndertakerMap());
+    private Intake intake = new Intake(map.getIntakeMap());
+    private CommandSequences commandSequences = new CommandSequences(drive, intake, shooter, armRotate, undertaker);
 
     NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
@@ -135,10 +147,25 @@ public final class Robot extends CommandRobot {
         driveController.back().onTrue(drive.resetCmd());
         driveController.a()
                 .whileTrue(drive.robotCentricDrive());
-        driveController.rightBumper()
-                .whileTrue(drive.moveToBranch(Branch.RIGHT_BRANCH));
-        driveController.leftBumper().whileTrue(drive.moveToBranch(Branch.LEFT_BRANCH));
+        driveController.x().whileTrue(intake.spinOut().alongWith(undertaker.spinOut()));
+        driveController.b()
+                .whileTrue(commandSequences.charge(Speeds.SUBWOOFER_SHOT, ArmRotatePresets.SHOOT_HIGH))
+                .onFalse(commandSequences.release());
+        driveController.y().whileTrue(commandSequences.charge(Speeds.SHUTTLE_SHOT, ArmRotatePresets.SHOOT_LOW))
+                .onFalse(commandSequences.release());
+        copilotController.a().onTrue(commandSequences.moveAndIntake());
 
+        copilotController.back().onTrue(intake.safeStateCmd().andThen(armRotate.safeStateCmd()));
+        copilotController.start().onTrue(shooter.setSpeed(Speeds.OFF));
+        copilotController.a().onTrue(commandSequences.moveAndIntake());
+        copilotController.b()
+                .whileTrue(commandSequences.charge(Speeds.SUBWOOFER_SHOT, ArmRotatePresets.SHOOT_HIGH))
+                .onFalse(commandSequences.release());
+        copilotController.y().whileTrue(commandSequences.charge(Speeds.SHUTTLE_SHOT, ArmRotatePresets.SHOOT_LOW))
+                .onFalse(commandSequences.release());
+        copilotController.x().whileTrue(intake.spinOut().alongWith(undertaker.spinOut()));
+        copilotController.rightStick().whileTrue(intake.feedShooter());
+        copilotController.povDown().onTrue(commandSequences.shooterSpeed(Speeds.FULL_SPEED));
     }
 
     @Override
@@ -158,7 +185,6 @@ public final class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
-
     }
 
     public DoubleUnaryOperator getScaler(double leftRange, double rightRange) {
