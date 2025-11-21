@@ -1,5 +1,6 @@
 package frc.robot.maps;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Inches;
@@ -23,6 +24,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -44,6 +46,7 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import yams.motorcontrollers.local.SparkWrapper;
 
 @RobotMapFor("00:80:2F:19:7B:A3")
 public class Shrimp extends RobotMap {
@@ -61,50 +64,60 @@ public class Shrimp extends RobotMap {
         SmartMotorControllerConfig steerConfig = new SmartMotorControllerConfig(driveSubsystem)
                 .withMotorInverted(false)
                 .withIdleMode(MotorMode.BRAKE)
-                .withClosedLoopController(0.004, 0.0, 0.0002);
+                .withClosedLoopController(0.004, 0.0, 0.0002)
+                .withGearing(new MechanismGearing(GearBox.fromStages("12.8:1")))
+                .withStatorCurrentLimit(Amps.of(30));
 
         SmartMotorControllerConfig driveConfig = new SmartMotorControllerConfig(driveSubsystem)
                 .withMotorInverted(false)
                 .withIdleMode(MotorMode.BRAKE)
                 .withWheelDiameter(Inches.of(3.95))
                 // Configuration for MK4 with L2 speeds
-                .withGearing(new MechanismGearing(GearBox.fromStages("14:50.0", "27:17", "15:45")));
+                .withClosedLoopController(0, 0.00015, 0)
+                .withFeedforward(new SimpleMotorFeedforward(0, 0.219))
+                .withGearing(new MechanismGearing(GearBox.fromStages("14:50.0", "27:17", "15:45")))
+                .withStatorCurrentLimit(Amps.of(30));
 
         // Front Left
-        final SmartMotorController frontLeftSteer = SmartMotorController.create(
+        final SmartMotorController frontLeftSteer = new SparkWrapper(
                 new SparkMax(1, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
-        final SmartMotorController frontLeftDrive = SmartMotorController.create(
-                new SparkMax(2, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        System.err.println("Front left steering: " + frontLeftSteer.toString());
+        final SmartMotorController frontLeftDrive = new SparkWrapper(
+                new SparkMax(2, MotorType.kBrushless), DCMotor.getNEO(1), driveConfig);
         final SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(frontLeftDrive, frontLeftSteer)
                 .withAbsoluteEncoder(new AnalogEncoder(0, 360, 271.12)::get)
-                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY.unaryMinus());
+                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY.unaryMinus())
+                .withTelemetry("Front Left", TelemetryVerbosity.MID);
 
         // Front right
-        final SmartMotorController frontRightSteer = SmartMotorController.create(
+        final SmartMotorController frontRightSteer = new SparkWrapper(
                 new SparkMax(3, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
-        final SmartMotorController frontRightDrive = SmartMotorController.create(
-                new SparkMax(4, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController frontRightDrive = new SparkWrapper(
+                new SparkMax(4, MotorType.kBrushless), DCMotor.getNEO(1), driveConfig);
         final SwerveModuleConfig frontRightConfig = new SwerveModuleConfig(frontRightDrive, frontRightSteer)
                 .withAbsoluteEncoder(new AnalogEncoder(3, 360, 5.5)::get)
-                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY);
+                .withLocation(MODULE_OFFSET_XY, MODULE_OFFSET_XY)
+                .withTelemetry("Front Right", TelemetryVerbosity.MID);
 
         // Back left
-        final SmartMotorController backLeftSteer = SmartMotorController.create(
+        final SmartMotorController backLeftSteer = new SparkWrapper(
                 new SparkMax(5, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
-        final SmartMotorController backLeftDrive = SmartMotorController.create(
-                new SparkMax(6, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController backLeftDrive = new SparkWrapper(
+                new SparkMax(6, MotorType.kBrushless), DCMotor.getNEO(1), driveConfig);
         final SwerveModuleConfig backLeftConfig = new SwerveModuleConfig(backLeftDrive, backLeftSteer)
                 .withAbsoluteEncoder(new AnalogEncoder(1, 360, 321.77)::get)
-                .withLocation(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY);
+                .withLocation(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY)
+                .withTelemetry("Back Left", TelemetryVerbosity.MID);
 
         // Back right
-        final SmartMotorController backRightSteer = SmartMotorController.create(
+        final SmartMotorController backRightSteer = new SparkWrapper(
                 new SparkMax(7, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
-        final SmartMotorController backRightDrive = SmartMotorController.create(
-                new SparkMax(8, MotorType.kBrushless), DCMotor.getNEO(1), steerConfig);
+        final SmartMotorController backRightDrive = new SparkWrapper(
+                new SparkMax(8, MotorType.kBrushless), DCMotor.getNEO(1), driveConfig);
         final SwerveModuleConfig backRightConfig = new SwerveModuleConfig(backRightDrive, backRightSteer)
                 .withAbsoluteEncoder(new AnalogEncoder(2, 360, 256.88)::get)
-                .withLocation(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY.unaryMinus());
+                .withLocation(MODULE_OFFSET_XY.unaryMinus(), MODULE_OFFSET_XY.unaryMinus())
+                .withTelemetry("Back Right", TelemetryVerbosity.MID);
 
         final SwerveDriveConfig swerveDriveConfig = new SwerveDriveConfig(driveSubsystem,
                 new SwerveModule(frontLeftConfig),
