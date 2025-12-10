@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -10,18 +8,25 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
+import com.chopshop166.chopshoplib.logging.LoggedSubsystem;
+import com.chopshop166.chopshoplib.logging.data.SwerveDriveData;
 import com.chopshop166.chopshoplib.maps.CameraSource;
 import com.chopshop166.chopshoplib.maps.VisionMap;
 import com.chopshop166.chopshoplib.motors.Modifier;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,48 +34,74 @@ import frc.robot.Vision;
 import frc.robot.Vision.Branch;
 import frc.robot.maps.RobotMap;
 import frc.robot.maps.subsystems.SwerveDriveMap;
-import yams.mechanisms.swerve.SwerveDrive;
 
 public class Drive extends SmartSubsystemBase {
 
+    public final SwerveDriveKinematics kinematics;
     private final VisionMap visionMap;
     private final VisionMap.Data visionData = new VisionMap.Data();
     private final Vision vision = new Vision();
 
+    private final double maxDriveSpeedMetersPerSecond;
+    private final double maxRotationRadiansPerSecond;
+    private final double SPEED_COEFFICIENT = 1;
+    private final double ROTATION_COEFFICIENT = 1;
     private final double ROTATION_KS = 0.1;
     private final double DRIVE_KS = 0.1;
-    private final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
+    final Modifier DEADBAND = Modifier.scalingDeadband(0.1);
 
-    private final ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002, 0.000,
-            new Constraints(240, 270));
-    private final ProfiledPIDController translationPID_X = new ProfiledPIDController(1.6, 0, 0.0,
-            new Constraints(2.0, 3.0));
-    private final ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.6, 0, 0.0,
-            new Constraints(2.0, 3.0));
-    private final DoubleSupplier xSpeedSupplier;
-    private final DoubleSupplier ySpeedSupplier;
-    private final DoubleSupplier rotationSupplier;
+    // ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002,
+    // 0.000, new Constraints(240, 270));
+    // ProfiledPIDController translationPID_X = new ProfiledPIDController(2.0, 0,
+    // 0.0, new Constraints(2.5, 3.0));
+    // ProfiledPIDController translationPID_Y = new ProfiledPIDController(2.0, 0,
+    // 0.0, new Constraints(2.5, 3.0));
+
+    ProfiledPIDController rotationPID = new ProfiledPIDController(0.06, 0.0002, 0.000, new Constraints(240, 270));
+    ProfiledPIDController translationPID_X = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
+    ProfiledPIDController translationPID_Y = new ProfiledPIDController(1.6, 0, 0.0, new Constraints(2.0, 3.0));
+    DoubleSupplier xSpeedSupplier;
+    DoubleSupplier ySpeedSupplier;
+    DoubleSupplier rotationSupplier;
 
     boolean isBlueAlliance = false;
     boolean isRobotCentric = false;
     Branch targetBranch = Branch.NONE;
     Pose2d targetPose = new Pose2d();
 
+    SwerveDrivePoseEstimator estimator;
     final SwerveDriveMap map;
-    final SwerveDrive swerveDriveMechanism;
+    final SwerveDriveData data = new SwerveDriveData();
+
+    // The layout of the AprilTags on the field
+    public static final AprilTagFieldLayout kTagLayout = CameraSource.DEFAULT_FIELD;
 
     public Drive(RobotMap map, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rotation,
             VisionMap visionMap) {
+
         this.map = map.getDriveMap(this);
-        this.swerveDriveMechanism = new SwerveDrive(this.map.swerveDriveConfig());
         this.visionMap = visionMap;
 
-        AutoBuilder.configure(swerveDriveMechanism::getPose,
+        this.map.gyro.reset();
+        kinematics = new SwerveDriveKinematics(this.map.frontLeft.getLocation(), this.map.frontRight.getLocation(),
+                this.map.rearLeft.getLocation(), this.map.rearRight.getLocation());
+        maxDriveSpeedMetersPerSecond = this.map.maxDriveSpeedMetersPerSecond;
+        maxRotationRadiansPerSecond = this.map.maxRotationRadianPerSecond;
+
+        estimator = new SwerveDrivePoseEstimator(kinematics, this.map.gyro.getRotation2d(),
+                data.getModulePositions(),
+                new Pose2d(),
+                VecBuilder.fill(0.02, 0.02, 0.01),
+                VecBuilder.fill(0.1, 0.1, 0.01));
+
+        visionData.estimator = estimator;
+
+        AutoBuilder.configure(estimator::getEstimatedPosition,
                 this::setPose,
                 this::getSpeeds,
-                (speeds, feedforwards) -> moveInternal(speeds),
-                this.map.holonomicDrive(),
-                this.map.pathPlannerConfig(),
+                (speeds, feedforwards) -> move(speeds),
+                this.map.holonomicDrive,
+                this.map.pathPlannerConfig,
                 () -> !isBlueAlliance,
                 this);
 
@@ -86,7 +117,8 @@ public class Drive extends SmartSubsystemBase {
     }
 
     public void setPose(Pose2d pose) {
-        swerveDriveMechanism.resetOdometry(pose);
+        estimator.resetPosition(this.map.gyro.getRotation2d(),
+                data.getModulePositions(), pose);
     }
 
     public Command setPoseCommand(Supplier<Pose2d> pose) {
@@ -96,7 +128,7 @@ public class Drive extends SmartSubsystemBase {
     }
 
     public ChassisSpeeds getSpeeds() {
-        return swerveDriveMechanism.getRobotRelativeSpeed();
+        return kinematics.toChassisSpeeds(data.getModuleStates());
     }
 
     public Command robotCentricDrive() {
@@ -110,7 +142,7 @@ public class Drive extends SmartSubsystemBase {
     @Override
     public void reset() {
         Rotation2d heading = isBlueAlliance ? new Rotation2d() : new Rotation2d(Math.PI);
-        Pose2d pose = swerveDriveMechanism.getPose();
+        Pose2d pose = estimator.getEstimatedPosition();
         setPose(new Pose2d(pose.getX(), pose.getY(), heading));
     }
 
@@ -125,11 +157,14 @@ public class Drive extends SmartSubsystemBase {
         // Use this for any background processing
         super.periodic();
         isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Blue;
+        estimator.update(this.map.gyro.getRotation2d(), this.data.getModulePositions());
 
-        visionMap.updateData(visionData, swerveDriveMechanism);
+        visionMap.updateData(visionData);
 
         periodicMove(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), rotationSupplier.getAsDouble());
 
+        Logger.recordOutput("Drive/Estimator Pose", estimator.getEstimatedPosition());
+        Logger.recordOutput("Drive/Robot Rotation Gyro", this.map.gyro.getRotation2d());
         Logger.recordOutput("Drive/Target Branch", targetBranch);
         Logger.recordOutput("Drive/Translation_X_PID/Error", translationPID_X.getPositionError());
         Logger.recordOutput("Drive/Translation_X_PID/Velocity", translationPID_X.getSetpoint().velocity);
@@ -140,20 +175,36 @@ public class Drive extends SmartSubsystemBase {
         Logger.recordOutput("Drive/Rotation_PID/Error", rotationPID.getPositionError());
         Logger.recordOutput("Drive/Rotation_PID/Velocity", rotationPID.getSetpoint().velocity);
         Logger.recordOutput("Drive/Rotation_PID/At Goal", rotationPID.atGoal());
+        Logger.recordOutput("Drive/ActualChassisSpeeds",
+                ChassisSpeeds.fromRobotRelativeSpeeds(kinematics.toChassisSpeeds(this.data.getModuleStates()),
+                        estimator.getEstimatedPosition().getRotation()));
 
-        swerveDriveMechanism.updateTelemetry();
+        this.map.updateData(data);
+        Logger.processInputs(this.getName(), this.data);
     }
 
     private void visionCalcs() {
-        int closestReefTag = vision.findNearestTagId(isBlueAlliance, swerveDriveMechanism.getPose());
+        Optional<Integer> closestReefTag = Optional.empty();
+        // if (visionData.targets.size() > 0) {
+        // vision.filterReefTags(isBlueAlliance, visionData.targets);
+        // PhotonTrackedTarget reefToRobot =
+        // vision.pickBestReefLocation(visionData.targets);
+        // closestReefTag = Optional.of(reefToRobot.fiducialId);
 
-        var chosenTagPoseOption = CameraSource.DEFAULT_FIELD.getTagPose(closestReefTag);
-        if (chosenTagPoseOption.isPresent()) {
-            Pose2d chosenTagPose = chosenTagPoseOption.get().toPose2d();
-            Logger.recordOutput("Drive/Chosen Tag", chosenTagPose);
-            chosenTagPose = chosenTagPose.transformBy(targetBranch.getOffset());
-            Logger.recordOutput("Drive/Chosen Tag Branch Offset", chosenTagPose);
-            targetPose = chosenTagPose;
+        // } else {
+        // Fall back to picking tag based on global pose
+        closestReefTag = Optional.of(vision.findNearestTagId(isBlueAlliance, estimator));
+        // }
+
+        if (closestReefTag.isPresent()) {
+            var chosenTagPoseOption = kTagLayout.getTagPose(closestReefTag.get());
+            if (chosenTagPoseOption.isPresent()) {
+                Pose2d chosenTagPose = chosenTagPoseOption.get().toPose2d();
+                Logger.recordOutput("Drive/Chosen Tag", chosenTagPose);
+                chosenTagPose = chosenTagPose.transformBy(targetBranch.getOffset());
+                Logger.recordOutput("Drive/Chosen Tag Branch Offset", chosenTagPose);
+                targetPose = chosenTagPose;
+            }
         }
     }
 
@@ -162,18 +213,14 @@ public class Drive extends SmartSubsystemBase {
         double xInput = DEADBAND.applyAsDouble(xSpeed);
         double yInput = DEADBAND.applyAsDouble(ySpeed);
 
-        final double maxDriveSpeedMetersPerSecond = swerveDriveMechanism.getConfig().getMaximumChassisLinearVelocity()
-                .get().in(MetersPerSecond);
-        final double maxRotationRadiansPerSecond = swerveDriveMechanism.getConfig().getMaximumChassisAngularVelocity()
-                .get().in(RadiansPerSecond);
-        double translateXSpeedMPS = xInput * maxDriveSpeedMetersPerSecond;
-        double translateYSpeedMPS = yInput * maxDriveSpeedMetersPerSecond;
-        double rotationSpeed = rotationInput * maxRotationRadiansPerSecond;
+        double translateXSpeedMPS = xInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double translateYSpeedMPS = yInput * maxDriveSpeedMetersPerSecond * SPEED_COEFFICIENT;
+        double rotationSpeed = rotationInput * maxRotationRadiansPerSecond * ROTATION_COEFFICIENT;
 
         if (targetBranch != Branch.NONE) {
 
             visionCalcs();
-            Pose2d robotPose = swerveDriveMechanism.getPose();
+            Pose2d robotPose = estimator.getEstimatedPosition();
             // soooooooooo x and y are backwards somehow. Values underneath are correct
             translateYSpeedMPS = translationPID_X.calculate(robotPose.getX(), targetPose.getX());
             translateYSpeedMPS += Math.copySign(DRIVE_KS, translateYSpeedMPS);
@@ -194,12 +241,12 @@ public class Drive extends SmartSubsystemBase {
 
     public Command moveToBranch(Branch targetBranch) {
         return startEnd(() -> {
-            final Pose2d robotPose = swerveDriveMechanism.getPose();
-            translationPID_X.reset(robotPose.getX());
-            translationPID_Y.reset(robotPose.getY());
-            rotationPID.reset(new State(robotPose.getRotation().getDegrees(), 0));
+            translationPID_X.reset(estimator.getEstimatedPosition().getX());
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
+            rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
             isRobotCentric = false;
+
         }, () -> {
             this.targetBranch = Branch.NONE;
         });
@@ -207,10 +254,9 @@ public class Drive extends SmartSubsystemBase {
 
     public Command moveToBranchWait(Branch targetBranch) {
         return runOnce(() -> {
-            final Pose2d robotPose = swerveDriveMechanism.getPose();
-            translationPID_X.reset(robotPose.getX());
-            translationPID_Y.reset(robotPose.getY());
-            rotationPID.reset(new State(robotPose.getRotation().getDegrees(), 0));
+            translationPID_X.reset(estimator.getEstimatedPosition().getX());
+            translationPID_Y.reset(estimator.getEstimatedPosition().getY());
+            rotationPID.reset(new State(estimator.getEstimatedPosition().getRotation().getDegrees(), 0));
             this.targetBranch = targetBranch;
         }).andThen(run(() -> {
         })).until(() -> {
@@ -233,23 +279,22 @@ public class Drive extends SmartSubsystemBase {
         if (robotCentricDrive) {
             speeds = new ChassisSpeeds(ySpeed, xSpeed, rotation);
         } else {
-            Rotation2d estRotation = swerveDriveMechanism.getPose().getRotation();
-            if (!isBlueAlliance) {
-                estRotation = estRotation.plus(Rotation2d.fromDegrees(180));
-            }
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed, rotation, estRotation);
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed,
+                    rotation, isBlueAlliance ? estimator.getEstimatedPosition().getRotation()
+                            : estimator.getEstimatedPosition().getRotation()
+                                    .plus(new Rotation2d(Units.degreesToRadians(180))));
         }
         Logger.recordOutput("Drive/TargetChassisSpeeds", speeds);
-        moveInternal(speeds);
+        move(speeds);
     }
 
-    public void moveInternal(ChassisSpeeds speeds) {
-        swerveDriveMechanism.setRobotRelativeChassisSpeeds(speeds);
+    private void move(final ChassisSpeeds speeds) {
+        // Now use this in our kinematics
+        final SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, maxDriveSpeedMetersPerSecond);
+
+        // All the states
+        this.data.setDesiredStates(moduleStates);
     }
 
-    @Override
-    public void simulationPeriodic() {
-        super.simulationPeriodic();
-        swerveDriveMechanism.simIterate();
-    }
 }

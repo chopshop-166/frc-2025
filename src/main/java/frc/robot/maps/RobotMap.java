@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.chopshop166.chopshoplib.drive.MockSwerveModule;
 import com.chopshop166.chopshoplib.maps.LedMapBase;
 import com.chopshop166.chopshoplib.maps.MockLedMap;
 import com.chopshop166.chopshoplib.maps.VisionMap;
@@ -17,12 +18,12 @@ import frc.robot.maps.subsystems.ElevatorMap;
 import frc.robot.maps.subsystems.FunnelMap;
 import frc.robot.maps.subsystems.MitocandriaMap;
 import frc.robot.maps.subsystems.SwerveDriveMap;
-import yams.mechanisms.config.SwerveDriveConfig;
 
 public class RobotMap {
 
     public SwerveDriveMap getDriveMap(Subsystem driveSubsystem) {
-        return new SwerveDriveMap(new SwerveDriveConfig(driveSubsystem), null, null);
+        return new SwerveDriveMap(new MockSwerveModule(null), new MockSwerveModule(null), new MockSwerveModule(null),
+                new MockSwerveModule(null), 1.0, 1.0, null, null, null);
     }
 
     public FunnelMap getFunnelMap() {

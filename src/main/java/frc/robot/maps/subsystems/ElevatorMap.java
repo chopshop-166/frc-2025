@@ -6,13 +6,13 @@ import com.chopshop166.chopshoplib.ValueRange;
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.sensors.IEncoder;
 import com.chopshop166.chopshoplib.sensors.MockEncoder;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import yams.motorcontrollers.SmartMotorController;
 
 public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
 
@@ -56,7 +56,7 @@ public class ElevatorMap implements LoggableMap<ElevatorMap.Data> {
     public final ElevatorFeedforward feedForward;
 
     public ElevatorMap() {
-        this(new SmartMotorController(), new MockEncoder(), p -> Double.NaN,
+        this(null, new MockEncoder(), p -> Double.NaN,
                 new ValueRange(0, 0), new ValueRange(0, 0), new ProfiledPIDController(0, 0, 0, new Constraints(0, 0)),
                 new ElevatorFeedforward(0, 0, 0));
     }

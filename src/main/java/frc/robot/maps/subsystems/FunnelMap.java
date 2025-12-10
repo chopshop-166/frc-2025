@@ -3,9 +3,10 @@ package frc.robot.maps.subsystems;
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
 import com.chopshop166.chopshoplib.sensors.IEncoder;
 import com.chopshop166.chopshoplib.sensors.MockEncoder;
+
+import yams.motorcontrollers.SmartMotorController;
 
 public class FunnelMap implements LoggableMap<FunnelMap.Data> {
 
@@ -14,7 +15,7 @@ public class FunnelMap implements LoggableMap<FunnelMap.Data> {
     public double driveSpeed;
 
     public FunnelMap() {
-        this.motor = new SmartMotorController();
+        this.motor = null;
         this.encoder = new MockEncoder();
         this.driveSpeed = 0;
     }

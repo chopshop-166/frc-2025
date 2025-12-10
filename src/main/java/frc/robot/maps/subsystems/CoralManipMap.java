@@ -5,14 +5,15 @@ import java.util.function.BooleanSupplier;
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
+
+import yams.motorcontrollers.SmartMotorController;
 
 public class CoralManipMap implements LoggableMap<CoralManipMap.Data> {
     public final SmartMotorController motor;
     public final BooleanSupplier sensor;
 
     public CoralManipMap() {
-        this(new SmartMotorController(), () -> false);
+        this(null, () -> false);
     }
 
     public CoralManipMap(SmartMotorController motor, BooleanSupplier sensor) {

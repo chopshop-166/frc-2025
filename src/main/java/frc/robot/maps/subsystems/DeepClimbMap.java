@@ -1,11 +1,14 @@
 package frc.robot.maps.subsystems;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import java.util.function.BooleanSupplier;
 
 import com.chopshop166.chopshoplib.logging.DataWrapper;
 import com.chopshop166.chopshoplib.logging.LoggableMap;
 import com.chopshop166.chopshoplib.logging.data.MotorControllerData;
-import com.chopshop166.chopshoplib.motors.SmartMotorController;
+
+import yams.motorcontrollers.SmartMotorController;
 
 public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
 
@@ -13,7 +16,7 @@ public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
     public final BooleanSupplier sensor;
 
     public DeepClimbMap() {
-        this(new SmartMotorController(), () -> true);
+        this(null, () -> true);
     }
 
     public DeepClimbMap(SmartMotorController motor, BooleanSupplier sensor) {
@@ -24,7 +27,7 @@ public class DeepClimbMap implements LoggableMap<DeepClimbMap.Data> {
     @Override
     public void updateData(Data data) {
         data.motor.updateData(motor);
-        data.encoderReading = motor.getEncoder().getDistance();
+        data.encoderReading = motor.getMeasurementPosition().in(Inches);
         data.atBottomLimit = sensor.getAsBoolean();
 
     }
