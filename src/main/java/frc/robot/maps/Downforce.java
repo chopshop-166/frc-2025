@@ -56,7 +56,7 @@ import frc.robot.maps.subsystems.IntakeMap;
 import frc.robot.maps.subsystems.ShooterMap;
 import frc.robot.maps.subsystems.UndertakerMap;
 
-@RobotMapFor("Downforce")
+@RobotMapFor("00:80:2f:19:78:a9")
 public class Downforce extends RobotMap {
 
     @Override
@@ -209,7 +209,7 @@ public class Downforce extends RobotMap {
         return new ArmRotateMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
                 absIEncoder, presets, pid,
                 // Hard limits
-                new ValueRange(-13.75, 87),
+                new ValueRange(-13.75, 89),
                 // Soft limits
                 new ValueRange(0, 73),
                 feedForward);
@@ -262,6 +262,8 @@ public class Downforce extends RobotMap {
         rightWheels.getMotorController().configure(configRight, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
+        rightWheels.setPidSlot(0);
+        leftWheels.setPidSlot(0);
         rightWheels.setControlType(ControlType.kVelocity);
         leftWheels.setControlType(ControlType.kVelocity);
         return new ShooterMap(rightWheels, leftWheels, true);
