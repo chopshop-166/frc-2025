@@ -69,15 +69,19 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
     }
 
     private double getArmAngle() {
-        return getData().rotationAbsAngleDegrees;
+        double angle = getData().rotationAbsAngleDegrees;
+        Logger.recordOutput("ArmRotate/AngleRaw", angle);
+        angle = (((angle + 180) % 360) - 180);
+        Logger.recordOutput("ArmRotate/AngleNew", angle);
+        return angle;
     }
 
     @Override
     public void periodic() {
         super.periodic();
-        armSafePub.set(getData().rotationAbsAngleDegrees < SAFE_ANGLE);
+        armSafePub.set(getArmAngle() < SAFE_ANGLE);
 
-        double speed = armRotateSpeed.getAsDouble();
+        double speed = -armRotateSpeed.getAsDouble();
 
         if (Math.abs(speed) > 0) {
             getData().preset = ArmRotatePresets.OFF;
@@ -87,7 +91,10 @@ public class ArmRotate extends LoggedSubsystem<Data, ArmRotateMap> {
                 speedCoef = MANUAL_LOWER_SPEED_COEF;
             }
 
+            Logger.recordOutput("ArmRotate/speedCoef", speedCoef);
+            Logger.recordOutput("ArmRotate/speed", speed);
             getData().motor.setpoint = (limits(speed * speedCoef));
+            Logger.recordOutput("ArmRotate/setpoint", getData().motor.setpoint);
 
         } else if (getData().preset != ArmRotatePresets.OFF) {
             double targetHeight = getData().preset == ArmRotatePresets.HOLD ? holdAngle

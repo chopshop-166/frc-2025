@@ -145,13 +145,15 @@ public final class Robot extends CommandRobot {
     @Override
     public void configureButtonBindings() {
         driveController.back().onTrue(drive.resetCmd());
-        driveController.a()
-                .whileTrue(drive.robotCentricDrive());
+        driveController.a().onTrue(commandSequences.moveAndIntake());
+
+        // driveController.a()
+        // .whileTrue(drive.robotCentricDrive());
         driveController.x().whileTrue(intake.spinOut().alongWith(undertaker.spinOut()));
         driveController.b()
-                .whileTrue(commandSequences.charge(Speeds.SUBWOOFER_SHOT, ArmRotatePresets.SHOOT_HIGH))
+                .whileTrue(commandSequences.charge(Speeds.AMP_SPEED, ArmRotatePresets.SHOOT_HIGH))
                 .onFalse(commandSequences.release());
-        driveController.y().whileTrue(commandSequences.charge(Speeds.SHUTTLE_SHOT, ArmRotatePresets.SHOOT_LOW))
+        driveController.y().whileTrue(commandSequences.charge(Speeds.AMP_SPEED, ArmRotatePresets.SHOOT_LOW))
                 .onFalse(commandSequences.release());
         copilotController.a().onTrue(commandSequences.moveAndIntake());
 
@@ -159,9 +161,9 @@ public final class Robot extends CommandRobot {
         copilotController.start().onTrue(shooter.setSpeed(Speeds.OFF));
         copilotController.a().onTrue(commandSequences.moveAndIntake());
         copilotController.b()
-                .whileTrue(commandSequences.charge(Speeds.SUBWOOFER_SHOT, ArmRotatePresets.SHOOT_HIGH))
+                .whileTrue(commandSequences.charge(Speeds.AMP_SPEED, ArmRotatePresets.SHOOT_HIGH))
                 .onFalse(commandSequences.release());
-        copilotController.y().whileTrue(commandSequences.charge(Speeds.SHUTTLE_SHOT, ArmRotatePresets.SHOOT_LOW))
+        copilotController.y().whileTrue(commandSequences.charge(Speeds.AMP_SPEED, ArmRotatePresets.SHOOT_LOW))
                 .onFalse(commandSequences.release());
         copilotController.x().whileTrue(intake.spinOut().alongWith(undertaker.spinOut()));
         copilotController.rightStick().whileTrue(intake.feedShooter());

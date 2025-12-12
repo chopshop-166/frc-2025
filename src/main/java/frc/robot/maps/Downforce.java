@@ -64,13 +64,13 @@ public class Downforce extends RobotMap {
 
         // Use Phoenix tuner
         // CAN ID 2
-        final double FLOFFSET = -0.48;
+        final double FLOFFSET = -0.972;
         // CAN ID 4
-        final double FROFFSET = -0.26;
+        final double FROFFSET = -0.261;
         // CAN ID 1
-        final double RLOFFSET = -0.36;
+        final double RLOFFSET = -0.85;
         // CAN ID 3
-        final double RROFFSET = -0.959;
+        final double RROFFSET = -0.9638;
 
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
@@ -162,15 +162,13 @@ public class Downforce extends RobotMap {
         CSSparkMax rightMotor = new CSSparkMax(14);
         SparkMaxConfig config = new SparkMaxConfig();
         config.idleMode(IdleMode.kBrake);
-        config.inverted(true);
+        config.inverted(false);
         leftMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         config.follow(leftMotor.getMotorController(), true);
         rightMotor.getMotorController().configure(config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        CSEncoder encoder = new CSEncoder(2, 3, false);
-        encoder.setDistancePerPulse(360.0 / 2048.0);
         DutyCycleEncoder absEncoder = new DutyCycleEncoder(1, 360, 60.2);
         absEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
         IEncoder absIEncoder = new IEncoder() {
@@ -197,7 +195,7 @@ public class Downforce extends RobotMap {
         // just put in that number, no need to make it negative
         ProfiledPIDController pid = new ProfiledPIDController(0.02, 0.0, 0.0, new Constraints(120, 500));
         pid.setTolerance(2);
-        ArmFeedforward feedForward = new ArmFeedforward(0, 0.03, 0.35, 0);
+        ArmFeedforward feedForward = new ArmFeedforward(0, 0.000524, 0.00612, 0);
 
         ArmRotateMap.PresetValue presets = p -> switch (p) {
             case INTAKE -> -13;
@@ -209,9 +207,9 @@ public class Downforce extends RobotMap {
         return new ArmRotateMap(new SmartMotorControllerGroup(leftMotor, rightMotor),
                 absIEncoder, presets, pid,
                 // Hard limits
-                new ValueRange(-13.75, 89),
+                new ValueRange(-12, 87),
                 // Soft limits
-                new ValueRange(0, 73),
+                new ValueRange(0, 75),
                 feedForward);
     }
 
@@ -238,6 +236,8 @@ public class Downforce extends RobotMap {
         topRoller.getMotorController().configure(configTop, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         configBottom.follow(topRoller.getMotorController());
+        bottomRoller.getMotorController().configure(configBottom, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
         return new UndertakerMap(new SmartMotorControllerGroup(topRoller,
                 bottomRoller));
     }
